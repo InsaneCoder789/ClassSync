@@ -5,6 +5,7 @@ import android.content.Intent
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.common.api.Scope
@@ -50,10 +51,23 @@ class GoogleAuthManager(private val context: Context) {
                 CommonStatusCodes.DEVELOPER_ERROR -> AuthState.Error(
                     "Google sign-in is misconfigured for this build. Recheck the Android OAuth client package name plus SHA-1/SHA-256 fingerprints."
                 )
+                GoogleSignInStatusCodes.SIGN_IN_FAILED -> AuthState.Error(
+                    "Google sign-in failed for this build. This usually means the Android OAuth client setup is incomplete or mismatched. Recheck the package name, SHA-1, and SHA-256 fingerprints in Google Cloud, then rebuild and try again."
+                )
+                GoogleSignInStatusCodes.SIGN_IN_CURRENTLY_IN_PROGRESS -> AuthState.Error(
+                    "Google sign-in is already in progress. Wait a moment and try again."
+                )
                 else -> AuthState.Error(
                     buildString {
                         append("Google sign-in failed: ")
-                        append(CommonStatusCodes.getStatusCodeString(error.statusCode))
+                        append(
+                            GoogleSignInStatusCodes.getStatusCodeString(error.statusCode)
+                                .takeIf { it.isNotBlank() && it != "unknown status code" }
+                                ?: CommonStatusCodes.getStatusCodeString(error.statusCode)
+                        )
+                        append(" (code ")
+                        append(error.statusCode)
+                        append(")")
                         error.localizedMessage?.takeIf { it.isNotBlank() }?.let {
                             append(". ")
                             append(it)
