@@ -1,0 +1,113 @@
+package com.rochiee.classsync.widget
+
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import android.widget.RemoteViews
+import com.rochiee.classsync.ClassSyncApplication
+import com.rochiee.classsync.MainActivity
+import com.rochiee.classsync.R
+import com.rochiee.classsync.ui.navigation.AppDestination
+import kotlinx.coroutines.runBlocking
+
+object ClassSyncWidgetUpdater {
+    fun updateAllWidgets(context: Context) {
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val componentName = ComponentName(context, ClassSyncWidgetProvider::class.java)
+        val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
+        if (widgetIds.isNotEmpty()) {
+            updateWidgets(context, appWidgetManager, widgetIds)
+        }
+    }
+
+    fun updateWidgets(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
+        val app = context.applicationContext as ClassSyncApplication
+        val summary = runBlocking {
+            app.container.widgetDataProvider.getWidgetSummary()
+        }
+        val formatter = app.container.widgetTaskFormatter
+
+        appWidgetIds.forEach { widgetId ->
+            val options = appWidgetManager.getAppWidgetOptions(widgetId)
+            val minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+            val expanded = minHeight >= 170
+            val deadlineTone = formatter.deadlineTone(summary.nextTaskDueMillis)
+            val views = RemoteViews(context.packageName, R.layout.classsync_widget_layout).apply {
+                setImageViewResource(R.id.widgetLogo, R.drawable.classsync_logo_generated)
+                setTextViewText(R.id.widgetTitle, "ClassSync")
+                setTextViewText(
+                    R.id.widgetSummaryText,
+                    formatter.relativeSummary(summary.todayTaskCount, summary.urgentTaskCount)
+                )
+                setTextViewText(R.id.widgetTodayCount, "${summary.todayTaskCount}")
+                setTextViewText(R.id.widgetUrgentCount, "${summary.urgentTaskCount}")
+                setTextViewText(R.id.widgetOverdueCount, "${summary.overdueTaskCount}")
+                setTextViewText(
+                    R.id.widgetNextTaskTitle,
+                    summary.nextTaskTitle ?: "No academic tasks yet"
+                )
+                setTextViewText(
+                    R.id.widgetNextTaskCourse,
+                    summary.nextTaskCourseName ?: "Academic focus"
+                )
+                setTextViewText(
+                    R.id.widgetNextTaskDue,
+                    formatter.dueText(summary.nextTaskDueMillis)
+                )
+                setTextViewText(
+                    R.id.widgetFocusLine,
+                    formatter.focusText(summary.secondTaskTitle, summary.secondTaskDueMillis)
+                )
+                setTextViewText(
+                    R.id.widgetLastUpdated,
+                    formatter.updatedText(summary.lastUpdatedMillis)
+                )
+                setTextColor(
+                    R.id.widgetNextTaskDue,
+                    when (deadlineTone) {
+                        WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE,
+                        WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> 0xFFD95D5DL.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW,
+                        WidgetTaskFormatter.WidgetDeadlineTone.SOON -> 0xFFED9B40.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.NORMAL -> 0xFF5C8DF6.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.NONE -> 0xFF7B8794.toInt()
+                    }
+                )
+                setViewVisibility(R.id.widgetNextTaskContainer, if (expanded) View.VISIBLE else View.GONE)
+                setViewVisibility(R.id.widgetFocusContainer, if (expanded) View.VISIBLE else View.GONE)
+                setViewVisibility(R.id.widgetLastUpdated, if (expanded) View.VISIBLE else View.GONE)
+                setOnClickPendingIntent(
+                    R.id.widgetRoot,
+                    openAppPendingIntent(context, AppDestination.Home.route)
+                )
+                setOnClickPendingIntent(
+                    R.id.widgetNextTaskContainer,
+                    openAppPendingIntent(context, AppDestination.Tasks.route)
+                )
+                setOnClickPendingIntent(R.id.widgetFocusContainer, openAppPendingIntent(context, AppDestination.Planner.route))
+            }
+            appWidgetManager.updateAppWidget(widgetId, views)
+        }
+    }
+
+    private fun openAppPendingIntent(context: Context, route: String): PendingIntent {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_START_DESTINATION, route)
+        }
+        return PendingIntent.getActivity(
+            context,
+            route.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+}
