@@ -1,3 +1,5 @@
+![ClassSync banner](docs/assets/classsync-banner.png)
+
 # ClassSync
 
 ClassSync is a local-first Android academic dashboard that brings Google Classroom, optional Gmail reminder discovery, manual tasks, planner views, exam prep, reminders, and a widget into one student-focused workflow.
