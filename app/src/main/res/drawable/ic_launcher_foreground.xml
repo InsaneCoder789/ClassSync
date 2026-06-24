@@ -7,6 +7,6 @@
         <bitmap
             android:antialias="true"
             android:gravity="center"
-            android:src="@drawable/classsync_logo_generated" />
+            android:src="@drawable/app_icon_foreground" />
     </item>
 </layer-list>

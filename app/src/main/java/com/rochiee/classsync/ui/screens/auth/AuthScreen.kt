@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import com.rochiee.classsync.bloc.auth.AuthEvent
 import com.rochiee.classsync.bloc.auth.AuthUiState
 import com.rochiee.classsync.bloc.sync.SyncEvent
+import com.rochiee.classsync.bloc.sync.SyncState
 import com.rochiee.classsync.ui.components.AppLogoLockup
 import com.rochiee.classsync.ui.components.EmptyState
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
@@ -21,6 +22,7 @@ import com.rochiee.classsync.ui.theme.LocalSpacing
 @Composable
 fun AuthScreen(
     authState: AuthUiState,
+    syncState: SyncState,
     onAuthEvent: (AuthEvent) -> Unit,
     onSyncEvent: (SyncEvent) -> Unit
 ) {
@@ -62,14 +64,16 @@ fun AuthScreen(
                     )
                 }
                 LiquidGlassTextButton(
-                    text = "Sync Classroom",
+                    text = if (syncState.isSyncing) "Syncing..." else "Sync Classroom",
                     onClick = { onSyncEvent(SyncEvent.RunClassroomSync) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !syncState.isSyncing
                 )
                 LiquidGlassTextButton(
-                    text = "Sync Gmail",
+                    text = if (syncState.isSyncing) "Syncing..." else "Sync Gmail",
                     onClick = { onSyncEvent(SyncEvent.RunGmailSync) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !syncState.isSyncing
                 )
                 LiquidGlassTextButton(text = "Sign out", onClick = { onAuthEvent(AuthEvent.SignOut) })
             } else {
@@ -85,6 +89,9 @@ fun AuthScreen(
                 )
             }
             authState.errorMessage?.let {
+                Text(text = it, color = MaterialTheme.colorScheme.error)
+            }
+            syncState.errorMessage?.let {
                 Text(text = it, color = MaterialTheme.colorScheme.error)
             }
         }

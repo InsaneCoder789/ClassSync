@@ -23,8 +23,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -40,6 +42,8 @@ import com.rochiee.classsync.bloc.auth.AuthEvent
 import com.rochiee.classsync.bloc.auth.AuthUiState
 import com.rochiee.classsync.bloc.settings.SettingsEvent
 import com.rochiee.classsync.bloc.settings.SettingsState
+import com.rochiee.classsync.bloc.sync.SyncEvent
+import com.rochiee.classsync.bloc.sync.SyncState
 import com.rochiee.classsync.ui.components.ButtonArrowBadge
 import com.rochiee.classsync.ui.theme.LocalSpacing
 
@@ -47,7 +51,9 @@ import com.rochiee.classsync.ui.theme.LocalSpacing
 fun OnboardingScreen(
     authState: AuthUiState,
     settingsState: SettingsState,
+    syncState: SyncState,
     onAuthEvent: (AuthEvent) -> Unit,
+    onSyncEvent: (SyncEvent) -> Unit,
     onSettingsEvent: (SettingsEvent) -> Unit,
     onOpenNotificationAccess: () -> Unit,
     onRequestReminderPermissionExplained: () -> Unit,
@@ -56,6 +62,8 @@ fun OnboardingScreen(
     val spacing = LocalSpacing.current
     val context = androidx.compose.ui.platform.LocalContext.current
     var step by remember { mutableIntStateOf(0) }
+    var pendingAction by remember { mutableStateOf<OnboardingPendingAction?>(null) }
+    var observedSyncStart by remember { mutableStateOf(false) }
     val steps = remember {
         listOf(
             OnboardingStepArt(R.drawable.onboarding_opening),
@@ -75,6 +83,30 @@ fun OnboardingScreen(
         }
     }
 
+    LaunchedEffect(authState.isSignedIn, authState.isLoading, authState.errorMessage, pendingAction) {
+        if (pendingAction == OnboardingPendingAction.Auth && authState.isSignedIn) {
+            pendingAction = null
+            step = 2
+        } else if (pendingAction == OnboardingPendingAction.Auth && !authState.isLoading && authState.errorMessage != null) {
+            pendingAction = null
+        }
+    }
+
+    LaunchedEffect(syncState.isSyncing, syncState.errorMessage, pendingAction, observedSyncStart) {
+        if (pendingAction == OnboardingPendingAction.ClassroomSync || pendingAction == OnboardingPendingAction.GmailSync) {
+            if (syncState.isSyncing) {
+                observedSyncStart = true
+            } else if (observedSyncStart) {
+                val failed = !syncState.errorMessage.isNullOrBlank()
+                if (!failed) {
+                    step += 1
+                }
+                pendingAction = null
+                observedSyncStart = false
+            }
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         when (step) {
             0 -> FullScreenOnboardingStep(
@@ -88,29 +120,47 @@ fun OnboardingScreen(
                 art = OnboardingStepArt(R.drawable.onboarding_google_connect),
                 step = 1,
                 totalSteps = steps.size,
-                infoText = null
+                infoText = authState.errorMessage
             ) {
                 OnboardingWhiteButton(
-                    label = if (authState.isSignedIn) "Continue" else "Continue with Google",
+                    label = when {
+                        authState.isSignedIn -> "Connected"
+                        pendingAction == OnboardingPendingAction.Auth || authState.isLoading -> "Connecting..."
+                        else -> "Continue with Google"
+                    },
                     onClick = {
-                        if (!authState.isSignedIn) {
+                        if (authState.isSignedIn) {
+                            step = 2
+                        } else {
+                            pendingAction = OnboardingPendingAction.Auth
+                            onAuthEvent(AuthEvent.ClearAuthError)
                             onAuthEvent(AuthEvent.SignIn(context))
                         }
-                        step += 1
-                    }
+                    },
+                    enabled = !authState.isLoading
                 )
             }
             2 -> FullScreenOnboardingStep(
                 art = OnboardingStepArt(R.drawable.onboarding_classroom_access),
                 step = 2,
-                totalSteps = steps.size
+                totalSteps = steps.size,
+                infoText = syncState.errorMessage
             ) {
                 OnboardingWhiteButton(
-                    label = "Continue",
+                    label = if (pendingAction == OnboardingPendingAction.ClassroomSync || syncState.isSyncing) {
+                        "Syncing Classroom..."
+                    } else {
+                        "Connect Classroom"
+                    },
                     onClick = {
                         onSettingsEvent(SettingsEvent.SetClassroomPermissionExplained(true))
-                        step += 1
-                    }
+                        onSettingsEvent(SettingsEvent.SetClassroomSyncEnabled(true))
+                        pendingAction = OnboardingPendingAction.ClassroomSync
+                        observedSyncStart = false
+                        onSyncEvent(SyncEvent.ClearError)
+                        onSyncEvent(SyncEvent.RunClassroomSync)
+                    },
+                    enabled = !syncState.isSyncing
                 )
             }
             3 -> FullScreenOnboardingStep(
@@ -148,7 +198,7 @@ fun OnboardingScreen(
                 art = OnboardingStepArt(R.drawable.onboarding_sync_setup),
                 step = 5,
                 totalSteps = steps.size,
-                infoText = null
+                infoText = syncState.errorMessage
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                     OnboardingWhiteButton(
@@ -160,13 +210,23 @@ fun OnboardingScreen(
                         }
                     )
                     OnboardingWhiteButton(
-                        label = if (settingsState.gmailSyncEnabled) "Gmail already enabled" else "Enable Gmail too",
+                        label = if (pendingAction == OnboardingPendingAction.GmailSync || syncState.isSyncing) {
+                            "Syncing Gmail..."
+                        } else if (settingsState.gmailSyncEnabled) {
+                            "Enable Gmail too"
+                        } else {
+                            "Enable Gmail too"
+                        },
                         onClick = {
                             onSettingsEvent(SettingsEvent.SetGmailSyncEnabled(true))
                             onSettingsEvent(SettingsEvent.SetGmailPermissionExplained(true))
-                            step += 1
+                            pendingAction = OnboardingPendingAction.GmailSync
+                            observedSyncStart = false
+                            onSyncEvent(SyncEvent.ClearError)
+                            onSyncEvent(SyncEvent.RunGmailSync)
                         },
-                        selected = settingsState.gmailSyncEnabled
+                        selected = settingsState.gmailSyncEnabled,
+                        enabled = !syncState.isSyncing
                     )
                 }
             }
@@ -185,6 +245,12 @@ fun OnboardingScreen(
             }
         }
     }
+}
+
+private enum class OnboardingPendingAction {
+    Auth,
+    ClassroomSync,
+    GmailSync
 }
 
 @Composable
@@ -270,13 +336,15 @@ private fun StepBadge(step: Int, totalSteps: Int) {
 private fun OnboardingWhiteButton(
     label: String,
     onClick: () -> Unit,
-    selected: Boolean = false
+    selected: Boolean = false,
+    enabled: Boolean = true
 ) {
     Surface(
         onClick = onClick,
+        enabled = enabled,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(30.dp),
-        color = if (selected) Color(0xFFF4F8FF) else Color.White.copy(alpha = 0.98f),
+        color = if (selected) Color(0xFFF4F8FF) else Color.White.copy(alpha = if (enabled) 0.98f else 0.72f),
         tonalElevation = 0.dp,
         shadowElevation = 10.dp
     ) {

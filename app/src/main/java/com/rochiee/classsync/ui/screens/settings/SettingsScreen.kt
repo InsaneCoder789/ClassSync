@@ -16,6 +16,7 @@ import com.rochiee.classsync.bloc.auth.AuthUiState
 import com.rochiee.classsync.bloc.settings.SettingsEvent
 import com.rochiee.classsync.bloc.settings.SettingsState
 import com.rochiee.classsync.bloc.sync.SyncEvent
+import com.rochiee.classsync.bloc.sync.SyncState
 import com.rochiee.classsync.domain.model.ThemeMode
 import com.rochiee.classsync.ui.components.AppLogoLockup
 import com.rochiee.classsync.ui.components.ElevatedInfoCard
@@ -32,6 +33,7 @@ import com.rochiee.classsync.ui.theme.Sun
 fun SettingsScreen(
     settingsState: SettingsState,
     authState: AuthUiState,
+    syncState: SyncState,
     onSettingsEvent: (SettingsEvent) -> Unit,
     onSyncEvent: (SyncEvent) -> Unit,
     onNavigateToDebug: () -> Unit,
@@ -144,26 +146,33 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
-                LiquidGlassTextButton(
-                    text = "Sync Classroom",
-                    onClick = { onSyncEvent(SyncEvent.RunClassroomSync) },
-                    modifier = Modifier.weight(1f),
-                    enabled = authState.isSignedIn && settingsState.classroomSyncEnabled
-                )
-                LiquidGlassTextButton(
-                    text = "Sync Gmail",
-                    onClick = { onSyncEvent(SyncEvent.RunGmailSync) },
-                    modifier = Modifier.weight(1f),
-                    enabled = authState.isSignedIn && settingsState.gmailSyncEnabled
+            syncState.errorMessage?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
                 LiquidGlassTextButton(
-                    text = "Full Sync",
+                    text = if (syncState.isSyncing) "Syncing..." else "Sync Classroom",
+                    onClick = { onSyncEvent(SyncEvent.RunClassroomSync) },
+                    modifier = Modifier.weight(1f),
+                    enabled = authState.isSignedIn && settingsState.classroomSyncEnabled && !syncState.isSyncing
+                )
+                LiquidGlassTextButton(
+                    text = if (syncState.isSyncing) "Syncing..." else "Sync Gmail",
+                    onClick = { onSyncEvent(SyncEvent.RunGmailSync) },
+                    modifier = Modifier.weight(1f),
+                    enabled = authState.isSignedIn && settingsState.gmailSyncEnabled && !syncState.isSyncing
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
+                LiquidGlassTextButton(
+                    text = if (syncState.isSyncing) "Syncing..." else "Full Sync",
                     onClick = { onSyncEvent(SyncEvent.RunManualFullSync) },
                     modifier = Modifier.weight(1f),
-                    enabled = authState.isSignedIn
+                    enabled = authState.isSignedIn && !syncState.isSyncing
                 )
                 LiquidGlassTextButton(text = "Debug tools", onClick = onNavigateToDebug, modifier = Modifier.weight(1f))
                 if (!authState.isSignedIn) {

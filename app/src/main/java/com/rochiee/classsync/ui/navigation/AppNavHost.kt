@@ -197,7 +197,9 @@ fun AppNavHost(
                 OnboardingScreen(
                     authState = authState,
                     settingsState = settingsState,
+                    syncState = syncState,
                     onAuthEvent = onAuthEvent,
+                    onSyncEvent = onSyncEvent,
                     onSettingsEvent = onSettingsEvent,
                     onOpenNotificationAccess = { onTaskEvent(TaskEvent.OpenNotificationAccessSettings) },
                     onRequestReminderPermissionExplained = {
@@ -222,7 +224,12 @@ fun AppNavHost(
                 )
             }
             composable(AppDestination.Tasks.route) {
-                TasksScreen(taskState = taskState, onTaskEvent = onTaskEvent)
+                TasksScreen(
+                    taskState = taskState,
+                    syncState = syncState,
+                    onTaskEvent = onTaskEvent,
+                    onSyncEvent = onSyncEvent
+                )
             }
             composable(AppDestination.Classroom.route) {
                 ClassroomScreen(
@@ -241,6 +248,7 @@ fun AppNavHost(
                 SettingsScreen(
                     settingsState = settingsState,
                     authState = authState,
+                    syncState = syncState,
                     onSettingsEvent = onSettingsEvent,
                     onSyncEvent = onSyncEvent,
                     onNavigateToDebug = { navController.navigate(AppDestination.Debug.route) },
@@ -266,6 +274,7 @@ fun AppNavHost(
             composable(AppDestination.Auth.route) {
                 AuthScreen(
                     authState = authState,
+                    syncState = syncState,
                     onAuthEvent = onAuthEvent,
                     onSyncEvent = onSyncEvent
                 )
