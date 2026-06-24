@@ -1,18 +1,9 @@
 package com.rochiee.classsync.ui.navigation
 
-import android.content.Context
-import android.content.Intent
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -29,12 +20,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import android.content.Context
+import android.content.Intent
 import com.rochiee.classsync.bloc.auth.AuthEvent
 import com.rochiee.classsync.bloc.auth.AuthUiState
 import com.rochiee.classsync.bloc.classroom.ClassroomScreenEvent
@@ -99,9 +93,9 @@ fun AppNavHost(
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
-    val showBottomBar = currentRoute?.let { route ->
-        AppDestination.bottomBarDestinations.any { destination -> destination.route == route }
-    } == true
+    val showBottomBar = remember(backStackEntry) {
+        AppDestination.bottomBarDestinations.any { it.route == backStackEntry?.destination?.route }
+    }
     val showTopBar = currentRoute != AppDestination.Onboarding.route
     val isHomeRoute = currentRoute == AppDestination.Home.route
 
@@ -181,11 +175,17 @@ fun AppNavHost(
                                     Image(
                                         painter = painterResource(id = it),
                                         contentDescription = destination.label,
-                                        modifier = Modifier.size(28.dp)
+                                        modifier = Modifier.size(24.dp)
                                     )
                                 } ?: Text(destination.label.take(1))
                             },
-                            label = { Text(destination.label) }
+                            label = {
+                                Text(
+                                    text = destination.label,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                         )
                     }
                 }

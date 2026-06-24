@@ -6,6 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowRowScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.rochiee.classsync.domain.model.AcademicTask
@@ -107,10 +111,27 @@ fun ElevatedInfoCard(
                     .background(accent.copy(alpha = 0.14f), RoundedCornerShape(18.dp))
                     .padding(horizontal = 10.dp, vertical = 6.dp)
             ) {
-                Text(text = title, style = MaterialTheme.typography.labelLarge, color = accent)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = accent,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
-            Text(text = value, style = MaterialTheme.typography.headlineSmall)
-            Text(text = supportingText, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = value,
+                style = MaterialTheme.typography.headlineSmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = supportingText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
@@ -375,15 +396,52 @@ fun LiquidGlassTextButton(
         enabled = enabled,
         selected = selected
     ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.titleMedium,
-            color = LocalContentColor.current
-        )
         if (showArrow) {
-            Spacer(modifier = Modifier.width(12.dp))
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = LocalContentColor.current,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Spacer(modifier = Modifier.width(10.dp))
             ButtonArrowBadge()
+        } else {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
+                color = LocalContentColor.current,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center
+            )
         }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun ResponsiveFlowRow(
+    modifier: Modifier = Modifier,
+    maxItemsInEachRow: Int,
+    content: @Composable FlowRowScope.() -> Unit
+) {
+    val spacing = LocalSpacing.current
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        maxItemsInEachRow = maxItemsInEachRow,
+        horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+        verticalArrangement = Arrangement.spacedBy(spacing.sm)
+    ) {
+        content()
     }
 }
 

@@ -2,9 +2,11 @@ package com.rochiee.classsync.ui.screens.planner
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,11 +20,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.rochiee.classsync.bloc.classroom.ClassroomScreenState
 import com.rochiee.classsync.bloc.planner.PlannerEvent
 import com.rochiee.classsync.bloc.planner.PlannerState
 import com.rochiee.classsync.ui.components.ElevatedInfoCard
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
+import com.rochiee.classsync.ui.components.ResponsiveFlowRow
 import com.rochiee.classsync.ui.components.ScreenSection
 import com.rochiee.classsync.ui.components.TintedPanel
 import com.rochiee.classsync.ui.components.formatDate
@@ -35,7 +39,7 @@ private enum class PlannerMode {
     Today, Week, Month, Range
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun PlannerScreen(
     plannerState: PlannerState,
@@ -105,86 +109,86 @@ fun PlannerScreen(
 
     Column(modifier = Modifier.padding(spacing.md), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
         ScreenSection(title = "Planner", subtitle = "Today, weekly, and monthly views on top of the existing planner backend.") {
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
-                LiquidGlassTextButton(text = "Today", onClick = { mode = PlannerMode.Today }, modifier = Modifier.weight(1f), selected = mode == PlannerMode.Today)
-                LiquidGlassTextButton(text = "Week", onClick = { mode = PlannerMode.Week }, modifier = Modifier.weight(1f), selected = mode == PlannerMode.Week)
-                LiquidGlassTextButton(text = "Month", onClick = { mode = PlannerMode.Month }, modifier = Modifier.weight(1f), selected = mode == PlannerMode.Month)
-                LiquidGlassTextButton(text = "Range", onClick = { mode = PlannerMode.Range }, modifier = Modifier.weight(1f), selected = mode == PlannerMode.Range)
+            ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                LiquidGlassTextButton(text = "Today", onClick = { mode = PlannerMode.Today }, modifier = Modifier.weight(1f).widthIn(min = 136.dp), selected = mode == PlannerMode.Today)
+                LiquidGlassTextButton(text = "Week", onClick = { mode = PlannerMode.Week }, modifier = Modifier.weight(1f).widthIn(min = 136.dp), selected = mode == PlannerMode.Week)
+                LiquidGlassTextButton(text = "Month", onClick = { mode = PlannerMode.Month }, modifier = Modifier.weight(1f).widthIn(min = 136.dp), selected = mode == PlannerMode.Month)
+                LiquidGlassTextButton(text = "Range", onClick = { mode = PlannerMode.Range }, modifier = Modifier.weight(1f).widthIn(min = 136.dp), selected = mode == PlannerMode.Range)
             }
         }
 
         when (mode) {
             PlannerMode.Today -> {
                 val day = plannerState.today
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing.md), modifier = Modifier.fillMaxWidth()) {
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
                     ElevatedInfoCard(
                         title = "Due today",
                         value = (day?.dueItems?.size ?: 0).toString(),
                         supportingText = "Items that need attention before tonight",
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
                         accent = Negative
                     )
                     ElevatedInfoCard(
                         title = "High priority",
                         value = (day?.highPriorityItems?.size ?: 0).toString(),
                         supportingText = "Hot items surfaced by the planner",
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
                         accent = Sun
                     )
                 }
             }
             PlannerMode.Week -> {
                 val week = plannerState.currentWeek
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing.md), modifier = Modifier.fillMaxWidth()) {
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
                     ElevatedInfoCard(
                         title = "Week tasks",
                         value = (week?.totalTaskCount ?: 0).toString(),
                         supportingText = "Scheduled work across this week",
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
                         accent = SkyBlue
                     )
                     ElevatedInfoCard(
                         title = "Overdue",
                         value = (week?.overdueTaskCount ?: 0).toString(),
                         supportingText = "Items already running behind",
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
                         accent = Negative
                     )
                 }
             }
             PlannerMode.Month -> {
                 val month = plannerState.currentMonth
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing.md), modifier = Modifier.fillMaxWidth()) {
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
                     ElevatedInfoCard(
                         title = "Month tasks",
                         value = (month?.totalTaskCount ?: 0).toString(),
                         supportingText = "Tasks visible in the current month",
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
                         accent = SkyBlue
                     )
                     ElevatedInfoCard(
                         title = "Assessments",
                         value = (month?.quizExamCount ?: 0).toString(),
                         supportingText = "Quizzes and exams in view",
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
                         accent = Sun
                     )
                 }
             }
             PlannerMode.Range -> {
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing.md), modifier = Modifier.fillMaxWidth()) {
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
                     ElevatedInfoCard(
                         title = "Range days",
                         value = selectedRangeLengthDays.toString(),
                         supportingText = "Custom planning window currently active",
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
                         accent = SkyBlue
                     )
                     ElevatedInfoCard(
                         title = "Due items",
                         value = plannerState.selectedRangeDays.sumOf { it.dueItems.size }.toString(),
                         supportingText = "Deadlines currently inside the range",
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
                         accent = Negative
                     )
                 }
@@ -216,14 +220,14 @@ fun PlannerScreen(
                 )
                 LiquidGlassTextButton(text = "Pick custom dates", onClick = { showRangePicker = true }, modifier = Modifier.fillMaxWidth())
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
+            ResponsiveFlowRow(maxItemsInEachRow = 2) {
                 LiquidGlassTextButton(
                     text = "Next 3 Days",
                     onClick = {
                         val now = System.currentTimeMillis()
                         onPlannerEvent(PlannerEvent.LoadRange(now, now + 2L * 24L * 60L * 60L * 1000L))
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).widthIn(min = 132.dp)
                 )
                 LiquidGlassTextButton(
                     text = "Next 7 Days",
@@ -231,7 +235,7 @@ fun PlannerScreen(
                         val now = System.currentTimeMillis()
                         onPlannerEvent(PlannerEvent.LoadRange(now, now + 6L * 24L * 60L * 60L * 1000L))
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).widthIn(min = 132.dp)
                 )
                 LiquidGlassTextButton(
                     text = "Next 14 Days",
@@ -239,7 +243,7 @@ fun PlannerScreen(
                         val now = System.currentTimeMillis()
                         onPlannerEvent(PlannerEvent.LoadRange(now, now + 13L * 24L * 60L * 60L * 1000L))
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).widthIn(min = 132.dp)
                 )
             }
         }

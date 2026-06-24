@@ -11,7 +11,7 @@ sealed class AppDestination(
     data object Onboarding : AppDestination("onboarding", "Start")
     data object Home : AppDestination("home", "Home", true, R.drawable.nav_home)
     data object Tasks : AppDestination("tasks", "Tasks", true, R.drawable.nav_tasks)
-    data object Classroom : AppDestination("classroom", "Classroom", true, R.drawable.nav_classroom)
+    data object Classroom : AppDestination("classroom", "Classes", true, R.drawable.nav_classroom)
     data object Planner : AppDestination("planner", "Planner", true, R.drawable.nav_planner)
     data object Settings : AppDestination("settings", "Settings", true, R.drawable.nav_settings)
     data object Debug : AppDestination("debug", "Debug")

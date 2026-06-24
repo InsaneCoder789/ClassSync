@@ -2,16 +2,18 @@ package com.rochiee.classsync.ui.screens.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.rochiee.classsync.bloc.auth.AuthUiState
 import com.rochiee.classsync.bloc.settings.SettingsEvent
 import com.rochiee.classsync.bloc.settings.SettingsState
@@ -21,6 +23,7 @@ import com.rochiee.classsync.domain.model.ThemeMode
 import com.rochiee.classsync.ui.components.AppLogoLockup
 import com.rochiee.classsync.ui.components.ElevatedInfoCard
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
+import com.rochiee.classsync.ui.components.ResponsiveFlowRow
 import com.rochiee.classsync.ui.components.ScreenSection
 import com.rochiee.classsync.ui.components.TintedPanel
 import com.rochiee.classsync.ui.components.formatDateTime
@@ -29,6 +32,7 @@ import com.rochiee.classsync.ui.theme.MintGreen
 import com.rochiee.classsync.ui.theme.SkyBlue
 import com.rochiee.classsync.ui.theme.Sun
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(
     settingsState: SettingsState,
@@ -43,26 +47,26 @@ fun SettingsScreen(
     Column(modifier = Modifier.padding(spacing.md), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
         TintedPanel {
             AppLogoLockup(subtitle = "Privacy-first controls and local-first automation")
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.md), modifier = Modifier.fillMaxWidth()) {
+            ResponsiveFlowRow(maxItemsInEachRow = 2) {
                 ElevatedInfoCard(
                     title = "Theme",
                     value = settingsState.themeMode.name.lowercase().replaceFirstChar { it.uppercase() },
                     supportingText = "Current visual mode",
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).widthIn(min = 132.dp),
                     accent = SkyBlue
                 )
                 ElevatedInfoCard(
                     title = "Reminder",
                     value = "${settingsState.defaultReminderHours}h",
                     supportingText = "Lead time before deadlines",
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).widthIn(min = 132.dp),
                     accent = Sun
                 )
                 ElevatedInfoCard(
                     title = "Digest",
                     value = if (settingsState.digestEnabled) "On" else "Off",
                     supportingText = "Daily overview delivery",
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).widthIn(min = 132.dp),
                     accent = MintGreen
                 )
             }
@@ -101,18 +105,18 @@ fun SettingsScreen(
                     text = "Theme mode",
                     style = MaterialTheme.typography.titleMedium
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
                     ThemeModeButton(
                         label = "Light",
                         selected = settingsState.themeMode == ThemeMode.LIGHT,
                         onClick = { onSettingsEvent(SettingsEvent.SetThemeMode(ThemeMode.LIGHT)) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f).widthIn(min = 120.dp)
                     )
                     ThemeModeButton(
                         label = "Dark",
                         selected = settingsState.themeMode == ThemeMode.DARK,
                         onClick = { onSettingsEvent(SettingsEvent.SetThemeMode(ThemeMode.DARK)) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f).widthIn(min = 120.dp)
                     )
                 }
             }
@@ -120,10 +124,10 @@ fun SettingsScreen(
 
         TintedPanel {
             Text(text = "Reminder lead time: ${settingsState.defaultReminderHours}h", style = MaterialTheme.typography.titleMedium)
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
-                LiquidGlassTextButton(text = "1h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(1)) }, modifier = Modifier.weight(1f), selected = settingsState.defaultReminderHours == 1)
-                LiquidGlassTextButton(text = "2h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(2)) }, modifier = Modifier.weight(1f), selected = settingsState.defaultReminderHours == 2)
-                LiquidGlassTextButton(text = "6h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(6)) }, modifier = Modifier.weight(1f), selected = settingsState.defaultReminderHours == 6)
+            ResponsiveFlowRow(maxItemsInEachRow = 3) {
+                LiquidGlassTextButton(text = "1h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(1)) }, modifier = Modifier.weight(1f).widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 1)
+                LiquidGlassTextButton(text = "2h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(2)) }, modifier = Modifier.weight(1f).widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 2)
+                LiquidGlassTextButton(text = "6h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(6)) }, modifier = Modifier.weight(1f).widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 6)
             }
             Text(text = "Last sync: ${settingsState.lastSyncTimeMillis.formatDateTime()}", style = MaterialTheme.typography.bodyMedium)
             if (authState.isSignedIn) {
@@ -153,30 +157,30 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.error
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
+            ResponsiveFlowRow(maxItemsInEachRow = 2) {
                 LiquidGlassTextButton(
                     text = if (syncState.isSyncing) "Syncing..." else "Sync Classroom",
                     onClick = { onSyncEvent(SyncEvent.RunClassroomSync) },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).widthIn(min = 148.dp),
                     enabled = authState.isSignedIn && settingsState.classroomSyncEnabled && !syncState.isSyncing
                 )
                 LiquidGlassTextButton(
                     text = if (syncState.isSyncing) "Syncing..." else "Sync Gmail",
                     onClick = { onSyncEvent(SyncEvent.RunGmailSync) },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).widthIn(min = 148.dp),
                     enabled = authState.isSignedIn && settingsState.gmailSyncEnabled && !syncState.isSyncing
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
+            ResponsiveFlowRow(maxItemsInEachRow = 2) {
                 LiquidGlassTextButton(
                     text = if (syncState.isSyncing) "Syncing..." else "Full Sync",
                     onClick = { onSyncEvent(SyncEvent.RunManualFullSync) },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).widthIn(min = 148.dp),
                     enabled = authState.isSignedIn && !syncState.isSyncing
                 )
-                LiquidGlassTextButton(text = "Debug tools", onClick = onNavigateToDebug, modifier = Modifier.weight(1f))
+                LiquidGlassTextButton(text = "Debug tools", onClick = onNavigateToDebug, modifier = Modifier.weight(1f).widthIn(min = 148.dp))
                 if (!authState.isSignedIn) {
-                    LiquidGlassTextButton(text = "Connect Google", onClick = onNavigateToAuth, modifier = Modifier.weight(1f))
+                    LiquidGlassTextButton(text = "Connect Google", onClick = onNavigateToAuth, modifier = Modifier.weight(1f).widthIn(min = 148.dp))
                 }
             }
         }
@@ -202,10 +206,10 @@ fun SettingsScreen(
             )
             TintedPanel {
                 Text(text = "Digest time: ${settingsState.digestHourOfDay}:00", style = MaterialTheme.typography.titleMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
-                    LiquidGlassTextButton(text = "7 AM", onClick = { onSettingsEvent(SettingsEvent.SetDigestHourOfDay(7)) }, modifier = Modifier.weight(1f), selected = settingsState.digestHourOfDay == 7)
-                    LiquidGlassTextButton(text = "12 PM", onClick = { onSettingsEvent(SettingsEvent.SetDigestHourOfDay(12)) }, modifier = Modifier.weight(1f), selected = settingsState.digestHourOfDay == 12)
-                    LiquidGlassTextButton(text = "8 PM", onClick = { onSettingsEvent(SettingsEvent.SetDigestHourOfDay(20)) }, modifier = Modifier.weight(1f), selected = settingsState.digestHourOfDay == 20)
+                ResponsiveFlowRow(maxItemsInEachRow = 3) {
+                    LiquidGlassTextButton(text = "7 AM", onClick = { onSettingsEvent(SettingsEvent.SetDigestHourOfDay(7)) }, modifier = Modifier.weight(1f).widthIn(min = 92.dp), selected = settingsState.digestHourOfDay == 7)
+                    LiquidGlassTextButton(text = "12 PM", onClick = { onSettingsEvent(SettingsEvent.SetDigestHourOfDay(12)) }, modifier = Modifier.weight(1f).widthIn(min = 92.dp), selected = settingsState.digestHourOfDay == 12)
+                    LiquidGlassTextButton(text = "8 PM", onClick = { onSettingsEvent(SettingsEvent.SetDigestHourOfDay(20)) }, modifier = Modifier.weight(1f).widthIn(min = 92.dp), selected = settingsState.digestHourOfDay == 20)
                 }
                 LiquidGlassTextButton(text = "Preview Today's Digest", onClick = { onSettingsEvent(SettingsEvent.PreviewDigest) }, modifier = Modifier.fillMaxWidth())
             }
