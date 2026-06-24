@@ -11,7 +11,7 @@ ClassSync reads the Google web client ID from local developer configuration so i
    - Google Classroom API
    - Gmail API
 5. Create an Android OAuth client for the app package `com.rochiee.classsync`.
-6. Create a web client for Google Identity.
+6. Create a separate Web application OAuth client for Google Identity.
 7. Add the web client ID to your local machine only, using one of these:
    - `local.properties`: `CLASSSYNC_GOOGLE_WEB_CLIENT_ID=...apps.googleusercontent.com`
    - `local.properties`: `CLASSSYNC_GOOGLE_CLIENT_SECRET_JSON=/absolute/path/to/client_secret_...json`
@@ -50,7 +50,8 @@ Keep scope usage minimal and avoid unnecessary inbox access.
 ## App wiring notes
 
 - `BuildConfig.GOOGLE_WEB_CLIENT_ID` is generated from local configuration at build time.
-- If `CLASSSYNC_GOOGLE_WEB_CLIENT_ID` is not set, the build can extract the local `client_id` from `CLASSSYNC_GOOGLE_CLIENT_SECRET_JSON`.
+- If `CLASSSYNC_GOOGLE_WEB_CLIENT_ID` is not set, the build can extract the local `client_id` from `CLASSSYNC_GOOGLE_CLIENT_SECRET_JSON` only when that JSON belongs to a web OAuth client.
+- Do not point `CLASSSYNC_GOOGLE_CLIENT_SECRET_JSON` at an Android or installed client JSON. Google sign-in token requests require the web client ID, not the Android client ID.
 - The web client ID is not a secret, but keeping it out of committed resources prevents accidental repo leakage and simplifies per-developer setup.
 - ClassSync stores only the selected Google account identity on-device, using encrypted local storage when available.
 - Handle missing OAuth setup gracefully in debug/testing builds.

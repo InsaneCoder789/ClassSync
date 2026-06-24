@@ -1,5 +1,6 @@
 import java.util.Properties
 import java.io.File
+import org.gradle.api.GradleException
 
 plugins {
     alias(libs.plugins.android.application)
@@ -29,6 +30,16 @@ fun clientIdFromLocalJson(properties: Properties): String {
     if (!file.exists()) return ""
 
     val text = file.readText()
+    if ("\"installed\"" in text && "\"web\"" !in text) {
+        throw GradleException(
+            """
+            CLASSSYNC_GOOGLE_CLIENT_SECRET_JSON points to an installed/Android OAuth JSON, not a web client JSON.
+            ClassSync needs the web OAuth client ID for Google sign-in token requests.
+            Create a Web application OAuth client in the same Google Cloud project and set:
+            CLASSSYNC_GOOGLE_WEB_CLIENT_ID=<your web client id>.apps.googleusercontent.com
+            """.trimIndent()
+        )
+    }
     val regex = Regex("\"client_id\"\\s*:\\s*\"([^\"]+)\"")
     return regex.find(text)?.groupValues?.getOrNull(1).orEmpty()
 }
