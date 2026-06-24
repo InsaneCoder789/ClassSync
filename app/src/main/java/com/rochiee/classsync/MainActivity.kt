@@ -89,6 +89,8 @@ class MainActivity : ComponentActivity() {
                     classroomState = classroomState,
                     studyPlanState = studyPlanState,
                     examModeState = examModeState,
+                    onBeginGoogleSignIn = authViewModel::beginSignInIntent,
+                    onCompleteGoogleSignIn = authViewModel::completeSignIn,
                     onAuthEvent = authViewModel::onEvent,
                     onTaskEvent = taskViewModel::onEvent,
                     onSyncEvent = syncViewModel::onEvent,

@@ -1,9 +1,9 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:bottom="18dp"
-        android:left="18dp"
-        android:right="18dp"
-        android:top="18dp">
+        android:bottom="24dp"
+        android:left="24dp"
+        android:right="24dp"
+        android:top="24dp">
         <bitmap
             android:antialias="true"
             android:gravity="center"

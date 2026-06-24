@@ -1,77 +1,76 @@
 package com.rochiee.classsync.auth
 
 import android.content.Context
-import androidx.credentials.CustomCredential
-import androidx.credentials.ClearCredentialStateRequest
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.NoCredentialException
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import android.content.Intent
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
+import com.google.android.gms.common.api.Scope
+import com.google.android.gms.tasks.Tasks
 import com.rochiee.classsync.BuildConfig
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 
 class GoogleAuthManager(private val context: Context) {
-    private val credentialManager = CredentialManager.create(context)
     private val secureAuthStore = SecureAuthStore(context.applicationContext)
-    
+
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
     private val webClientId: String
         get() = BuildConfig.GOOGLE_WEB_CLIENT_ID.trim()
 
-    suspend fun signIn(activityContext: Context) {
+    fun beginSignInIntent(activityContext: Context): Intent? {
+        if (!isOAuthConfigured()) {
+            _authState.value = AuthState.Error(
+                "Google OAuth is not configured yet. Follow /Users/rohanc/AndroidStudioProjects/classsync/docs/GOOGLE_SETUP.md before signing in."
+            )
+            return null
+        }
+
         _authState.value = AuthState.Loading
+        return googleSignInClient(activityContext).signInIntent
+    }
+
+    fun completeSignIn(data: Intent?) {
         try {
-            if (!isOAuthConfigured()) {
-                _authState.value = AuthState.Error(
-                    "Google OAuth is not configured yet. Replace the placeholder client ID and follow docs/GOOGLE_SETUP.md before signing in."
+            val account = GoogleSignIn.getSignedInAccountFromIntent(data)
+                .getResult(ApiException::class.java)
+            persistAccount(account)
+        } catch (error: ApiException) {
+            _authState.value = when (error.statusCode) {
+                CommonStatusCodes.CANCELED -> AuthState.Error(
+                    "Google sign-in was canceled before an account was selected."
                 )
-                return
+                CommonStatusCodes.DEVELOPER_ERROR -> AuthState.Error(
+                    "Google sign-in is misconfigured for this build. Recheck the Android OAuth client package name plus SHA-1/SHA-256 fingerprints."
+                )
+                else -> AuthState.Error(
+                    buildString {
+                        append("Google sign-in failed: ")
+                        append(CommonStatusCodes.getStatusCodeString(error.statusCode))
+                        error.localizedMessage?.takeIf { it.isNotBlank() }?.let {
+                            append(". ")
+                            append(it)
+                        }
+                    }
+                )
             }
-            val googleIdOption = GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(false)
-                .setServerClientId(webClientId)
-                .setAutoSelectEnabled(true)
-                .build()
-
-            val request = GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .build()
-
-            val result = credentialManager.getCredential(activityContext, request)
-            val credential = result.credential
-
-            if (
-                credential is CustomCredential &&
-                credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-            ) {
-                val googleCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                secureAuthStore.saveSession(
-                    email = googleCredential.id,
-                    displayName = googleCredential.displayName
-                )
-                _authState.value = AuthState.Authenticated(
-                    email = googleCredential.id,
-                    displayName = googleCredential.displayName,
-                    idToken = googleCredential.idToken
-                )
-            } else {
-                _authState.value = AuthState.Error("Unexpected credential type")
-            }
-        } catch (_: NoCredentialException) {
-            _authState.value = AuthState.Error("No Google credential was selected.")
-        } catch (e: Exception) {
-            _authState.value = AuthState.Error(e.message ?: "Sign-in failed")
+        } catch (error: Exception) {
+            _authState.value = AuthState.Error(error.message ?: "Google sign-in failed.")
         }
     }
 
     suspend fun signOut() {
         try {
-            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+            withContext(Dispatchers.IO) {
+                Tasks.await(googleSignInClient(context).signOut())
+            }
             secureAuthStore.clearSession()
             _authState.value = AuthState.Unauthenticated
         } catch (e: Exception) {
@@ -81,14 +80,20 @@ class GoogleAuthManager(private val context: Context) {
 
     fun checkAuthState() {
         if (_authState.value == AuthState.Idle) {
+            val account = GoogleSignIn.getLastSignedInAccount(context)
             val session = secureAuthStore.restoreSession()
-            _authState.value = if (isOAuthConfigured() && session != null) {
-                AuthState.Authenticated(
-                    email = session.email,
-                    displayName = session.displayName
-                )
-            } else {
-                AuthState.Unauthenticated
+            _authState.value = when {
+                isOAuthConfigured() && account?.email?.isNotBlank() == true -> {
+                    persistAccount(account)
+                    _authState.value
+                }
+                isOAuthConfigured() && session != null -> {
+                    AuthState.Authenticated(
+                        email = session.email,
+                        displayName = session.displayName
+                    )
+                }
+                else -> AuthState.Unauthenticated
             }
         }
     }
@@ -104,5 +109,35 @@ class GoogleAuthManager(private val context: Context) {
     fun selectedAccountEmail(): String? {
         return (authState.value as? AuthState.Authenticated)?.email
             ?: secureAuthStore.restoreSession()?.email
+    }
+
+    private fun googleSignInClient(activityContext: Context) =
+        GoogleSignIn.getClient(activityContext, googleSignInOptions())
+
+    private fun googleSignInOptions(): GoogleSignInOptions {
+        val scopes = GoogleScopes.ALL_SCOPES.map(::Scope)
+        return GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestIdToken(webClientId)
+            .requestScopes(scopes.first(), *scopes.drop(1).toTypedArray())
+            .build()
+    }
+
+    private fun persistAccount(account: GoogleSignInAccount) {
+        val email = account.email?.trim().orEmpty()
+        if (email.isBlank()) {
+            _authState.value = AuthState.Error("Google sign-in succeeded but no account email was returned.")
+            return
+        }
+
+        secureAuthStore.saveSession(
+            email = email,
+            displayName = account.displayName
+        )
+        _authState.value = AuthState.Authenticated(
+            email = email,
+            displayName = account.displayName,
+            idToken = account.idToken
+        )
     }
 }

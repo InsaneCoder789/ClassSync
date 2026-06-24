@@ -41,7 +41,7 @@ object ClassSyncWidgetUpdater {
             val expanded = minHeight >= 170
             val deadlineTone = formatter.deadlineTone(summary.nextTaskDueMillis)
             val views = RemoteViews(context.packageName, R.layout.classsync_widget_layout).apply {
-                setImageViewResource(R.id.widgetLogo, R.drawable.classsync_logo_generated)
+                setImageViewResource(R.id.widgetLogo, R.mipmap.ic_launcher)
                 setTextViewText(R.id.widgetTitle, "ClassSync")
                 setTextViewText(
                     R.id.widgetSummaryText,

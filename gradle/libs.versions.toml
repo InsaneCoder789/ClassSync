@@ -12,6 +12,7 @@ room = "2.6.1"
 ksp = "2.0.21-1.0.27"
 credentials = "1.3.0"
 googleid = "1.1.1"
+playServicesAuth = "21.1.1"
 google-api-client = "2.2.0"
 google-oauth-client = "1.34.1"
 google-api-services-gmail = "v1-rev20220404-2.0.0"
@@ -43,6 +44,7 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+google-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 google-api-client-android = { group = "com.google.api-client", name = "google-api-client-android", version.ref = "google-api-client" }
 google-api-services-gmail = { group = "com.google.apis", name = "google-api-services-gmail", version.ref = "google-api-services-gmail" }
 google-api-services-classroom = { group = "com.google.apis", name = "google-api-services-classroom", version.ref = "google-api-services-classroom" }

@@ -1,5 +1,9 @@
 package com.rochiee.classsync.ui.screens.debug
 
+import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +41,8 @@ fun DebugScreen(
     settingsState: SettingsState,
     eventState: EventState,
     plannerState: PlannerState,
+    onBeginGoogleSignIn: (Context) -> Intent?,
+    onCompleteGoogleSignIn: (Intent?) -> Unit,
     onAuthEvent: (AuthEvent) -> Unit,
     onTaskEvent: (TaskEvent) -> Unit,
     onSyncEvent: (SyncEvent) -> Unit,
@@ -46,10 +52,22 @@ fun DebugScreen(
 ) {
     val spacing = LocalSpacing.current
     val context = androidx.compose.ui.platform.LocalContext.current
+    val signInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        onCompleteGoogleSignIn(result.data)
+    }
     Column(modifier = Modifier.padding(spacing.md), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
         ScreenSection(title = "Debug tools", subtitle = "Existing backend controls moved out of MainActivity.") {
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
-                LiquidGlassTextButton(text = "Sign in", onClick = { onAuthEvent(AuthEvent.SignIn(context)) }, modifier = Modifier.weight(1f))
+                LiquidGlassTextButton(
+                    text = "Sign in",
+                    onClick = {
+                        onAuthEvent(AuthEvent.ClearAuthError)
+                        onBeginGoogleSignIn(context)?.let(signInLauncher::launch)
+                    },
+                    modifier = Modifier.weight(1f)
+                )
                 LiquidGlassTextButton(text = "Sign out", onClick = { onAuthEvent(AuthEvent.SignOut) }, modifier = Modifier.weight(1f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {

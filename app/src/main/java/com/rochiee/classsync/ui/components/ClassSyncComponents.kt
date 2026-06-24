@@ -426,7 +426,7 @@ fun AppLogoLockup(
             contentAlignment = Alignment.Center
         ) {
             androidx.compose.foundation.Image(
-                painter = androidx.compose.ui.res.painterResource(id = com.rochiee.classsync.R.drawable.classsync_logo_generated),
+                painter = androidx.compose.ui.res.painterResource(id = com.rochiee.classsync.R.mipmap.ic_launcher),
                 contentDescription = "ClassSync logo",
                 modifier = Modifier.width(32.dp).height(32.dp)
             )

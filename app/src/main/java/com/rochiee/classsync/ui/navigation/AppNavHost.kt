@@ -1,5 +1,7 @@
 package com.rochiee.classsync.ui.navigation
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -81,6 +83,8 @@ fun AppNavHost(
     classroomState: ClassroomScreenState,
     studyPlanState: StudyPlanState,
     examModeState: ExamModeScreenState,
+    onBeginGoogleSignIn: (Context) -> Intent?,
+    onCompleteGoogleSignIn: (Intent?) -> Unit,
     onAuthEvent: (AuthEvent) -> Unit,
     onTaskEvent: (TaskEvent) -> Unit,
     onSyncEvent: (SyncEvent) -> Unit,
@@ -198,6 +202,8 @@ fun AppNavHost(
                     authState = authState,
                     settingsState = settingsState,
                     syncState = syncState,
+                    onBeginGoogleSignIn = onBeginGoogleSignIn,
+                    onCompleteGoogleSignIn = onCompleteGoogleSignIn,
                     onAuthEvent = onAuthEvent,
                     onSyncEvent = onSyncEvent,
                     onSettingsEvent = onSettingsEvent,
@@ -263,6 +269,8 @@ fun AppNavHost(
                     settingsState = settingsState,
                     eventState = eventState,
                     plannerState = plannerState,
+                    onBeginGoogleSignIn = onBeginGoogleSignIn,
+                    onCompleteGoogleSignIn = onCompleteGoogleSignIn,
                     onAuthEvent = onAuthEvent,
                     onTaskEvent = onTaskEvent,
                     onSyncEvent = onSyncEvent,
@@ -275,6 +283,8 @@ fun AppNavHost(
                 AuthScreen(
                     authState = authState,
                     syncState = syncState,
+                    onBeginGoogleSignIn = onBeginGoogleSignIn,
+                    onCompleteGoogleSignIn = onCompleteGoogleSignIn,
                     onAuthEvent = onAuthEvent,
                     onSyncEvent = onSyncEvent
                 )

@@ -1,4 +1,5 @@
 import java.util.Properties
+import java.io.File
 
 plugins {
     alias(libs.plugins.android.application)
@@ -20,10 +21,24 @@ fun escapeBuildConfigString(value: String): String {
         .replace("\"", "\\\"")
 }
 
+fun clientIdFromLocalJson(properties: Properties): String {
+    val configuredPath = properties.getProperty("CLASSSYNC_GOOGLE_CLIENT_SECRET_JSON").orEmpty().trim()
+    if (configuredPath.isBlank()) return ""
+
+    val file = File(configuredPath)
+    if (!file.exists()) return ""
+
+    val text = file.readText()
+    val regex = Regex("\"client_id\"\\s*:\\s*\"([^\"]+)\"")
+    return regex.find(text)?.groupValues?.getOrNull(1).orEmpty()
+}
+
 val googleWebClientId = providers.gradleProperty("CLASSSYNC_GOOGLE_WEB_CLIENT_ID")
     .orElse(
         providers.provider {
-            localProperties.getProperty("CLASSSYNC_GOOGLE_WEB_CLIENT_ID").orEmpty()
+            localProperties.getProperty("CLASSSYNC_GOOGLE_WEB_CLIENT_ID")
+                ?.takeIf { it.isNotBlank() }
+                ?: clientIdFromLocalJson(localProperties)
         }
     )
     .orElse(providers.environmentVariable("CLASSSYNC_GOOGLE_WEB_CLIENT_ID"))
@@ -103,6 +118,7 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.androidx.security.crypto)
     implementation(libs.googleid)
+    implementation(libs.google.play.services.auth)
 
     implementation(libs.google.api.client.android)
     implementation(libs.google.api.services.gmail)

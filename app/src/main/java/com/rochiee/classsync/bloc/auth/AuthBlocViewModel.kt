@@ -1,5 +1,7 @@
 package com.rochiee.classsync.bloc.auth
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rochiee.classsync.auth.AuthState
@@ -41,14 +43,16 @@ class AuthBlocViewModel(
                         )
                         AuthState.Loading -> it.copy(
                             isOAuthConfigured = googleAuthManager.isOAuthConfigured(),
-                            isLoading = true
+                            isLoading = true,
+                            errorMessage = null
                         )
                         AuthState.Unauthenticated, AuthState.Idle -> it.copy(
                             isOAuthConfigured = googleAuthManager.isOAuthConfigured(),
                             isSignedIn = false,
                             isLoading = false,
                             userEmail = null,
-                            displayName = null
+                            displayName = null,
+                            errorMessage = null
                         )
                     }
                 }
@@ -59,11 +63,6 @@ class AuthBlocViewModel(
     fun onEvent(event: AuthEvent) {
         when (event) {
             AuthEvent.CheckAuthState -> googleAuthManager.checkAuthState()
-            is AuthEvent.SignIn -> {
-                viewModelScope.launch {
-                    googleAuthManager.signIn(event.context)
-                }
-            }
             AuthEvent.SignOut -> {
                 viewModelScope.launch {
                     googleAuthManager.signOut()
@@ -73,5 +72,11 @@ class AuthBlocViewModel(
                 _state.update { it.copy(errorMessage = null) }
             }
         }
+    }
+
+    fun beginSignInIntent(context: Context): Intent? = googleAuthManager.beginSignInIntent(context)
+
+    fun completeSignIn(data: Intent?) {
+        googleAuthManager.completeSignIn(data)
     }
 }

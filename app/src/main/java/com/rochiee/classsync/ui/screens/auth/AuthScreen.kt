@@ -1,5 +1,9 @@
 package com.rochiee.classsync.ui.screens.auth
 
+import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,11 +27,18 @@ import com.rochiee.classsync.ui.theme.LocalSpacing
 fun AuthScreen(
     authState: AuthUiState,
     syncState: SyncState,
+    onBeginGoogleSignIn: (Context) -> Intent?,
+    onCompleteGoogleSignIn: (Intent?) -> Unit,
     onAuthEvent: (AuthEvent) -> Unit,
     onSyncEvent: (SyncEvent) -> Unit
 ) {
     val spacing = LocalSpacing.current
     val context = androidx.compose.ui.platform.LocalContext.current
+    val signInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        onCompleteGoogleSignIn(result.data)
+    }
     Column(
         modifier = Modifier.padding(spacing.md),
         verticalArrangement = Arrangement.spacedBy(spacing.lg)
@@ -83,7 +94,10 @@ fun AuthScreen(
                 )
                 LiquidGlassTextButton(
                     text = "Continue with Google",
-                    onClick = { onAuthEvent(AuthEvent.SignIn(context)) },
+                    onClick = {
+                        onAuthEvent(AuthEvent.ClearAuthError)
+                        onBeginGoogleSignIn(context)?.let(signInLauncher::launch)
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = authState.isOAuthConfigured
                 )

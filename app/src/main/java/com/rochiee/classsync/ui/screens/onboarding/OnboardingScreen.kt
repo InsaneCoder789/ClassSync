@@ -1,6 +1,8 @@
 package com.rochiee.classsync.ui.screens.onboarding
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -52,6 +54,8 @@ fun OnboardingScreen(
     authState: AuthUiState,
     settingsState: SettingsState,
     syncState: SyncState,
+    onBeginGoogleSignIn: (Context) -> Intent?,
+    onCompleteGoogleSignIn: (Intent?) -> Unit,
     onAuthEvent: (AuthEvent) -> Unit,
     onSyncEvent: (SyncEvent) -> Unit,
     onSettingsEvent: (SettingsEvent) -> Unit,
@@ -82,12 +86,19 @@ fun OnboardingScreen(
             onRequestReminderPermissionExplained()
         }
     }
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        onCompleteGoogleSignIn(result.data)
+    }
 
     LaunchedEffect(authState.isSignedIn, authState.isLoading, authState.errorMessage, pendingAction) {
         if (pendingAction == OnboardingPendingAction.Auth && authState.isSignedIn) {
             pendingAction = null
             step = 2
         } else if (pendingAction == OnboardingPendingAction.Auth && !authState.isLoading && authState.errorMessage != null) {
+            pendingAction = null
+        } else if (pendingAction == OnboardingPendingAction.Auth && !authState.isLoading && !authState.isSignedIn) {
             pendingAction = null
         }
     }
@@ -134,7 +145,7 @@ fun OnboardingScreen(
                         } else {
                             pendingAction = OnboardingPendingAction.Auth
                             onAuthEvent(AuthEvent.ClearAuthError)
-                            onAuthEvent(AuthEvent.SignIn(context))
+                            onBeginGoogleSignIn(context)?.let(googleSignInLauncher::launch)
                         }
                     },
                     enabled = !authState.isLoading
