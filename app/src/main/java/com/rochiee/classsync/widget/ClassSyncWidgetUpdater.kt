@@ -74,10 +74,11 @@ object ClassSyncWidgetUpdater {
                     R.id.widgetNextTaskDue,
                     when (deadlineTone) {
                         WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE,
-                        WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> 0xFFD95D5DL.toInt()
-                        WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW,
-                        WidgetTaskFormatter.WidgetDeadlineTone.SOON -> 0xFFED9B40.toInt()
-                        WidgetTaskFormatter.WidgetDeadlineTone.NORMAL -> 0xFF5C8DF6.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> 0xFF9D3A3AL.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> 0xFFD95D5DL.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.SOON -> 0xFFE68A3AL.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.UPCOMING -> 0xFFE0B84CL.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.SAFE -> 0xFF39A66AL.toInt()
                         WidgetTaskFormatter.WidgetDeadlineTone.NONE -> 0xFF7B8794.toInt()
                     }
                 )

@@ -23,6 +23,7 @@ import com.rochiee.classsync.planner.PlannerDay
 import com.rochiee.classsync.planner.PlannerMonth
 import com.rochiee.classsync.ui.components.DeadlineTone
 import com.rochiee.classsync.ui.components.EmptyState
+import com.rochiee.classsync.ui.components.ResponsiveFlowRow
 import com.rochiee.classsync.ui.components.TintedPanel
 import com.rochiee.classsync.ui.components.deadlineToneFor
 import com.rochiee.classsync.ui.theme.LocalSpacing
@@ -50,10 +51,11 @@ fun MonthPlannerView(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
-                    MonthLegendChip(label = "Due today", color = DeadlineTone.TODAY.color, modifier = Modifier.weight(1f))
-                    MonthLegendChip(label = "Due tomorrow", color = DeadlineTone.TOMORROW.color, modifier = Modifier.weight(1f))
-                    MonthLegendChip(label = "Upcoming", color = DeadlineTone.NORMAL.color, modifier = Modifier.weight(1f))
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                    MonthLegendChip(label = "Due today", color = DeadlineTone.TODAY.color)
+                    MonthLegendChip(label = "Due tomorrow", color = DeadlineTone.TOMORROW.color)
+                    MonthLegendChip(label = "Due soon", color = DeadlineTone.SOON.color)
+                    MonthLegendChip(label = "On track", color = DeadlineTone.SAFE.color)
                 }
             }
 

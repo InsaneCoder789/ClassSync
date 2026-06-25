@@ -66,7 +66,7 @@ object WorkScheduler {
     }
 
     fun scheduleWidgetRefresh(context: Context) {
-        val request = PeriodicWorkRequestBuilder<WidgetRefreshWorker>(2, TimeUnit.HOURS)
+        val request = PeriodicWorkRequestBuilder<WidgetRefreshWorker>(1, TimeUnit.HOURS)
             .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(

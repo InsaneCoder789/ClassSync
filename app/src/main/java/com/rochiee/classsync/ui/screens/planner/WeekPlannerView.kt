@@ -2,9 +2,8 @@ package com.rochiee.classsync.ui.screens.planner
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,8 +24,8 @@ fun WeekPlannerView(
     if (days.isEmpty()) {
         EmptyState("Week is empty", "Load your planner after syncing courses and tasks.")
     } else {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            items(days) { day ->
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+            days.forEach { day ->
                 val tone = day.dueItems.minByOrNull { it.dueDateMillis ?: Long.MAX_VALUE }?.let {
                     deadlineToneFor(it.dueDateMillis, it.isCompleted)
                 } ?: DeadlineTone.NONE

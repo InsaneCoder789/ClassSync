@@ -103,7 +103,8 @@ class SyncClassroomCourseworkUseCase(
                     sourceId = sourceIdForCourseWork(workDto),
                     sourcePackageName = null,
                     originalLink = workDto.alternateLink,
-                    receivedAtMillis = workDto.updateTimeMillis.takeIf { it > 0 } ?: workDto.creationTimeMillis
+                    receivedAtMillis = workDto.updateTimeMillis.takeIf { it > 0 } ?: workDto.creationTimeMillis,
+                    dueDateMillisOverride = workDto.dueDateMillis
                 )
             )
             event?.let {

@@ -1,5 +1,7 @@
 package com.rochiee.classsync.ui.screens.planner
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -107,88 +109,93 @@ fun PlannerScreen(
         }
     }
 
-    Column(modifier = Modifier.padding(spacing.md), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
+    Column(
+        modifier = Modifier
+            .padding(spacing.md)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(spacing.lg)
+    ) {
         ScreenSection(title = "Planner", subtitle = "Today, weekly, and monthly views on top of the existing planner backend.") {
             ResponsiveFlowRow(maxItemsInEachRow = 2) {
-                LiquidGlassTextButton(text = "Today", onClick = { mode = PlannerMode.Today }, modifier = Modifier.weight(1f).widthIn(min = 136.dp), selected = mode == PlannerMode.Today)
-                LiquidGlassTextButton(text = "Week", onClick = { mode = PlannerMode.Week }, modifier = Modifier.weight(1f).widthIn(min = 136.dp), selected = mode == PlannerMode.Week)
-                LiquidGlassTextButton(text = "Month", onClick = { mode = PlannerMode.Month }, modifier = Modifier.weight(1f).widthIn(min = 136.dp), selected = mode == PlannerMode.Month)
-                LiquidGlassTextButton(text = "Range", onClick = { mode = PlannerMode.Range }, modifier = Modifier.weight(1f).widthIn(min = 136.dp), selected = mode == PlannerMode.Range)
+                LiquidGlassTextButton(text = "Today", onClick = { mode = PlannerMode.Today }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Today)
+                LiquidGlassTextButton(text = "Week", onClick = { mode = PlannerMode.Week }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Week)
+                LiquidGlassTextButton(text = "Month", onClick = { mode = PlannerMode.Month }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Month)
+                LiquidGlassTextButton(text = "Range", onClick = { mode = PlannerMode.Range }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Range)
             }
         }
 
         when (mode) {
             PlannerMode.Today -> {
                 val day = plannerState.today
-                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                ResponsiveFlowRow(maxItemsInEachRow = 1) {
                     ElevatedInfoCard(
                         title = "Due today",
                         value = (day?.dueItems?.size ?: 0).toString(),
                         supportingText = "Items that need attention before tonight",
-                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         accent = Negative
                     )
                     ElevatedInfoCard(
                         title = "High priority",
                         value = (day?.highPriorityItems?.size ?: 0).toString(),
                         supportingText = "Hot items surfaced by the planner",
-                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         accent = Sun
                     )
                 }
             }
             PlannerMode.Week -> {
                 val week = plannerState.currentWeek
-                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                ResponsiveFlowRow(maxItemsInEachRow = 1) {
                     ElevatedInfoCard(
                         title = "Week tasks",
                         value = (week?.totalTaskCount ?: 0).toString(),
                         supportingText = "Scheduled work across this week",
-                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         accent = SkyBlue
                     )
                     ElevatedInfoCard(
                         title = "Overdue",
                         value = (week?.overdueTaskCount ?: 0).toString(),
                         supportingText = "Items already running behind",
-                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         accent = Negative
                     )
                 }
             }
             PlannerMode.Month -> {
                 val month = plannerState.currentMonth
-                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                ResponsiveFlowRow(maxItemsInEachRow = 1) {
                     ElevatedInfoCard(
                         title = "Month tasks",
                         value = (month?.totalTaskCount ?: 0).toString(),
                         supportingText = "Tasks visible in the current month",
-                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         accent = SkyBlue
                     )
                     ElevatedInfoCard(
                         title = "Assessments",
                         value = (month?.quizExamCount ?: 0).toString(),
                         supportingText = "Quizzes and exams in view",
-                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         accent = Sun
                     )
                 }
             }
             PlannerMode.Range -> {
-                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                ResponsiveFlowRow(maxItemsInEachRow = 1) {
                     ElevatedInfoCard(
                         title = "Range days",
                         value = selectedRangeLengthDays.toString(),
                         supportingText = "Custom planning window currently active",
-                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         accent = SkyBlue
                     )
                     ElevatedInfoCard(
                         title = "Due items",
                         value = plannerState.selectedRangeDays.sumOf { it.dueItems.size }.toString(),
                         supportingText = "Deadlines currently inside the range",
-                        modifier = Modifier.weight(1f).widthIn(min = 148.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         accent = Negative
                     )
                 }
@@ -227,7 +234,7 @@ fun PlannerScreen(
                         val now = System.currentTimeMillis()
                         onPlannerEvent(PlannerEvent.LoadRange(now, now + 2L * 24L * 60L * 60L * 1000L))
                     },
-                    modifier = Modifier.weight(1f).widthIn(min = 132.dp)
+                    modifier = Modifier.widthIn(min = 132.dp)
                 )
                 LiquidGlassTextButton(
                     text = "Next 7 Days",
@@ -235,7 +242,7 @@ fun PlannerScreen(
                         val now = System.currentTimeMillis()
                         onPlannerEvent(PlannerEvent.LoadRange(now, now + 6L * 24L * 60L * 60L * 1000L))
                     },
-                    modifier = Modifier.weight(1f).widthIn(min = 132.dp)
+                    modifier = Modifier.widthIn(min = 132.dp)
                 )
                 LiquidGlassTextButton(
                     text = "Next 14 Days",
@@ -243,7 +250,7 @@ fun PlannerScreen(
                         val now = System.currentTimeMillis()
                         onPlannerEvent(PlannerEvent.LoadRange(now, now + 13L * 24L * 60L * 60L * 1000L))
                     },
-                    modifier = Modifier.weight(1f).widthIn(min = 132.dp)
+                    modifier = Modifier.widthIn(min = 132.dp)
                 )
             }
         }

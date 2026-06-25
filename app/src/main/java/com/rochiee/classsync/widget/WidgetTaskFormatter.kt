@@ -9,7 +9,8 @@ class WidgetTaskFormatter {
         TODAY,
         TOMORROW,
         SOON,
-        NORMAL,
+        UPCOMING,
+        SAFE,
         NONE
     }
 
@@ -65,7 +66,8 @@ class WidgetTaskFormatter {
             dueMillis < tomorrowStart -> WidgetDeadlineTone.TODAY
             dueMillis < dayAfterTomorrowStart -> WidgetDeadlineTone.TOMORROW
             dueMillis < nowMillis + 3L * 24L * 60L * 60L * 1000L -> WidgetDeadlineTone.SOON
-            else -> WidgetDeadlineTone.NORMAL
+            dueMillis < nowMillis + 7L * 24L * 60L * 60L * 1000L -> WidgetDeadlineTone.UPCOMING
+            else -> WidgetDeadlineTone.SAFE
         }
     }
 }

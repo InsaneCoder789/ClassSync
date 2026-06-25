@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,6 +18,7 @@ import com.rochiee.classsync.ui.components.DeadlineChip
 import com.rochiee.classsync.ui.components.DeadlineText
 import com.rochiee.classsync.ui.components.EmptyState
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
+import com.rochiee.classsync.ui.components.ResponsiveFlowRow
 import com.rochiee.classsync.ui.components.StatRow
 import com.rochiee.classsync.ui.components.TintedPanel
 import com.rochiee.classsync.ui.components.formatDate
@@ -102,9 +101,9 @@ private fun CourseSimpleList(
     if (items.isEmpty()) {
         EmptyState("Nothing here yet", emptyMessage)
     } else {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            items(items) { item ->
-                TintedPanel {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+            items.forEach { item ->
+                TintedPanel(modifier = Modifier.fillMaxWidth()) {
                     Text(text = item, style = MaterialTheme.typography.bodyLarge)
                 }
             }
@@ -121,20 +120,17 @@ private fun CourseTaskList(
     if (tasks.isEmpty()) {
         EmptyState("Nothing here yet", emptyMessage)
     } else {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            items(tasks) { task ->
-                TintedPanel {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+            tasks.forEach { task ->
+                TintedPanel(modifier = Modifier.fillMaxWidth()) {
                     Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
                         Text(text = task.title, style = MaterialTheme.typography.titleMedium)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = task.courseName, style = MaterialTheme.typography.bodyMedium)
+                        Text(text = task.courseName, style = MaterialTheme.typography.bodyMedium)
+                        ResponsiveFlowRow(maxItemsInEachRow = 2) {
                             DeadlineChip(dueMillis = task.dueDate, isCompleted = task.isCompleted)
-                        }
-                        if (task.description.isNotBlank()) {
-                            Text(text = task.description, style = MaterialTheme.typography.bodySmall)
+                            if (task.description.isNotBlank()) {
+                                Text(text = task.description, style = MaterialTheme.typography.bodySmall)
+                            }
                         }
                         DeadlineText(dueMillis = task.dueDate, isCompleted = task.isCompleted)
                     }

@@ -11,5 +11,6 @@ data class RawClassroomEventInput(
     val sourceId: String?,
     val sourcePackageName: String?,
     val originalLink: String?,
-    val receivedAtMillis: Long
+    val receivedAtMillis: Long,
+    val dueDateMillisOverride: Long? = null
 )

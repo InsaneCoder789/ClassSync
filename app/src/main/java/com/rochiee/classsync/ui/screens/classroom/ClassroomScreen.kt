@@ -1,5 +1,7 @@
 package com.rochiee.classsync.ui.screens.classroom
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -22,7 +24,12 @@ fun ClassroomScreen(
     var selectedTab by remember { mutableStateOf(CourseTab.Overview) }
     val selectedSummary = classroomState.courseSummaries.firstOrNull { it.courseId == classroomState.selectedCourseId }
 
-    Column(modifier = Modifier.padding(spacing.md), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
+    Column(
+        modifier = Modifier
+            .padding(spacing.md)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(spacing.lg)
+    ) {
         CourseListScreen(
             summaries = classroomState.courseSummaries,
             isRefreshing = classroomState.isRefreshing,

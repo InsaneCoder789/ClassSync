@@ -42,10 +42,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.rochiee.classsync.domain.model.AcademicTask
 import com.rochiee.classsync.domain.model.TaskPriority
+import com.rochiee.classsync.ui.theme.AlertOrange
+import com.rochiee.classsync.ui.theme.CautionYellow
+import com.rochiee.classsync.ui.theme.DeepNegative
 import com.rochiee.classsync.ui.theme.LocalSpacing
 import com.rochiee.classsync.ui.theme.MintGreen
 import com.rochiee.classsync.ui.theme.Negative
 import com.rochiee.classsync.ui.theme.Positive
+import com.rochiee.classsync.ui.theme.SafeGreen
 import com.rochiee.classsync.ui.theme.SkyBlue
 import com.rochiee.classsync.ui.theme.Sun
 import com.rochiee.classsync.ui.theme.Warning
@@ -103,25 +107,25 @@ fun ElevatedInfoCard(
                     color = Color.White.copy(alpha = 0.32f),
                     shape = RoundedCornerShape(28.dp)
                 )
-                .padding(spacing.lg),
+                .padding(horizontal = spacing.md, vertical = spacing.md),
             verticalArrangement = Arrangement.spacedBy(spacing.sm)
         ) {
             Box(
                 modifier = Modifier
-                    .background(accent.copy(alpha = 0.14f), RoundedCornerShape(18.dp))
-                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                    .background(accent.copy(alpha = 0.14f), RoundedCornerShape(16.dp))
+                    .padding(horizontal = 10.dp, vertical = 5.dp)
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelMedium,
                     color = accent,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
             Text(
                 text = value,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -153,11 +157,12 @@ enum class DeadlineTone(
     val label: String,
     val color: Color
 ) {
-    OVERDUE("Overdue", Negative),
-    TODAY("Due today", Negative),
-    TOMORROW("Due tomorrow", Warning),
-    SOON("Due soon", Sun),
-    NORMAL("Upcoming", SkyBlue),
+    OVERDUE("Overdue", DeepNegative),
+    TODAY("Due today", DeepNegative),
+    TOMORROW("Due tomorrow", Negative),
+    SOON("Due soon", AlertOrange),
+    UPCOMING("Upcoming", CautionYellow),
+    SAFE("On track", SafeGreen),
     COMPLETE("Done", Positive),
     NONE("No date", Color(0xFF7B8794))
 }
@@ -185,7 +190,8 @@ fun deadlineToneFor(
         dueMillis < startOfTomorrow -> DeadlineTone.TODAY
         dueMillis < startOfDayAfterTomorrow -> DeadlineTone.TOMORROW
         dueMillis < nowMillis + 3L * 24L * 60L * 60L * 1000L -> DeadlineTone.SOON
-        else -> DeadlineTone.NORMAL
+        dueMillis < nowMillis + 7L * 24L * 60L * 60L * 1000L -> DeadlineTone.UPCOMING
+        else -> DeadlineTone.SAFE
     }
 }
 
@@ -324,7 +330,7 @@ fun TintedPanel(
                     color = Color.White.copy(alpha = 0.28f),
                     shape = RoundedCornerShape(28.dp)
                 )
-                .padding(spacing.lg),
+                .padding(horizontal = spacing.md, vertical = spacing.md),
             verticalArrangement = Arrangement.spacedBy(spacing.md)
         ) {
             content()
@@ -373,7 +379,7 @@ fun LiquidGlassButton(
                 )
                 .fillMaxWidth()
                 .border(1.dp, borderColor, RoundedCornerShape(26.dp))
-                .padding(horizontal = 18.dp, vertical = 15.dp),
+                .padding(horizontal = 16.dp, vertical = 13.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
             content = content
@@ -411,7 +417,7 @@ fun LiquidGlassTextButton(
                     textAlign = TextAlign.Center
                 )
             }
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             ButtonArrowBadge()
         } else {
             Text(
@@ -455,7 +461,7 @@ fun ButtonArrowBadge(
     Box(
         modifier = modifier
             .background(background, RoundedCornerShape(18.dp))
-            .padding(horizontal = 11.dp, vertical = 8.dp),
+            .padding(horizontal = 10.dp, vertical = 7.dp),
         contentAlignment = Alignment.Center
     ) {
         Icon(
@@ -486,7 +492,7 @@ fun AppLogoLockup(
             androidx.compose.foundation.Image(
                 painter = androidx.compose.ui.res.painterResource(id = com.rochiee.classsync.R.mipmap.ic_launcher),
                 contentDescription = "ClassSync logo",
-                modifier = Modifier.width(32.dp).height(32.dp)
+                modifier = Modifier.width(34.dp).height(34.dp)
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {

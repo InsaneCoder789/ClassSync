@@ -13,7 +13,7 @@ class ClassroomEventParser {
         val normalizedText = cleanText(originalText)
         val eventType = ClassroomEventClassifier.classify(normalizedText)
         val actionType = ClassroomEventClassifier.actionTypeFor(eventType)
-        val dueDate = DeadlineParser.parse(originalText, input.receivedAtMillis)
+        val dueDate = input.dueDateMillisOverride ?: DeadlineParser.parse(originalText, input.receivedAtMillis)
         val eventId = ClassroomEventFingerprintGenerator.generate(input, normalizedText)
         val priority = EventPriorityEngine.priorityFor(eventType, actionType, dueDate, input.receivedAtMillis)
 
