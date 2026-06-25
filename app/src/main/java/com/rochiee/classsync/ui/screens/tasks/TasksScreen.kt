@@ -15,13 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.rochiee.classsync.bloc.task.TaskEvent
 import com.rochiee.classsync.bloc.task.TaskState
-import com.rochiee.classsync.bloc.sync.SyncEvent
 import com.rochiee.classsync.bloc.sync.SyncState
 import com.rochiee.classsync.ui.components.CourseChip
 import com.rochiee.classsync.ui.components.DeadlineChip
 import com.rochiee.classsync.ui.components.DeadlineText
 import com.rochiee.classsync.ui.components.EmptyState
-import com.rochiee.classsync.ui.components.LiquidGlassTextButton
 import com.rochiee.classsync.ui.components.ResponsiveFlowRow
 import com.rochiee.classsync.ui.components.ScreenSection
 import com.rochiee.classsync.ui.components.TintedPanel
@@ -33,30 +31,21 @@ fun TasksScreen(
     taskState: TaskState,
     syncState: SyncState,
     onTaskEvent: (TaskEvent) -> Unit,
-    onSyncEvent: (SyncEvent) -> Unit
+    onSyncEvent: (com.rochiee.classsync.bloc.sync.SyncEvent) -> Unit
 ) {
     val spacing = LocalSpacing.current
     Column(modifier = Modifier.padding(spacing.md), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
         ScreenSection(title = "Tasks", subtitle = "Assignments, reminders, and manually added work.") {
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
-                LiquidGlassTextButton(
-                    text = if (syncState.isSyncing) "Syncing..." else "Sync Classroom",
-                    onClick = { onSyncEvent(SyncEvent.RunClassroomSync) },
-                    modifier = Modifier.weight(1f),
-                    enabled = !syncState.isSyncing
-                )
-                LiquidGlassTextButton(
-                    text = if (syncState.isSyncing) "Syncing..." else "Sync Gmail",
-                    onClick = { onSyncEvent(SyncEvent.RunGmailSync) },
-                    modifier = Modifier.weight(1f),
-                    enabled = !syncState.isSyncing
-                )
-            }
             syncState.errorMessage?.let { error ->
                 TintedPanel {
                     Text(text = error, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
                 }
             }
+            Text(
+                text = "Sync actions have moved to Settings so this space stays focused on actual work.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
         if (taskState.tasks.isEmpty()) {

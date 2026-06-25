@@ -53,33 +53,95 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(spacing.lg)
     ) {
         TintedPanel {
-            AppLogoLockup(subtitle = "Privacy-first controls and local-first automation")
-            ResponsiveFlowRow(maxItemsInEachRow = 1) {
+            AppLogoLockup(subtitle = "Control sync, reminders, and your 4th semester workspace from one place")
+            ResponsiveFlowRow(maxItemsInEachRow = 2) {
                 ElevatedInfoCard(
-                    title = "Theme",
-                    value = settingsState.themeMode.name.lowercase().replaceFirstChar { it.uppercase() },
-                    supportingText = "Current visual mode",
+                    title = "Account",
+                    value = if (authState.isSignedIn) "Connected" else "Needs setup",
+                    supportingText = authState.userEmail ?: authState.displayName ?: "Google not connected yet",
                     modifier = Modifier.fillMaxWidth(),
                     accent = SkyBlue
                 )
                 ElevatedInfoCard(
-                    title = "Reminder",
-                    value = "${settingsState.defaultReminderHours}h",
-                    supportingText = "Lead time before deadlines",
+                    title = "Last sync",
+                    value = settingsState.lastSyncTimeMillis.formatDateTime(),
+                    supportingText = if (syncState.isSyncing) "A sync is currently running" else "Latest successful local refresh",
                     modifier = Modifier.fillMaxWidth(),
                     accent = Sun
                 )
                 ElevatedInfoCard(
-                    title = "Digest",
-                    value = if (settingsState.digestEnabled) "On" else "Off",
-                    supportingText = "Daily overview delivery",
+                    title = "Reminder lead",
+                    value = "${settingsState.defaultReminderHours}h",
+                    supportingText = "Default notice before deadlines",
                     modifier = Modifier.fillMaxWidth(),
                     accent = MintGreen
                 )
             }
         }
 
-        ScreenSection(title = "Settings", subtitle = "Privacy-first controls for sync, reminders, and onboarding.") {
+        ScreenSection(title = "Sync hub", subtitle = "Keep live academic data fresh and decide which sources ClassSync should use.") {
+            TintedPanel {
+                if (authState.isSignedIn) {
+                    Text(
+                        text = "Connected as ${authState.userEmail ?: authState.displayName ?: "student"}",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                } else {
+                    Text(
+                        text = "Google identity is not connected yet.",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                Text(
+                    text = if (authState.isOAuthConfigured) {
+                        "Classroom sync is your primary semester source. Gmail remains optional for catching academic reminders."
+                    } else {
+                        "Google sync is disabled until a local OAuth client ID is configured on this machine."
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                syncState.errorMessage?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                    LiquidGlassTextButton(
+                        text = if (syncState.isSyncing) "Syncing..." else "Sync Classroom",
+                        onClick = { onSyncEvent(SyncEvent.RunClassroomSync) },
+                        modifier = Modifier.widthIn(min = 148.dp),
+                        enabled = authState.isSignedIn && settingsState.classroomSyncEnabled && !syncState.isSyncing
+                    )
+                    LiquidGlassTextButton(
+                        text = if (syncState.isSyncing) "Syncing..." else "Sync Gmail",
+                        onClick = { onSyncEvent(SyncEvent.RunGmailSync) },
+                        modifier = Modifier.widthIn(min = 148.dp),
+                        enabled = authState.isSignedIn && settingsState.gmailSyncEnabled && !syncState.isSyncing
+                    )
+                    LiquidGlassTextButton(
+                        text = if (syncState.isSyncing) "Syncing..." else "Full Sync",
+                        onClick = { onSyncEvent(SyncEvent.RunManualFullSync) },
+                        modifier = Modifier.widthIn(min = 148.dp),
+                        enabled = authState.isSignedIn && !syncState.isSyncing
+                    )
+                    if (!authState.isSignedIn) {
+                        LiquidGlassTextButton(
+                            text = "Connect Google",
+                            onClick = onNavigateToAuth,
+                            modifier = Modifier.widthIn(min = 148.dp)
+                        )
+                    } else {
+                        LiquidGlassTextButton(
+                            text = "Debug tools",
+                            onClick = onNavigateToDebug,
+                            modifier = Modifier.widthIn(min = 148.dp)
+                        )
+                    }
+                }
+            }
             SettingsToggleRow(
                 title = "Classroom sync",
                 description = "Primary source for assignments, quizzes, and course activity.",
@@ -106,6 +168,22 @@ fun SettingsScreen(
             )
         }
 
+        ScreenSection(title = "Reminders first", subtitle = "Critical due work and ongoing alerts should be easy to control.") {
+            TintedPanel {
+                Text(text = "Reminder lead time: ${settingsState.defaultReminderHours}h", style = MaterialTheme.typography.titleMedium)
+                ResponsiveFlowRow(maxItemsInEachRow = 3) {
+                    LiquidGlassTextButton(text = "1h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(1)) }, modifier = Modifier.widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 1)
+                    LiquidGlassTextButton(text = "2h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(2)) }, modifier = Modifier.widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 2)
+                    LiquidGlassTextButton(text = "6h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(6)) }, modifier = Modifier.widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 6)
+                }
+                Text(
+                    text = "Live due-soon notifications and assignment reminders use this value as the default lead window.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
         ScreenSection(title = "Appearance", subtitle = "Pick the mode that feels best on your device.") {
             TintedPanel {
                 Text(
@@ -125,69 +203,6 @@ fun SettingsScreen(
                         onClick = { onSettingsEvent(SettingsEvent.SetThemeMode(ThemeMode.DARK)) },
                         modifier = Modifier.widthIn(min = 132.dp)
                     )
-                }
-            }
-        }
-
-        TintedPanel {
-            Text(text = "Reminder lead time: ${settingsState.defaultReminderHours}h", style = MaterialTheme.typography.titleMedium)
-            ResponsiveFlowRow(maxItemsInEachRow = 3) {
-                LiquidGlassTextButton(text = "1h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(1)) }, modifier = Modifier.widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 1)
-                LiquidGlassTextButton(text = "2h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(2)) }, modifier = Modifier.widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 2)
-                LiquidGlassTextButton(text = "6h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(6)) }, modifier = Modifier.widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 6)
-            }
-            Text(text = "Last sync: ${settingsState.lastSyncTimeMillis.formatDateTime()}", style = MaterialTheme.typography.bodyMedium)
-            if (authState.isSignedIn) {
-                Text(
-                    text = "Connected as ${authState.userEmail ?: authState.displayName ?: "student"}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            } else {
-                Text(
-                    text = "Google identity is not connected yet.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            Text(
-                text = if (authState.isOAuthConfigured) {
-                    "Classroom sync is available once a Google account is connected. Gmail sync remains optional and fully local-first."
-                } else {
-                    "Google sync is disabled until a local OAuth client ID is supplied on this machine."
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            syncState.errorMessage?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-            ResponsiveFlowRow(maxItemsInEachRow = 2) {
-                LiquidGlassTextButton(
-                    text = if (syncState.isSyncing) "Syncing..." else "Sync Classroom",
-                    onClick = { onSyncEvent(SyncEvent.RunClassroomSync) },
-                    modifier = Modifier.widthIn(min = 148.dp),
-                    enabled = authState.isSignedIn && settingsState.classroomSyncEnabled && !syncState.isSyncing
-                )
-                LiquidGlassTextButton(
-                    text = if (syncState.isSyncing) "Syncing..." else "Sync Gmail",
-                    onClick = { onSyncEvent(SyncEvent.RunGmailSync) },
-                    modifier = Modifier.widthIn(min = 148.dp),
-                    enabled = authState.isSignedIn && settingsState.gmailSyncEnabled && !syncState.isSyncing
-                )
-            }
-            ResponsiveFlowRow(maxItemsInEachRow = 2) {
-                LiquidGlassTextButton(
-                    text = if (syncState.isSyncing) "Syncing..." else "Full Sync",
-                    onClick = { onSyncEvent(SyncEvent.RunManualFullSync) },
-                    modifier = Modifier.widthIn(min = 148.dp),
-                    enabled = authState.isSignedIn && !syncState.isSyncing
-                )
-                LiquidGlassTextButton(text = "Debug tools", onClick = onNavigateToDebug, modifier = Modifier.widthIn(min = 148.dp))
-                if (!authState.isSignedIn) {
-                    LiquidGlassTextButton(text = "Connect Google", onClick = onNavigateToAuth, modifier = Modifier.widthIn(min = 148.dp))
                 }
             }
         }
