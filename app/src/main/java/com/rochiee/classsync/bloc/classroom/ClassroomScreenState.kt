@@ -1,19 +1,14 @@
 package com.rochiee.classsync.bloc.classroom
 
-import com.rochiee.classsync.dashboard.CourseDashboardSummary
-import com.rochiee.classsync.data.local.entity.CourseEntity
-import com.rochiee.classsync.domain.model.AcademicTask
-import com.rochiee.classsync.domain.model.ClassroomEvent
+import com.rochiee.classsync.domain.model.ClassroomCatalog
+import com.rochiee.classsync.domain.model.ClassroomSection
 
 data class ClassroomScreenState(
     val isLoading: Boolean = true,
-    val courses: List<CourseEntity> = emptyList(),
-    val courseSummaries: List<CourseDashboardSummary> = emptyList(),
-    val allTasks: List<AcademicTask> = emptyList(),
-    val allEvents: List<ClassroomEvent> = emptyList(),
-    val selectedCourseId: String? = null,
-    val selectedCourseTasks: List<AcademicTask> = emptyList(),
-    val selectedCourseEvents: List<ClassroomEvent> = emptyList(),
+    val catalog: ClassroomCatalog = ClassroomCatalog(emptyList()),
+    val selectedSemester: Int? = null,
+    val selectedSectionId: String? = null,
+    val selectedSection: ClassroomSection? = null,
     val isRefreshing: Boolean = false,
     val errorMessage: String? = null
 )

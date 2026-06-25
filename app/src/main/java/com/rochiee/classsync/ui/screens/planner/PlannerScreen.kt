@@ -204,7 +204,8 @@ fun PlannerScreen(
 
         PlannerFilterSheet(
             current = plannerState.activeFilter,
-            availableCourseIds = classroomState.courses.map { it.courseId to it.name },
+            availableCourseIds = classroomState.catalog.semesters
+                .flatMap { semester -> semester.sections.map { section -> section.sectionId to section.sectionId } },
             onApply = { filter ->
                 onPlannerEvent(PlannerEvent.SetFilter(filter))
                 when (mode) {

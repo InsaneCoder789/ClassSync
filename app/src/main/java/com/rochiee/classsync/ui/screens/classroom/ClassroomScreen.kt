@@ -2,6 +2,7 @@ package com.rochiee.classsync.ui.screens.classroom
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,16 +10,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowForward
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Groups
+import androidx.compose.material.icons.rounded.School
+import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,21 +39,25 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.rochiee.classsync.bloc.classroom.ClassroomScreenEvent
 import com.rochiee.classsync.bloc.classroom.ClassroomScreenState
-import com.rochiee.classsync.data.local.entity.CourseEntity
+import com.rochiee.classsync.domain.model.ClassroomDaySchedule
+import com.rochiee.classsync.domain.model.ClassroomScheduleEntry
+import com.rochiee.classsync.domain.model.ClassroomSection
+import com.rochiee.classsync.ui.components.EmptyState
+import com.rochiee.classsync.ui.components.ErrorState
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
+import com.rochiee.classsync.ui.components.LoadingState
 import com.rochiee.classsync.ui.components.TintedPanel
 import com.rochiee.classsync.ui.theme.LocalSpacing
-import java.util.Calendar
 
-private val scheduleShell = Color(0xFF141018)
-private val scheduleShellBorder = Color(0xFF2A202C)
-private val scheduleCard = Color(0xFF3A2B39)
-private val scheduleCardHighlight = Color(0xFF8A4B22)
-private val scheduleTabIdle = Color(0xFF2B222E)
-private val scheduleTabSelected = Color(0xFFC38528)
-private val scheduleAccent = Color(0xFFFFA53C)
-private val scheduleTextPrimary = Color(0xFFF8F2F6)
-private val scheduleTextMuted = Color(0xFFD9C9D3)
+private val timetableShell = Color(0xFF121014)
+private val timetableShellBorder = Color(0xFF2C2331)
+private val timetableCard = Color(0xFF342737)
+private val timetableCardHighlight = Color(0xFF8E4A23)
+private val timetableDayIdle = Color(0xFF262128)
+private val timetableDaySelected = Color(0xFF8FD1B6)
+private val timetableAccent = Color(0xFFFFA23A)
+private val timetableTextPrimary = Color(0xFFF8F2F6)
+private val timetableTextMuted = Color(0xFFC9BEC7)
 
 @Composable
 fun ClassroomScreen(
@@ -53,35 +65,12 @@ fun ClassroomScreen(
     onClassroomEvent: (ClassroomScreenEvent) -> Unit
 ) {
     val spacing = LocalSpacing.current
-    var selectedSemester by remember { mutableStateOf("4") }
-    var selectedSection by remember { mutableStateOf<String?>(null) }
-    var selectedDayIndex by remember { mutableIntStateOf(currentWeekIndex()) }
-
-    val semesterOptions = remember(classroomState.courses) {
-        buildList {
-            add("4")
-            classroomState.courses
-                .mapNotNull { deriveSemester(it.name, it.section) }
-                .distinct()
-                .filterNot { it == "4" }
-                .sorted()
-                .forEach(::add)
-        }
-    }
-    val filteredCourses = remember(classroomState.courses, selectedSemester, selectedSection) {
-        classroomState.courses.filter { course ->
-            val semesterMatches = deriveSemester(course.name, course.section) == selectedSemester
-            val sectionMatches = selectedSection == null || course.section == selectedSection
-            semesterMatches && sectionMatches
-        }
-    }
-    val sectionOptions = remember(filteredCourses) {
-        filteredCourses.mapNotNull { it.section }.distinct().sorted()
-    }
-    val timetableWeek = remember(filteredCourses, classroomState.allTasks) {
-        buildTimetableWeek(filteredCourses, classroomState.allTasks)
-    }
-    val selectedDay = timetableWeek.getOrNull(selectedDayIndex) ?: timetableWeek.first()
+    val semesterOptions = remember { (1..8).toList() }
+    val selectedSemester = classroomState.selectedSemester
+    val selectedSemesterData = classroomState.catalog.semesters.firstOrNull { it.semesterNumber == selectedSemester }
+    val selectedSection = classroomState.selectedSection
+    var selectedDayIndex by remember(selectedSection?.sectionId) { mutableIntStateOf(0) }
+    val selectedDay = selectedSection?.days?.getOrNull(selectedDayIndex)
 
     Column(
         modifier = Modifier
@@ -101,123 +90,80 @@ fun ClassroomScreen(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
             Text(
-                text = "Schedule",
+                text = if (selectedSection == null) "Timetable" else selectedSection.sectionId,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Semester $selectedSemester${selectedSection?.let { " • section $it" } ?: ""} timetable",
+                text = when {
+                    selectedSection != null -> "Semester ${selectedSemester ?: "-"} timetable"
+                    selectedSemester != null -> "Choose a section for Semester $selectedSemester"
+                    else -> "Semester Selection → Section Selection → Timetable"
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
-        TintedPanel {
-            Text(
-                text = "Timetable filters",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+        when {
+            classroomState.isLoading -> LoadingState("Loading classroom catalog...")
+            classroomState.errorMessage != null -> ErrorState(classroomState.errorMessage)
+            selectedSemester == null -> SemesterSelectionStep(
+                semesterOptions = semesterOptions,
+                catalogState = classroomState,
+                onSelectSemester = { onClassroomEvent(ClassroomScreenEvent.SelectSemester(it)) }
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
-                semesterOptions.take(3).forEach { semester ->
-                    LiquidGlassTextButton(
-                        text = "Sem $semester",
-                        onClick = {
-                            selectedSemester = semester
-                            selectedSection = null
-                        },
-                        modifier = Modifier.weight(1f),
-                        selected = selectedSemester == semester,
-                        showArrow = false
-                    )
-                }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
-                LiquidGlassTextButton(
-                    text = "All",
-                    onClick = { selectedSection = null },
-                    modifier = Modifier.weight(1f),
-                    selected = selectedSection == null,
-                    showArrow = false
-                )
-                sectionOptions.take(2).forEach { section ->
-                    LiquidGlassTextButton(
-                        text = section,
-                        onClick = { selectedSection = section },
-                        modifier = Modifier.weight(1f),
-                        selected = selectedSection == section,
-                        showArrow = false
-                    )
-                }
-            }
-            LiquidGlassTextButton(
-                text = if (classroomState.isRefreshing) "Refreshing..." else "Refresh schedule",
-                onClick = { onClassroomEvent(ClassroomScreenEvent.RefreshCourses) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !classroomState.isRefreshing
+            selectedSection == null -> SectionSelectionStep(
+                semester = selectedSemester,
+                state = classroomState,
+                onBack = { onClassroomEvent(ClassroomScreenEvent.BackToSemesters) },
+                onRefresh = { onClassroomEvent(ClassroomScreenEvent.RefreshData) },
+                onSelectSection = { onClassroomEvent(ClassroomScreenEvent.SelectSection(it)) }
+            )
+            else -> TimetableDetailStep(
+                semester = selectedSemester,
+                section = selectedSection,
+                selectedDay = selectedDay,
+                selectedDayIndex = selectedDayIndex,
+                onSelectDay = { selectedDayIndex = it },
+                onBack = { onClassroomEvent(ClassroomScreenEvent.BackToSections) },
+                onChangeSemester = { onClassroomEvent(ClassroomScreenEvent.BackToSemesters) }
             )
         }
+    }
+}
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(scheduleShell, RoundedCornerShape(32.dp))
-                .border(1.dp, scheduleShellBorder, RoundedCornerShape(32.dp))
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(
-                        text = "Weekly board",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = scheduleTextPrimary,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        text = "${filteredCourses.size} subjects mapped into a class-first schedule",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = scheduleTextMuted
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .background(scheduleTabIdle, RoundedCornerShape(18.dp))
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = selectedSection ?: "All sections",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = scheduleTextPrimary
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                timetableWeek.forEachIndexed { index, day ->
-                    ScheduleDayTab(
-                        label = day.label,
-                        selected = index == selectedDayIndex,
-                        onClick = { selectedDayIndex = index }
-                    )
-                }
-            }
-
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                if (selectedDay.entries.isEmpty()) {
-                    ScheduleEmptyCard()
-                } else {
-                    selectedDay.entries.forEachIndexed { index, entry ->
-                        ScheduleLessonCard(
-                            entry = entry,
-                            highlighted = index == 0 && selectedDayIndex == currentWeekIndex()
+@Composable
+private fun SemesterSelectionStep(
+    semesterOptions: List<Int>,
+    catalogState: ClassroomScreenState,
+    onSelectSemester: (Int) -> Unit
+) {
+    TintedPanel {
+        Text(
+            text = "Choose your semester",
+            style = MaterialTheme.typography.titleMedium
+        )
+        Text(
+            text = "The current XLS provides 4th semester data. Other semesters are already wired for future data drops.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            semesterOptions.chunked(2).forEach { rowSemesters ->
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                    rowSemesters.forEach { semester ->
+                        val sectionCount = catalogState.catalog.semesters
+                            .firstOrNull { it.semesterNumber == semester }
+                            ?.sections
+                            ?.size
+                            ?: 0
+                        SelectionCard(
+                            title = "Semester $semester",
+                            subtitle = if (sectionCount > 0) "$sectionCount sections ready" else "No section data yet",
+                            icon = Icons.Rounded.School,
+                            modifier = Modifier.weight(1f),
+                            onClick = { onSelectSemester(semester) }
                         )
                     }
                 }
@@ -227,46 +173,313 @@ fun ClassroomScreen(
 }
 
 @Composable
-private fun ScheduleDayTab(
+private fun SectionSelectionStep(
+    semester: Int,
+    state: ClassroomScreenState,
+    onBack: () -> Unit,
+    onRefresh: () -> Unit,
+    onSelectSection: (String) -> Unit
+) {
+    val sections = state.catalog.semesters
+        .firstOrNull { it.semesterNumber == semester }
+        ?.sections
+        .orEmpty()
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        StepActionRow(
+            primaryText = "Change semester",
+            secondaryText = if (state.isRefreshing) "Refreshing..." else "Reload data",
+            onPrimary = onBack,
+            onSecondary = onRefresh,
+            secondaryEnabled = !state.isRefreshing
+        )
+
+        if (sections.isEmpty()) {
+            EmptyState(
+                title = "No section data available for this semester yet.",
+                description = "The flow is ready for Semester $semester, but the current XLS only contains populated timetable data for supported semesters."
+            )
+        } else {
+            TintedPanel {
+                Text(
+                    text = "Select your section",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = "Semester $semester has ${sections.size} sections available from the imported XLS.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    sections.chunked(2).forEach { rowSections ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                            rowSections.forEach { section ->
+                                SelectionCard(
+                                    title = section.sectionId,
+                                    subtitle = "${section.days.count { it.entries.isNotEmpty() }} weekdays ready",
+                                    icon = Icons.Rounded.Groups,
+                                    modifier = Modifier.weight(1f),
+                                    onClick = { onSelectSection(section.sectionId) }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimetableDetailStep(
+    semester: Int,
+    section: ClassroomSection,
+    selectedDay: ClassroomDaySchedule?,
+    selectedDayIndex: Int,
+    onSelectDay: (Int) -> Unit,
+    onBack: () -> Unit,
+    onChangeSemester: () -> Unit
+) {
+    val spacing = LocalSpacing.current
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        StepActionRow(
+            primaryText = "Change section",
+            secondaryText = "Change semester",
+            onPrimary = onBack,
+            onSecondary = onChangeSemester
+        )
+
+        TintedPanel {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = section.sectionId,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = "Semester $semester • ${section.days.count { it.entries.isNotEmpty() }} imported weekdays",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Rounded.CalendarMonth,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Icon(
+                        imageVector = Icons.Rounded.Tune,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(timetableShell, RoundedCornerShape(32.dp))
+                .border(1.dp, timetableShellBorder, RoundedCornerShape(32.dp))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(spacing.md)
+        ) {
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                section.days.forEachIndexed { index, day ->
+                    TimetableDayChip(
+                        label = day.label,
+                        selected = index == selectedDayIndex,
+                        onClick = { onSelectDay(index) }
+                    )
+                }
+            }
+
+            if (selectedDay == null || selectedDay.entries.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .background(timetableDayIdle, RoundedCornerShape(18.dp))
+                                .padding(14.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.CalendarMonth,
+                                contentDescription = null,
+                                tint = timetableTextMuted
+                            )
+                        }
+                        Text(
+                            text = "No classes scheduled",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = timetableTextPrimary
+                        )
+                        Text(
+                            text = "Enjoy your free day!",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = timetableTextMuted
+                        )
+                    }
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    selectedDay.entries.forEachIndexed { index, entry ->
+                        TimetableEntryCard(
+                            entry = entry,
+                            highlighted = index == 0
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StepActionRow(
+    primaryText: String,
+    secondaryText: String,
+    onPrimary: () -> Unit,
+    onSecondary: () -> Unit,
+    secondaryEnabled: Boolean = true
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+        LiquidGlassTextButton(
+            text = primaryText,
+            onClick = onPrimary,
+            modifier = Modifier.weight(1f)
+        )
+        LiquidGlassTextButton(
+            text = secondaryText,
+            onClick = onSecondary,
+            modifier = Modifier.weight(1f),
+            enabled = secondaryEnabled
+        )
+    }
+}
+
+@Composable
+private fun SelectionCard(
+    title: String,
+    subtitle: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .background(
+                MaterialTheme.colorScheme.surface,
+                RoundedCornerShape(24.dp)
+            )
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                RoundedCornerShape(24.dp)
+            )
+            .clickable(onClick = onClick)
+            .padding(16.dp)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), RoundedCornerShape(18.dp))
+                    .padding(10.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            LiquidGlassTextButton(
+                text = "Open",
+                onClick = onClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
+private fun TimetableDayChip(
     label: String,
     selected: Boolean,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
-            .width(68.dp)
+            .width(74.dp)
             .background(
-                color = if (selected) scheduleTabSelected else scheduleTabIdle,
-                shape = RoundedCornerShape(14.dp)
+                if (selected) timetableDaySelected else timetableDayIdle,
+                RoundedCornerShape(22.dp)
             )
-            .padding(2.dp)
+            .clickable(onClick = onClick)
+            .padding(vertical = 18.dp),
+        contentAlignment = Alignment.Center
     ) {
-        LiquidGlassTextButton(
+        Text(
             text = label,
-            onClick = onClick,
-            modifier = Modifier.fillMaxWidth(),
-            selected = selected,
-            showArrow = false
+            color = if (selected) Color(0xFF111111) else timetableTextPrimary,
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)
+                .padding(horizontal = 6.dp)
         )
     }
 }
 
 @Composable
-private fun ScheduleLessonCard(
-    entry: TimetableEntry,
+private fun TimetableEntryCard(
+    entry: ClassroomScheduleEntry,
     highlighted: Boolean
 ) {
-    val cardColor = if (highlighted || entry.emphasis) scheduleCardHighlight else scheduleCard
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(cardColor, RoundedCornerShape(24.dp))
+            .background(
+                if (highlighted) timetableCardHighlight else timetableCard,
+                RoundedCornerShape(26.dp)
+            )
             .border(
                 width = if (highlighted) 1.dp else 0.dp,
-                color = if (highlighted) scheduleAccent.copy(alpha = 0.9f) else Color.Transparent,
-                shape = RoundedCornerShape(24.dp)
+                color = if (highlighted) timetableAccent else Color.Transparent,
+                shape = RoundedCornerShape(26.dp)
             )
-            .padding(horizontal = 14.dp, vertical = 16.dp)
+            .padding(horizontal = 14.dp, vertical = 18.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -280,202 +493,33 @@ private fun ScheduleLessonCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .background(scheduleAccent, RoundedCornerShape(99.dp))
-                        .padding(horizontal = 2.dp, vertical = 22.dp)
+                        .background(timetableAccent, RoundedCornerShape(99.dp))
+                        .padding(horizontal = 2.dp, vertical = 24.dp)
                 )
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text = entry.title,
+                        text = entry.subject,
                         style = MaterialTheme.typography.titleLarge,
-                        color = scheduleTextPrimary,
+                        color = timetableTextPrimary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = entry.timeLabel,
+                        text = entry.time,
                         style = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Monospace),
-                        color = scheduleTextMuted,
+                        color = timetableTextMuted,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
             }
             Text(
-                text = entry.roomLabel,
+                text = entry.room,
                 style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace),
-                color = scheduleTextPrimary,
+                color = timetableTextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
     }
-}
-
-@Composable
-private fun ScheduleEmptyCard() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(scheduleCard, RoundedCornerShape(24.dp))
-            .padding(20.dp)
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(
-                text = "No classes mapped for this day",
-                style = MaterialTheme.typography.titleMedium,
-                color = scheduleTextPrimary
-            )
-            Text(
-                text = "Try another section or refresh after your Classroom sync completes.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = scheduleTextMuted
-            )
-        }
-    }
-}
-
-private data class TimetableDay(
-    val label: String,
-    val entries: List<TimetableEntry>
-)
-
-private data class TimetableEntry(
-    val dayIndex: Int,
-    val startHour: Int,
-    val startMinute: Int,
-    val endHour: Int,
-    val endMinute: Int,
-    val title: String,
-    val roomLabel: String,
-    val emphasis: Boolean
-) {
-    val timeLabel: String
-        get() = "${formatHour(startHour, startMinute)} - ${formatHour(endHour, endMinute)}"
-}
-
-private data class TimetableSlot(
-    val dayIndex: Int,
-    val startHour: Int,
-    val startMinute: Int,
-    val endHour: Int,
-    val endMinute: Int
-)
-
-private fun buildTimetableWeek(
-    courses: List<CourseEntity>,
-    tasks: List<com.rochiee.classsync.domain.model.AcademicTask>
-): List<TimetableDay> {
-    val sortedCourses = courses
-        .sortedBy { courseShortTitle(it.name) }
-
-    val urgentCourses = tasks
-        .filter { !it.isCompleted && it.dueDate != null }
-        .sortedBy { it.dueDate }
-        .take(4)
-        .map { it.courseName }
-        .toSet()
-
-    val slotTemplates = listOf(
-        TimetableSlot(0, 8, 0, 9, 0),
-        TimetableSlot(0, 9, 0, 10, 0),
-        TimetableSlot(0, 10, 0, 11, 0),
-        TimetableSlot(1, 11, 0, 12, 0),
-        TimetableSlot(1, 12, 0, 13, 0),
-        TimetableSlot(2, 8, 0, 9, 0),
-        TimetableSlot(2, 9, 0, 10, 0),
-        TimetableSlot(2, 10, 0, 11, 0),
-        TimetableSlot(3, 8, 0, 9, 0),
-        TimetableSlot(3, 9, 0, 10, 0),
-        TimetableSlot(3, 10, 0, 11, 0),
-        TimetableSlot(3, 11, 0, 12, 0),
-        TimetableSlot(3, 12, 0, 13, 0),
-        TimetableSlot(3, 13, 0, 14, 0),
-        TimetableSlot(4, 8, 0, 9, 0),
-        TimetableSlot(4, 9, 0, 10, 0),
-        TimetableSlot(4, 10, 0, 11, 0),
-        TimetableSlot(5, 9, 0, 10, 0),
-        TimetableSlot(5, 10, 0, 11, 0)
-    )
-
-    val flattenedEntries = buildList {
-        var slotIndex = 0
-        sortedCourses.forEach { course ->
-            val occurrenceCount = if (course.name.contains("(L)", ignoreCase = true)) 2 else 1
-            repeat(occurrenceCount) {
-                val slot = slotTemplates[slotIndex % slotTemplates.size]
-                add(
-                    TimetableEntry(
-                        dayIndex = slot.dayIndex,
-                        startHour = slot.startHour,
-                        startMinute = slot.startMinute,
-                        endHour = slot.endHour,
-                        endMinute = slot.endMinute,
-                        title = courseShortTitle(course.name),
-                        roomLabel = course.room ?: course.section ?: "Classroom",
-                        emphasis = course.name in urgentCourses
-                    )
-                )
-                slotIndex++
-            }
-        }
-    }
-
-    val dayLabels = listOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
-    return dayLabels.mapIndexed { index, label ->
-        TimetableDay(
-            label = label,
-            entries = flattenedEntries
-                .filter { it.dayIndex == index }
-                .sortedWith(compareBy<TimetableEntry> { it.startHour }.thenBy { it.startMinute })
-        )
-    }
-}
-
-private fun courseShortTitle(name: String): String {
-    val cleaned = name
-        .replace(Regex("""semester\s*\d+""", RegexOption.IGNORE_CASE), "")
-        .replace(Regex("""section\s*[a-z0-9-]+""", RegexOption.IGNORE_CASE), "")
-        .replace(Regex("""\s+"""), " ")
-        .trim()
-    return when {
-        cleaned.length <= 14 -> cleaned
-        else -> cleaned
-            .split(" ")
-            .filter { it.isNotBlank() }
-            .map { token -> token.first().uppercaseChar() }
-            .joinToString("")
-            .ifBlank { cleaned.take(14) }
-    }
-}
-
-private fun deriveSemester(courseName: String, section: String?): String? {
-    val fullText = listOf(courseName, section.orEmpty()).joinToString(" ").lowercase()
-    return Regex("""(?:sem(?:ester)?)\s*([1-8])|([1-8])(?:st|nd|rd|th)\s*sem""")
-        .find(fullText)
-        ?.groupValues
-        ?.drop(1)
-        ?.firstOrNull { it.isNotBlank() }
-        ?: if (fullText.contains("4th") || fullText.contains("sem 4") || fullText.contains("semester 4")) "4" else null
-}
-
-private fun currentWeekIndex(): Int {
-    return when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
-        Calendar.MONDAY -> 0
-        Calendar.TUESDAY -> 1
-        Calendar.WEDNESDAY -> 2
-        Calendar.THURSDAY -> 3
-        Calendar.FRIDAY -> 4
-        Calendar.SATURDAY -> 5
-        else -> 6
-    }
-}
-
-private fun formatHour(hour24: Int, minute: Int): String {
-    val suffix = if (hour24 >= 12) "PM" else "AM"
-    val displayHour = when {
-        hour24 == 0 -> 12
-        hour24 > 12 -> hour24 - 12
-        else -> hour24
-    }
-    return "%02d:%02d %s".format(displayHour, minute, suffix)
 }

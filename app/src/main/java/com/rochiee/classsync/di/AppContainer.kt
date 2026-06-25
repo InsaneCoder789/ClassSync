@@ -13,6 +13,7 @@ import com.rochiee.classsync.data.remote.classroom.ClassroomApiClient
 import com.rochiee.classsync.data.remote.classroom.ClassroomRemoteDataSource
 import com.rochiee.classsync.data.remote.gmail.GmailApiClient
 import com.rochiee.classsync.data.remote.gmail.GmailRemoteDataSource
+import com.rochiee.classsync.data.repository.ClassroomCatalogRepositoryImpl
 import com.rochiee.classsync.data.repository.ClassroomEventRepositoryImpl
 import com.rochiee.classsync.data.repository.ClassroomRepositoryImpl
 import com.rochiee.classsync.data.repository.GmailRepositoryImpl
@@ -24,6 +25,7 @@ import com.rochiee.classsync.dashboard.CourseDashboardAggregator
 import com.rochiee.classsync.digest.DigestAggregator
 import com.rochiee.classsync.digest.DigestScheduler
 import com.rochiee.classsync.exam.ExamModeAggregator
+import com.rochiee.classsync.domain.repository.ClassroomCatalogRepository
 import com.rochiee.classsync.domain.repository.ClassroomEventRepository
 import com.rochiee.classsync.domain.repository.ClassroomRepository
 import com.rochiee.classsync.domain.repository.GmailRepository
@@ -40,6 +42,7 @@ import com.rochiee.classsync.domain.usecase.digest.GenerateDigestSummaryUseCase
 import com.rochiee.classsync.domain.usecase.digest.PreviewDailyDigestUseCase
 import com.rochiee.classsync.domain.usecase.digest.ScheduleDailyDigestUseCase
 import com.rochiee.classsync.domain.usecase.exam.GetExamModeUseCase
+import com.rochiee.classsync.domain.usecase.classroom.GetClassroomCatalogUseCase
 import com.rochiee.classsync.domain.usecase.classroom.ObserveClassroomCoursesUseCase
 import com.rochiee.classsync.domain.usecase.classroom.SyncClassroomCoursesUseCase
 import com.rochiee.classsync.domain.usecase.classroom.SyncClassroomCourseworkUseCase
@@ -157,6 +160,8 @@ interface AppContainer {
     val googleAuthManager: GoogleAuthManager
     val gmailRepository: GmailRepository
     val syncGmailTasksUseCase: SyncGmailTasksUseCase
+    val classroomCatalogRepository: ClassroomCatalogRepository
+    val getClassroomCatalogUseCase: GetClassroomCatalogUseCase
     val classroomRepository: ClassroomRepository
     val observeClassroomCoursesUseCase: ObserveClassroomCoursesUseCase
     val syncClassroomCoursesUseCase: SyncClassroomCoursesUseCase
@@ -212,6 +217,10 @@ class AppContainerImpl(private val context: Context) : AppContainer {
 
     override val settingsRepository: SettingsRepository by lazy {
         SettingsRepositoryImpl(settingsDataStore)
+    }
+
+    override val classroomCatalogRepository: ClassroomCatalogRepository by lazy {
+        ClassroomCatalogRepositoryImpl(context.applicationContext)
     }
 
     override val classroomEventRepository: ClassroomEventRepository by lazy {
@@ -493,6 +502,10 @@ class AppContainerImpl(private val context: Context) : AppContainer {
             setLastSyncTimeUseCase,
             refreshWidgetsUseCase
         )
+    }
+
+    override val getClassroomCatalogUseCase: GetClassroomCatalogUseCase by lazy {
+        GetClassroomCatalogUseCase(classroomCatalogRepository)
     }
 
     // Classroom

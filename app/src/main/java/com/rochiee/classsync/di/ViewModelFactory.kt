@@ -110,12 +110,7 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(ClassroomScreenViewModel::class.java) -> {
                 ClassroomScreenViewModel(
-                    container.observeClassroomCoursesUseCase,
-                    container.observeTasksUseCase,
-                    container.observeAllEventsUseCase,
-                    container.courseDashboardAggregator,
-                    container.syncClassroomCoursesUseCase,
-                    container.syncClassroomCourseworkUseCase
+                    container.getClassroomCatalogUseCase
                 ) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

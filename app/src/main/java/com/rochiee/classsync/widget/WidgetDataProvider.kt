@@ -48,17 +48,7 @@ class WidgetDataProvider(
         val redZoneTasks = allDatedTasks.filter { task ->
             task.dueDate?.let { dueMillis -> isRedZone(dueMillis, now) } == true
         }
-        val rotation = if (redZoneTasks.isEmpty()) 0 else Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % redZoneTasks.size
-        val rotatedRedZoneTasks = if (redZoneTasks.isEmpty()) {
-            emptyList()
-        } else {
-            redZoneTasks.drop(rotation) + redZoneTasks.take(rotation)
-        }
-        val primaryTask = rotatedRedZoneTasks.firstOrNull() ?: upcomingTasks.firstOrNull()
-        val secondTask = when {
-            rotatedRedZoneTasks.size > 1 -> rotatedRedZoneTasks.getOrNull(1)
-            else -> upcomingTasks.firstOrNull { it.sourceId != primaryTask?.sourceId }
-        }
+        val primaryTask = redZoneTasks.firstOrNull() ?: upcomingTasks.firstOrNull()
         return WidgetSummary(
             todayTaskCount = todayTasks.size,
             urgentTaskCount = urgentTasks.size,
@@ -66,11 +56,7 @@ class WidgetDataProvider(
             primaryTaskTitle = primaryTask?.title,
             primaryTaskCourseName = primaryTask?.courseName,
             primaryTaskDueMillis = primaryTask?.dueDate,
-            redZoneOverflowCount = (redZoneTasks.size - 1).coerceAtLeast(0),
-            secondTaskTitle = secondTask?.title,
-            secondTaskCourseName = secondTask?.courseName,
-            secondTaskDueMillis = secondTask?.dueDate,
-            lastUpdatedMillis = System.currentTimeMillis()
+            redZoneOverflowCount = (redZoneTasks.size - 1).coerceAtLeast(0)
         )
     }
 
