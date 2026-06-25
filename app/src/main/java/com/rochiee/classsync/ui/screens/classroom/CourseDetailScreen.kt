@@ -48,7 +48,12 @@ fun CourseDetailScreen(
         modifier = androidx.compose.ui.Modifier.horizontalScroll(rememberScrollState())
     ) {
         CourseTab.entries.forEach { tab ->
-            LiquidGlassTextButton(text = tab.label, onClick = { onSelectTab(tab) }, selected = selectedTab == tab)
+            LiquidGlassTextButton(
+                text = tab.label,
+                onClick = { onSelectTab(tab) },
+                selected = selectedTab == tab,
+                showArrow = false
+            )
         }
     }
 

@@ -33,7 +33,11 @@ fun CourseListScreen(
     val spacing = LocalSpacing.current
     ScreenSection(title = "Classroom", subtitle = "Course-wise organization powered by local course, task, and event data.") {
         Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            LiquidGlassTextButton(text = if (isRefreshing) "Refreshing..." else "Refresh Courses", onClick = onRefresh)
+            LiquidGlassTextButton(
+                text = if (isRefreshing) "Refreshing..." else "Refresh Courses",
+                onClick = onRefresh,
+                showArrow = false
+            )
         }
         if (summaries.isEmpty()) {
             EmptyState("No courses yet", "Run Classroom sync to populate your course list.")
