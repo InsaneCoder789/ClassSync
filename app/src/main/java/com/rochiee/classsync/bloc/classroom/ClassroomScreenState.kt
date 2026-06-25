@@ -9,6 +9,8 @@ data class ClassroomScreenState(
     val isLoading: Boolean = true,
     val courses: List<CourseEntity> = emptyList(),
     val courseSummaries: List<CourseDashboardSummary> = emptyList(),
+    val allTasks: List<AcademicTask> = emptyList(),
+    val allEvents: List<ClassroomEvent> = emptyList(),
     val selectedCourseId: String? = null,
     val selectedCourseTasks: List<AcademicTask> = emptyList(),
     val selectedCourseEvents: List<ClassroomEvent> = emptyList(),

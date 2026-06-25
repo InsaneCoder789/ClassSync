@@ -66,6 +66,8 @@ class ClassroomScreenViewModel(
                 val baseState = current.copy(
                     isLoading = false,
                     courses = courses,
+                    allTasks = tasks,
+                    allEvents = events,
                     selectedCourseId = selectedCourseId,
                     courseSummaries = courses.map { course ->
                         courseDashboardAggregator.buildSummary(course, tasks, events)
