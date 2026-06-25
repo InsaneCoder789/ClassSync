@@ -46,6 +46,10 @@ class WidgetTaskFormatter {
         }
     }
 
+    fun overflowText(extraCount: Int): String {
+        return "+$extraCount more in red zone"
+    }
+
     fun updatedText(updatedAtMillis: Long): String {
         return "Updated ${DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(updatedAtMillis))}"
     }

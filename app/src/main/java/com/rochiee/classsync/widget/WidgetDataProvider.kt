@@ -40,22 +40,44 @@ class WidgetDataProvider(
         val todayTasks = getTodayTasks()
         val urgentTasks = getUrgentTasks()
         val overdueTasks = getOverdueTasks()
-        val upcomingTasks = taskRepository.getTasksSnapshot()
-            .filter { !it.isCompleted && it.dueDate != null && it.dueDate >= System.currentTimeMillis() }
+        val now = System.currentTimeMillis()
+        val allDatedTasks = taskRepository.getTasksSnapshot()
+            .filter { !it.isCompleted && it.dueDate != null }
             .sortedBy { it.dueDate }
-        val nextTask = upcomingTasks.getOrNull(0)
-        val secondTask = upcomingTasks.getOrNull(1)
+        val upcomingTasks = allDatedTasks.filter { (it.dueDate ?: 0L) >= now }
+        val redZoneTasks = allDatedTasks.filter { task ->
+            task.dueDate?.let { dueMillis -> isRedZone(dueMillis, now) } == true
+        }
+        val primaryTask = redZoneTasks.firstOrNull() ?: upcomingTasks.firstOrNull()
+        val secondTask = (if (redZoneTasks.size > 1) {
+            upcomingTasks.filterNot { it.sourceId == primaryTask?.sourceId }.firstOrNull()
+        } else {
+            upcomingTasks.getOrNull(1)
+        })
         return WidgetSummary(
             todayTaskCount = todayTasks.size,
             urgentTaskCount = urgentTasks.size,
             overdueTaskCount = overdueTasks.size,
-            nextTaskTitle = nextTask?.title,
-            nextTaskCourseName = nextTask?.courseName,
-            nextTaskDueMillis = nextTask?.dueDate,
+            primaryTaskTitle = primaryTask?.title,
+            primaryTaskCourseName = primaryTask?.courseName,
+            primaryTaskDueMillis = primaryTask?.dueDate,
+            redZoneOverflowCount = (redZoneTasks.size - 1).coerceAtLeast(0),
             secondTaskTitle = secondTask?.title,
             secondTaskDueMillis = secondTask?.dueDate,
             lastUpdatedMillis = System.currentTimeMillis()
         )
+    }
+
+    private fun isRedZone(dueMillis: Long, now: Long): Boolean {
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = now
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val dayAfterTomorrowStart = calendar.timeInMillis + (2L * 24L * 60L * 60L * 1000L)
+        return dueMillis < dayAfterTomorrowStart
     }
 
     private fun todayBounds(): Pair<Long, Long> {

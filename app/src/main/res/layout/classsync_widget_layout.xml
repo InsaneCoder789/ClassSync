@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_root_surface"
-    android:gravity="center_vertical"
+    android:gravity="top"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="14dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -161,6 +161,17 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/widgetNextTaskOverflow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="+1 more in red zone"
+            android:textColor="#9D3A3A"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/widgetNextTaskTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -168,7 +179,9 @@
             android:text="No academic tasks yet"
             android:textColor="#122033"
             android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
         <TextView
             android:id="@+id/widgetNextTaskCourse"
@@ -177,7 +190,9 @@
             android:layout_marginTop="3dp"
             android:text="Academic focus"
             android:textColor="#64748B"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <TextView
             android:id="@+id/widgetNextTaskDue"
@@ -214,7 +229,9 @@
             android:layout_marginTop="4dp"
             android:text="No upcoming tasks"
             android:textColor="#122033"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            android:maxLines="2"
+            android:ellipsize="end" />
     </LinearLayout>
 
     <TextView
