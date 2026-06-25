@@ -47,7 +47,6 @@ fun HomeScreen(
     onNavigateToActivity: () -> Unit,
     onNavigateToStudyPlanner: () -> Unit,
     onNavigateToExamMode: () -> Unit,
-    onNavigateToDebug: () -> Unit,
     onNavigateToAuth: () -> Unit
 ) {
     val spacing = LocalSpacing.current
@@ -128,22 +127,16 @@ fun HomeScreen(
         }
 
         TintedPanel {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
-                    Text(
-                        text = "Operations",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = "Last sync ${syncState.lastSyncMillis.formatDateTime()} • ${eventState.recentEvents.size} recent changes",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+            Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+                Text(
+                    text = "Operations",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = "Last sync ${syncState.lastSyncMillis.formatDateTime()} • ${eventState.recentEvents.size} recent changes",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Box(
                     modifier = Modifier
                         .background(
@@ -163,10 +156,7 @@ fun HomeScreen(
                 LiquidGlassTextButton(text = "Activity", onClick = onNavigateToActivity, modifier = Modifier.weight(1f))
                 LiquidGlassTextButton(text = "Study", onClick = onNavigateToStudyPlanner, modifier = Modifier.weight(1f))
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
-                LiquidGlassTextButton(text = "Exam", onClick = onNavigateToExamMode, modifier = Modifier.weight(1f))
-                LiquidGlassTextButton(text = "Debug", onClick = onNavigateToDebug, modifier = Modifier.weight(1f))
-            }
+            LiquidGlassTextButton(text = "Exam", onClick = onNavigateToExamMode, modifier = Modifier.fillMaxWidth())
             if (!authState.isSignedIn) {
                 LiquidGlassTextButton(
                     text = "Connect Google",

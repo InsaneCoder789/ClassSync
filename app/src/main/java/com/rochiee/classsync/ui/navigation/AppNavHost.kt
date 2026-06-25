@@ -1,16 +1,30 @@
 package com.rochiee.classsync.ui.navigation
 
-import androidx.compose.foundation.Image
+import android.content.Context
+import android.content.Intent
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.rounded.AssignmentTurnedIn
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.School
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -18,8 +32,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -27,8 +41,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import android.content.Context
-import android.content.Intent
 import com.rochiee.classsync.bloc.auth.AuthEvent
 import com.rochiee.classsync.bloc.auth.AuthUiState
 import com.rochiee.classsync.bloc.classroom.ClassroomScreenEvent
@@ -142,10 +154,10 @@ fun AppNavHost(
                                     }
                                 }
                             ) {
-                                Image(
-                                    painter = painterResource(id = com.rochiee.classsync.R.drawable.ic_back),
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Back",
-                                    modifier = Modifier.size(28.dp)
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
                         }
@@ -155,38 +167,48 @@ fun AppNavHost(
         },
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)) {
-                    AppDestination.bottomBarDestinations.forEach { destination ->
-                        val selected = backStackEntry?.destination?.hierarchy?.any { it.route == destination.route } == true
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = {
-                                navController.navigate(destination.route) {
-                                    popUpTo(AppDestination.Home.route) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = Color.Transparent
-                            ),
-                            icon = {
-                                destination.iconRes?.let {
-                                    Image(
-                                        painter = painterResource(id = it),
-                                        contentDescription = destination.label,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                } ?: Text(destination.label.take(1))
-                            },
-                            label = {
-                                Text(
-                                    text = destination.label,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(horizontal = 18.dp, vertical = 12.dp)
+                ) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
+                        shape = RoundedCornerShape(28.dp),
+                        shadowElevation = 18.dp,
+                        tonalElevation = 10.dp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                                shape = RoundedCornerShape(28.dp)
+                            )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            AppDestination.bottomBarDestinations.forEach { destination ->
+                                val selected = backStackEntry?.destination?.hierarchy?.any { it.route == destination.route } == true
+                                FloatingNavItem(
+                                    label = destination.label,
+                                    icon = iconForDestination(destination),
+                                    selected = selected,
+                                    modifier = Modifier.weight(1f),
+                                    onClick = {
+                                        navController.navigate(destination.route) {
+                                            popUpTo(AppDestination.Home.route) { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    }
                                 )
                             }
-                        )
+                        }
                     }
                 }
             }
@@ -225,7 +247,6 @@ fun AppNavHost(
                     onNavigateToActivity = { navController.navigate(AppDestination.Activity.route) },
                     onNavigateToStudyPlanner = { navController.navigate(AppDestination.StudyPlanner.route) },
                     onNavigateToExamMode = { navController.navigate(AppDestination.ExamMode.route) },
-                    onNavigateToDebug = { navController.navigate(AppDestination.Debug.route) },
                     onNavigateToAuth = { navController.navigate(AppDestination.Auth.route) }
                 )
             }
@@ -317,6 +338,63 @@ fun AppNavHost(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun FloatingNavItem(
+    label: String,
+    icon: ImageVector,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(22.dp),
+        color = if (selected) {
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
+        } else {
+            Color.Transparent
+        }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+                if (selected) {
+                    Text(
+                        text = label,
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun iconForDestination(destination: AppDestination): ImageVector {
+    return when (destination) {
+        AppDestination.Home -> Icons.Rounded.Home
+        AppDestination.Tasks -> Icons.Rounded.AssignmentTurnedIn
+        AppDestination.Classroom -> Icons.Rounded.School
+        AppDestination.Planner -> Icons.Rounded.CalendarMonth
+        AppDestination.Settings -> Icons.Rounded.Settings
+        else -> Icons.Rounded.Home
     }
 }
 

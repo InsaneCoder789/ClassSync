@@ -9,6 +9,7 @@ data class WidgetSummary(
     val primaryTaskDueMillis: Long?,
     val redZoneOverflowCount: Int,
     val secondTaskTitle: String?,
+    val secondTaskCourseName: String?,
     val secondTaskDueMillis: Long?,
     val lastUpdatedMillis: Long
 )

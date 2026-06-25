@@ -133,12 +133,6 @@ fun SettingsScreen(
                             onClick = onNavigateToAuth,
                             modifier = Modifier.widthIn(min = 148.dp)
                         )
-                    } else {
-                        LiquidGlassTextButton(
-                            text = "Debug tools",
-                            onClick = onNavigateToDebug,
-                            modifier = Modifier.widthIn(min = 148.dp)
-                        )
                     }
                 }
             }
@@ -234,6 +228,25 @@ fun SettingsScreen(
                     LiquidGlassTextButton(text = "8 PM", onClick = { onSettingsEvent(SettingsEvent.SetDigestHourOfDay(20)) }, modifier = Modifier.widthIn(min = 92.dp), selected = settingsState.digestHourOfDay == 20)
                 }
                 LiquidGlassTextButton(text = "Preview Today's Digest", onClick = { onSettingsEvent(SettingsEvent.PreviewDigest) }, modifier = Modifier.fillMaxWidth())
+            }
+        }
+
+        ScreenSection(title = "Advanced", subtitle = "Developer controls live here so the main workflow stays clean.") {
+            TintedPanel {
+                Text(
+                    text = "Debug tools",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = "Use sample data, auth checks, and manual diagnostics from this section only.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                LiquidGlassTextButton(
+                    text = "Open Debug Tools",
+                    onClick = onNavigateToDebug,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }

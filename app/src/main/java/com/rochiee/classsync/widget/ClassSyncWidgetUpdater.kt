@@ -44,7 +44,9 @@ object ClassSyncWidgetUpdater {
             val minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
             val expanded = minHeight >= 170
             val wide = minWidth >= 250
+            val showSecondaryCard = summary.secondTaskTitle != null && (minHeight >= 220 || wide)
             val deadlineTone = formatter.deadlineTone(summary.primaryTaskDueMillis)
+            val secondaryTone = formatter.deadlineTone(summary.secondTaskDueMillis)
             val isDark = themeMode == ThemeMode.DARK
             val rootSurface = if (isDark) R.drawable.widget_root_surface_dark else R.drawable.widget_root_surface
             val neutralCardSurface = if (isDark) R.drawable.widget_card_surface_dark else R.drawable.widget_card_surface
@@ -79,17 +81,34 @@ object ClassSyncWidgetUpdater {
                     formatter.overflowText(summary.redZoneOverflowCount)
                 )
                 setTextViewText(
-                    R.id.widgetFocusLine,
-                    formatter.focusText(summary.secondTaskTitle, summary.secondTaskDueMillis)
+                    R.id.widgetSecondaryTaskTitle,
+                    summary.secondTaskTitle ?: "No upcoming tasks"
                 )
                 setTextViewText(
-                    R.id.widgetLastUpdated,
-                    formatter.updatedText(summary.lastUpdatedMillis)
+                    R.id.widgetSecondaryTaskCourse,
+                    summary.secondTaskCourseName ?: "Academic focus"
+                )
+                setTextViewText(
+                    R.id.widgetSecondaryTaskDue,
+                    formatter.dueText(summary.secondTaskDueMillis)
                 )
                 setInt(
-                    R.id.widgetNextTaskContainer,
+                    R.id.widgetPrimaryTaskContainer,
                     "setBackgroundResource",
                     when (deadlineTone) {
+                        WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE -> if (isDark) R.drawable.widget_card_overdue_dark else R.drawable.widget_card_overdue
+                        WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> if (isDark) R.drawable.widget_card_today_dark else R.drawable.widget_card_today
+                        WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) R.drawable.widget_card_tomorrow_dark else R.drawable.widget_card_tomorrow
+                        WidgetTaskFormatter.WidgetDeadlineTone.SOON -> if (isDark) R.drawable.widget_card_soon_dark else R.drawable.widget_card_soon
+                        WidgetTaskFormatter.WidgetDeadlineTone.UPCOMING -> if (isDark) R.drawable.widget_card_upcoming_dark else R.drawable.widget_card_upcoming
+                        WidgetTaskFormatter.WidgetDeadlineTone.SAFE -> if (isDark) R.drawable.widget_card_safe_dark else R.drawable.widget_card_safe
+                        WidgetTaskFormatter.WidgetDeadlineTone.NONE -> neutralCardSurface
+                    }
+                )
+                setInt(
+                    R.id.widgetSecondaryTaskContainer,
+                    "setBackgroundResource",
+                    when (secondaryTone) {
                         WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE -> if (isDark) R.drawable.widget_card_overdue_dark else R.drawable.widget_card_overdue
                         WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> if (isDark) R.drawable.widget_card_today_dark else R.drawable.widget_card_today
                         WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) R.drawable.widget_card_tomorrow_dark else R.drawable.widget_card_tomorrow
@@ -119,6 +138,24 @@ object ClassSyncWidgetUpdater {
                     WidgetTaskFormatter.WidgetDeadlineTone.SAFE -> if (isDark) 0xFF88E7B0.toInt() else 0xFF347F5A.toInt()
                     WidgetTaskFormatter.WidgetDeadlineTone.NONE -> secondaryText
                 }
+                val secondaryAccentText = when (secondaryTone) {
+                    WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE,
+                    WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> if (isDark) 0xFFFFD7D7.toInt() else 0xFF7E2323.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) 0xFFFFDFDF.toInt() else 0xFF962E2E.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.SOON -> if (isDark) 0xFFFFE1C8.toInt() else 0xFF8C4E16.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.UPCOMING -> if (isDark) 0xFFFFEFA8.toInt() else 0xFF8C6A13.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.SAFE -> if (isDark) 0xFFD8FFE7.toInt() else 0xFF1E6D45.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.NONE -> primaryText
+                }
+                val secondaryMutedAccentText = when (secondaryTone) {
+                    WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE,
+                    WidgetTaskFormatter.WidgetDeadlineTone.TODAY,
+                    WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) 0xFFFFAAAA.toInt() else 0xFFB14A4A.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.SOON -> if (isDark) 0xFFFFC887.toInt() else 0xFFB86C2A.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.UPCOMING -> if (isDark) 0xFFFFDB73.toInt() else 0xFFA5832E.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.SAFE -> if (isDark) 0xFF88E7B0.toInt() else 0xFF347F5A.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.NONE -> secondaryText
+                }
                 setTextColor(R.id.widgetTitle, primaryText)
                 setTextColor(R.id.widgetSummaryText, secondaryText)
                 setTextColor(R.id.widgetTodayLabel, secondaryText)
@@ -131,9 +168,24 @@ object ClassSyncWidgetUpdater {
                 setTextColor(R.id.widgetNextTaskOverflow, accentText)
                 setTextColor(R.id.widgetNextTaskTitle, accentText)
                 setTextColor(R.id.widgetNextTaskCourse, mutedAccentText)
+                setTextColor(R.id.widgetSecondaryTaskLabel, secondaryMutedAccentText)
+                setTextColor(R.id.widgetSecondaryTaskTitle, secondaryAccentText)
+                setTextColor(R.id.widgetSecondaryTaskCourse, secondaryMutedAccentText)
                 setTextColor(
                     R.id.widgetNextTaskDue,
                     when (deadlineTone) {
+                        WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE,
+                        WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> if (isDark) 0xFFFFD7D7.toInt() else 0xFF9D3A3A.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) 0xFFFFE3E3.toInt() else 0xFFD95D5D.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.SOON -> if (isDark) 0xFFFFDEB5.toInt() else 0xFFE68A3A.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.UPCOMING -> if (isDark) 0xFFFFEFA8.toInt() else 0xFFE0B84C.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.SAFE -> if (isDark) 0xFFD8FFE7.toInt() else 0xFF39A66A.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.NONE -> secondaryText
+                    }
+                )
+                setTextColor(
+                    R.id.widgetSecondaryTaskDue,
+                    when (secondaryTone) {
                         WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE,
                         WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> if (isDark) 0xFFFFD7D7.toInt() else 0xFF9D3A3A.toInt()
                         WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) 0xFFFFE3E3.toInt() else 0xFFD95D5D.toInt()
@@ -147,13 +199,18 @@ object ClassSyncWidgetUpdater {
                     R.id.widgetNextTaskOverflow,
                     if (summary.redZoneOverflowCount > 0) View.VISIBLE else View.GONE
                 )
-                setViewVisibility(R.id.widgetNextTaskContainer, if (expanded) View.VISIBLE else View.GONE)
+                setViewVisibility(R.id.widgetPrimaryTaskContainer, if (expanded) View.VISIBLE else View.GONE)
+                setViewVisibility(R.id.widgetSecondaryTaskContainer, if (showSecondaryCard) View.VISIBLE else View.GONE)
                 setOnClickPendingIntent(
                     R.id.widgetRoot,
                     openAppPendingIntent(context, AppDestination.Home.route)
                 )
                 setOnClickPendingIntent(
-                    R.id.widgetNextTaskContainer,
+                    R.id.widgetPrimaryTaskContainer,
+                    openAppPendingIntent(context, AppDestination.Tasks.route)
+                )
+                setOnClickPendingIntent(
+                    R.id.widgetSecondaryTaskContainer,
                     openAppPendingIntent(context, AppDestination.Tasks.route)
                 )
             }
