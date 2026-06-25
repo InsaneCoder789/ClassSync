@@ -47,15 +47,19 @@ import com.rochiee.classsync.ui.components.ErrorState
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
 import com.rochiee.classsync.ui.components.LoadingState
 import com.rochiee.classsync.ui.components.TintedPanel
+import com.rochiee.classsync.ui.theme.AlertOrange
+import com.rochiee.classsync.ui.theme.Ink
 import com.rochiee.classsync.ui.theme.LocalSpacing
+import com.rochiee.classsync.ui.theme.NightAccent
+import com.rochiee.classsync.ui.theme.SkyBlue
 
 private val timetableShell = Color(0xFF121014)
 private val timetableShellBorder = Color(0xFF2C2331)
 private val timetableCard = Color(0xFF342737)
-private val timetableCardHighlight = Color(0xFF8E4A23)
+private val timetableCardHighlight = Color(0xFF1D3359)
 private val timetableDayIdle = Color(0xFF262128)
-private val timetableDaySelected = Color(0xFF8FD1B6)
-private val timetableAccent = Color(0xFFFFA23A)
+private val timetableDaySelected = SkyBlue
+private val timetableAccent = NightAccent
 private val timetableTextPrimary = Color(0xFFF8F2F6)
 private val timetableTextMuted = Color(0xFFC9BEC7)
 
@@ -451,7 +455,7 @@ private fun TimetableDayChip(
     ) {
         Text(
             text = label,
-            color = if (selected) Color(0xFF111111) else timetableTextPrimary,
+            color = if (selected) Ink else timetableTextPrimary,
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier

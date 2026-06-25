@@ -42,8 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.rochiee.classsync.domain.model.AcademicTask
 import com.rochiee.classsync.domain.model.TaskPriority
-import com.rochiee.classsync.ui.theme.AlertOrange
-import com.rochiee.classsync.ui.theme.CautionYellow
 import com.rochiee.classsync.ui.theme.DeepNegative
 import com.rochiee.classsync.ui.theme.LocalSpacing
 import com.rochiee.classsync.ui.theme.MintGreen
@@ -51,8 +49,8 @@ import com.rochiee.classsync.ui.theme.Negative
 import com.rochiee.classsync.ui.theme.Positive
 import com.rochiee.classsync.ui.theme.SafeGreen
 import com.rochiee.classsync.ui.theme.SkyBlue
-import com.rochiee.classsync.ui.theme.Sun
-import com.rochiee.classsync.ui.theme.Warning
+import com.rochiee.classsync.ui.theme.SilverBorder
+import com.rochiee.classsync.ui.theme.SilverBorderSoft
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -160,8 +158,8 @@ enum class DeadlineTone(
     OVERDUE("Overdue", DeepNegative),
     TODAY("Due today", DeepNegative),
     TOMORROW("Due tomorrow", Negative),
-    SOON("Due soon", AlertOrange),
-    UPCOMING("Upcoming", CautionYellow),
+    SOON("Due soon", SkyBlue),
+    UPCOMING("Upcoming", SkyBlue),
     SAFE("On track", SafeGreen),
     COMPLETE("Done", Positive),
     NONE("No date", Color(0xFF7B8794))
@@ -231,7 +229,7 @@ fun DeadlineText(
 fun PriorityChip(priority: TaskPriority) {
     val (label, color) = when (priority) {
         TaskPriority.HIGH -> "High" to Negative
-        TaskPriority.MEDIUM -> "Medium" to Sun
+        TaskPriority.MEDIUM -> "Medium" to SkyBlue
         TaskPriority.LOW -> "Low" to MintGreen
         TaskPriority.URGENT -> "Urgent" to Negative
     }
@@ -351,14 +349,14 @@ fun LiquidGlassButton(
     content: @Composable RowScope.() -> Unit
 ) {
     val baseColor = if (selected) {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
     } else {
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.24f)
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.42f)
     }
     val borderColor = if (selected) {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.34f)
+        SilverBorder
     } else {
-        Color.White.copy(alpha = if (enabled) 0.42f else 0.24f)
+        if (enabled) SilverBorderSoft else SilverBorderSoft.copy(alpha = 0.45f)
     }
     val contentColor = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f)
 
@@ -376,13 +374,13 @@ fun LiquidGlassButton(
                     brush = Brush.linearGradient(
                         listOf(
                             baseColor.copy(alpha = 0.92f),
-                            baseColor.copy(alpha = 0.72f)
+                            baseColor.copy(alpha = 0.78f)
                         )
                     ),
                     shape = RoundedCornerShape(26.dp)
                 )
                 .fillMaxWidth()
-                .border(1.dp, borderColor, RoundedCornerShape(26.dp))
+                .border(1.2.dp, borderColor, RoundedCornerShape(26.dp))
                 .padding(horizontal = 16.dp, vertical = 13.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,

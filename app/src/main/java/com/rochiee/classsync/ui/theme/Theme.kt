@@ -13,7 +13,7 @@ private val ColorWhite = Color(0xFFFFFFFF)
 private val LightColorScheme = lightColorScheme(
     primary = SkyBlue,
     onPrimary = Mist,
-    secondary = MintGreen,
+    secondary = NightAccent,
     tertiary = Sun,
     background = Mist,
     onBackground = Ink,
@@ -26,7 +26,7 @@ private val LightColorScheme = lightColorScheme(
 
 private val DarkColorScheme = darkColorScheme(
     primary = NightAccent,
-    secondary = MintGreen,
+    secondary = SilverBorder,
     tertiary = Sun,
     background = Ink,
     onBackground = Mist,

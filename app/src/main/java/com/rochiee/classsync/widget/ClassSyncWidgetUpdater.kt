@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import com.rochiee.classsync.ClassSyncApplication
@@ -72,10 +71,6 @@ object ClassSyncWidgetUpdater {
                     R.id.widgetNextTaskDue,
                     formatter.dueText(summary.primaryTaskDueMillis)
                 )
-                setTextViewText(
-                    R.id.widgetNextTaskOverflow,
-                    formatter.overflowText(summary.redZoneOverflowCount)
-                )
                 setInt(
                     R.id.widgetNextTaskContainer,
                     "setBackgroundResource",
@@ -118,7 +113,6 @@ object ClassSyncWidgetUpdater {
                 setTextColor(R.id.widgetOverdueLabel, if (isDark) 0xFFFFAAAA.toInt() else 0xFF9A4B4B.toInt())
                 setTextColor(R.id.widgetOverdueCount, if (isDark) 0xFFFFB4B4.toInt() else 0xFFD95D5D.toInt())
                 setTextColor(R.id.widgetNextTaskLabel, mutedAccentText)
-                setTextColor(R.id.widgetNextTaskOverflow, accentText)
                 setTextColor(R.id.widgetNextTaskTitle, accentText)
                 setTextColor(R.id.widgetNextTaskCourse, mutedAccentText)
                 setTextColor(
@@ -132,10 +126,6 @@ object ClassSyncWidgetUpdater {
                         WidgetTaskFormatter.WidgetDeadlineTone.SAFE -> if (isDark) 0xFFD8FFE7.toInt() else 0xFF39A66A.toInt()
                         WidgetTaskFormatter.WidgetDeadlineTone.NONE -> secondaryText
                     }
-                )
-                setViewVisibility(
-                    R.id.widgetNextTaskOverflow,
-                    if (summary.redZoneOverflowCount > 0) View.VISIBLE else View.GONE
                 )
                 setViewVisibility(R.id.widgetNextTaskContainer, if (expanded) View.VISIBLE else View.GONE)
                 setOnClickPendingIntent(
