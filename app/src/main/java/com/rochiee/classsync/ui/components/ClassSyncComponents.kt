@@ -306,9 +306,13 @@ fun StatRow(label: String, value: String, modifier: Modifier = Modifier, onClick
 @Composable
 fun TintedPanel(
     modifier: Modifier = Modifier,
+    accentColor: Color? = null,
     content: @Composable () -> Unit
 ) {
     val spacing = LocalSpacing.current
+    val topColor = accentColor?.copy(alpha = 0.14f) ?: MaterialTheme.colorScheme.surface.copy(alpha = 0.86f)
+    val bottomColor = accentColor?.copy(alpha = 0.08f) ?: MaterialTheme.colorScheme.surface.copy(alpha = 0.68f)
+    val borderColor = accentColor?.copy(alpha = 0.24f) ?: Color.White.copy(alpha = 0.28f)
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(28.dp),
@@ -319,15 +323,15 @@ fun TintedPanel(
                 .background(
                     brush = Brush.verticalGradient(
                         listOf(
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.86f),
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.68f)
+                            topColor,
+                            bottomColor
                         )
                     ),
                     shape = RoundedCornerShape(28.dp)
                 )
                 .border(
                     width = 1.dp,
-                    color = Color.White.copy(alpha = 0.28f),
+                    color = borderColor,
                     shape = RoundedCornerShape(28.dp)
                 )
                 .padding(horizontal = spacing.md, vertical = spacing.md),

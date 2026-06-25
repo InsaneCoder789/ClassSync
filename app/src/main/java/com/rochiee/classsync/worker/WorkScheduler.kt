@@ -9,6 +9,7 @@ object WorkScheduler {
     const val CLASSROOM_SYNC_WORK = "CLASSROOM_SYNC_WORK"
     const val FULL_SYNC_WORK = "FULL_SYNC_WORK"
     const val WIDGET_REFRESH_WORK = "WIDGET_REFRESH_WORK"
+    const val DUE_SOON_NOTIFICATION_WORK = "DUE_SOON_NOTIFICATION_WORK"
 
     fun scheduleGmailSync(context: Context) {
         val constraints = Constraints.Builder()
@@ -74,6 +75,22 @@ object WorkScheduler {
             ExistingPeriodicWorkPolicy.UPDATE,
             request
         )
+    }
+
+    fun scheduleDueSoonNotificationRefresh(context: Context) {
+        val request = PeriodicWorkRequestBuilder<DueSoonNotificationWorker>(1, TimeUnit.HOURS)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            DUE_SOON_NOTIFICATION_WORK,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            request
+        )
+    }
+
+    fun runOneTimeDueSoonNotificationRefresh(context: Context) {
+        val request = OneTimeWorkRequestBuilder<DueSoonNotificationWorker>().build()
+        WorkManager.getInstance(context).enqueue(request)
     }
 
     fun cancelAll(context: Context) {

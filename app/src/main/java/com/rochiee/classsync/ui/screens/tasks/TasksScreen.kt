@@ -22,8 +22,10 @@ import com.rochiee.classsync.ui.components.DeadlineChip
 import com.rochiee.classsync.ui.components.DeadlineText
 import com.rochiee.classsync.ui.components.EmptyState
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
+import com.rochiee.classsync.ui.components.ResponsiveFlowRow
 import com.rochiee.classsync.ui.components.ScreenSection
 import com.rochiee.classsync.ui.components.TintedPanel
+import com.rochiee.classsync.ui.components.deadlineTone
 import com.rochiee.classsync.ui.theme.LocalSpacing
 
 @Composable
@@ -62,7 +64,8 @@ fun TasksScreen(
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                 items(taskState.tasks, key = { it.id }) { task ->
-                    TintedPanel {
+                    val tone = task.deadlineTone()
+                    TintedPanel(accentColor = tone.color) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -70,15 +73,16 @@ fun TasksScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
                                 Text(text = task.title, style = MaterialTheme.typography.titleMedium)
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(spacing.xs),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
+                                ResponsiveFlowRow(maxItemsInEachRow = 2) {
                                     CourseChip(courseName = task.courseName)
                                     DeadlineChip(dueMillis = task.dueDate, isCompleted = task.isCompleted)
                                 }
                                 if (task.description.isNotBlank()) {
-                                    Text(text = task.description, style = MaterialTheme.typography.bodyMedium)
+                                    Text(
+                                        text = task.description,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        maxLines = 4
+                                    )
                                 }
                                 DeadlineText(dueMillis = task.dueDate, isCompleted = task.isCompleted)
                             }

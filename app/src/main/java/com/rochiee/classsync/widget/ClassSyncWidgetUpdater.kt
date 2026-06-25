@@ -70,6 +70,19 @@ object ClassSyncWidgetUpdater {
                     R.id.widgetLastUpdated,
                     formatter.updatedText(summary.lastUpdatedMillis)
                 )
+                setInt(
+                    R.id.widgetNextTaskContainer,
+                    "setBackgroundResource",
+                    when (deadlineTone) {
+                        WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE,
+                        WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> R.drawable.widget_card_today
+                        WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> R.drawable.widget_card_tomorrow
+                        WidgetTaskFormatter.WidgetDeadlineTone.SOON -> R.drawable.widget_card_soon
+                        WidgetTaskFormatter.WidgetDeadlineTone.UPCOMING -> R.drawable.widget_card_upcoming
+                        WidgetTaskFormatter.WidgetDeadlineTone.SAFE -> R.drawable.widget_card_safe
+                        WidgetTaskFormatter.WidgetDeadlineTone.NONE -> R.drawable.widget_card_surface
+                    }
+                )
                 setTextColor(
                     R.id.widgetNextTaskDue,
                     when (deadlineTone) {

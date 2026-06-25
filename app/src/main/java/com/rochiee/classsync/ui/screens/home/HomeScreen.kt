@@ -19,6 +19,7 @@ import com.rochiee.classsync.bloc.task.TaskState
 import com.rochiee.classsync.ui.components.ElevatedInfoCard
 import com.rochiee.classsync.ui.components.DeadlineChip
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
+import com.rochiee.classsync.ui.components.ResponsiveFlowRow
 import com.rochiee.classsync.ui.components.ScreenSection
 import com.rochiee.classsync.ui.components.TintedPanel
 import com.rochiee.classsync.ui.components.formatDateTime
@@ -109,7 +110,7 @@ fun HomeScreen(
                             text = "Next deadline: ${task.title}",
                             style = MaterialTheme.typography.bodyLarge
                         )
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ResponsiveFlowRow(maxItemsInEachRow = 2) {
                             DeadlineChip(dueMillis = task.dueDate, isCompleted = task.isCompleted)
                             Text(
                                 text = task.dueDate.formatDateTime(),
@@ -123,13 +124,11 @@ fun HomeScreen(
                     text = "Recent logs: ${syncState.logs.size}",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    LiquidGlassTextButton(text = "Activity", onClick = onNavigateToActivity, modifier = Modifier.weight(1f))
-                    LiquidGlassTextButton(text = "Study", onClick = onNavigateToStudyPlanner, modifier = Modifier.weight(1f))
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    LiquidGlassTextButton(text = "Exam", onClick = onNavigateToExamMode, modifier = Modifier.weight(1f))
-                    LiquidGlassTextButton(text = "Debug", onClick = onNavigateToDebug, modifier = Modifier.weight(1f))
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                    LiquidGlassTextButton(text = "Activity", onClick = onNavigateToActivity, modifier = Modifier.fillMaxWidth())
+                    LiquidGlassTextButton(text = "Study", onClick = onNavigateToStudyPlanner, modifier = Modifier.fillMaxWidth())
+                    LiquidGlassTextButton(text = "Exam", onClick = onNavigateToExamMode, modifier = Modifier.fillMaxWidth())
+                    LiquidGlassTextButton(text = "Debug", onClick = onNavigateToDebug, modifier = Modifier.fillMaxWidth())
                 }
                 if (!authState.isSignedIn) {
                     LiquidGlassTextButton(text = "Connect Google", onClick = onNavigateToAuth, modifier = Modifier.fillMaxWidth())
