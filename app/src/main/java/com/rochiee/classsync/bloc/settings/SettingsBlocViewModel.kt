@@ -20,6 +20,8 @@ import com.rochiee.classsync.domain.usecase.settings.SetNotificationPermissionEx
 import com.rochiee.classsync.domain.usecase.settings.SetOnboardingCompletedUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetNotificationParsingEnabledUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetThemeModeUseCase
+import com.rochiee.classsync.domain.usecase.worker.CancelBackgroundSyncUseCase
+import com.rochiee.classsync.domain.usecase.worker.ScheduleBackgroundSyncUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,7 +49,9 @@ class SettingsBlocViewModel(
     private val setThemeModeUseCase: SetThemeModeUseCase,
     private val scheduleDailyDigestUseCase: ScheduleDailyDigestUseCase,
     private val cancelDailyDigestUseCase: CancelDailyDigestUseCase,
-    private val previewDailyDigestUseCase: PreviewDailyDigestUseCase
+    private val previewDailyDigestUseCase: PreviewDailyDigestUseCase,
+    private val scheduleBackgroundSyncUseCase: ScheduleBackgroundSyncUseCase,
+    private val cancelBackgroundSyncUseCase: CancelBackgroundSyncUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsState(isLoading = true))
@@ -60,9 +64,9 @@ class SettingsBlocViewModel(
     fun onEvent(event: SettingsEvent) {
         when (event) {
             SettingsEvent.LoadSettings -> observeSettings()
-            is SettingsEvent.SetBackgroundSyncEnabled -> updateSetting { setBackgroundSyncEnabledUseCase(event.enabled) }
-            is SettingsEvent.SetGmailSyncEnabled -> updateSetting { setGmailSyncEnabledUseCase(event.enabled) }
-            is SettingsEvent.SetClassroomSyncEnabled -> updateSetting { setClassroomSyncEnabledUseCase(event.enabled) }
+            is SettingsEvent.SetBackgroundSyncEnabled -> updateBackgroundSyncEnabled(event.enabled)
+            is SettingsEvent.SetGmailSyncEnabled -> updateSyncSourceSetting { setGmailSyncEnabledUseCase(event.enabled) }
+            is SettingsEvent.SetClassroomSyncEnabled -> updateSyncSourceSetting { setClassroomSyncEnabledUseCase(event.enabled) }
             is SettingsEvent.SetNotificationParsingEnabled -> updateSetting { setNotificationParsingEnabledUseCase(event.enabled) }
             is SettingsEvent.SetDefaultReminderHours -> updateSetting { setDefaultReminderHoursUseCase(event.hours) }
             is SettingsEvent.SetOnboardingCompleted -> updateSetting { setOnboardingCompletedUseCase(event.completed) }
@@ -128,6 +132,34 @@ class SettingsBlocViewModel(
                     scheduleDailyDigestUseCase(_state.value.digestHourOfDay)
                 } else {
                     cancelDailyDigestUseCase()
+                }
+            } catch (error: Exception) {
+                _state.update { it.copy(errorMessage = error.message) }
+            }
+        }
+    }
+
+    private fun updateBackgroundSyncEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            try {
+                setBackgroundSyncEnabledUseCase(enabled)
+                if (enabled) {
+                    scheduleBackgroundSyncUseCase()
+                } else {
+                    cancelBackgroundSyncUseCase()
+                }
+            } catch (error: Exception) {
+                _state.update { it.copy(errorMessage = error.message) }
+            }
+        }
+    }
+
+    private fun updateSyncSourceSetting(block: suspend () -> Unit) {
+        viewModelScope.launch {
+            try {
+                block()
+                if (_state.value.backgroundSyncEnabled) {
+                    scheduleBackgroundSyncUseCase()
                 }
             } catch (error: Exception) {
                 _state.update { it.copy(errorMessage = error.message) }

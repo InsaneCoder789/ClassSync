@@ -7,7 +7,6 @@ import com.rochiee.classsync.domain.model.SyncLog
 import com.rochiee.classsync.domain.usecase.export.ExportTasksCsvUseCase
 import com.rochiee.classsync.domain.usecase.export.ExportTasksJsonUseCase
 import com.rochiee.classsync.domain.usecase.gmail.SyncGmailTasksUseCase
-import com.rochiee.classsync.domain.usecase.notification.OpenNotificationAccessSettingsUseCase
 import com.rochiee.classsync.domain.usecase.classroom.SyncClassroomCoursesUseCase
 import com.rochiee.classsync.domain.usecase.classroom.SyncClassroomCourseworkUseCase
 import com.rochiee.classsync.domain.usecase.synclog.AddSyncLogUseCase
@@ -19,7 +18,6 @@ import com.rochiee.classsync.domain.usecase.worker.CancelBackgroundSyncUseCase
 import com.rochiee.classsync.domain.usecase.worker.RunOneTimeFullSyncUseCase
 import com.rochiee.classsync.domain.usecase.worker.ScheduleBackgroundSyncUseCase
 import com.rochiee.classsync.taskengine.DeadlineParser
-import com.rochiee.classsync.taskengine.NotificationTaskParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,7 +38,6 @@ class TaskBlocViewModel(
     private val scheduleBackgroundSyncUseCase: ScheduleBackgroundSyncUseCase,
     private val cancelBackgroundSyncUseCase: CancelBackgroundSyncUseCase,
     private val runOneTimeFullSyncUseCase: RunOneTimeFullSyncUseCase,
-    private val openNotificationAccessSettingsUseCase: OpenNotificationAccessSettingsUseCase,
     private val addSyncLogUseCase: AddSyncLogUseCase,
     private val exportTasksCsvUseCase: ExportTasksCsvUseCase,
     private val exportTasksJsonUseCase: ExportTasksJsonUseCase
@@ -70,9 +67,7 @@ class TaskBlocViewModel(
             is TaskEvent.DeleteTask -> {
                 deleteTask(event.task)
             }
-            is TaskEvent.SimulateNotificationTask -> {
-                simulateNotification(event.packageName, event.title, event.text)
-            }
+            is TaskEvent.SimulateNotificationTask -> Unit
             TaskEvent.SyncGmailTasks -> {
                 syncGmailTasks()
             }
@@ -87,9 +82,6 @@ class TaskBlocViewModel(
             }
             TaskEvent.RunOneTimeFullSync -> {
                 runOneTimeFullSync()
-            }
-            TaskEvent.OpenNotificationAccessSettings -> {
-                openNotificationAccessSettings()
             }
             TaskEvent.ExportTasksCsv -> {
                 exportTasksCsv()
@@ -130,7 +122,7 @@ class TaskBlocViewModel(
         }
     }
 
-    private fun addManualTask(title: String, description: String, courseName: String, dueDateMillis: Long) {
+    private fun addManualTask(title: String, description: String, courseName: String, dueDateMillis: Long?) {
         viewModelScope.launch {
             addManualTaskUseCase(
                 AcademicTask(
@@ -153,17 +145,6 @@ class TaskBlocViewModel(
     private fun deleteTask(task: AcademicTask) {
         viewModelScope.launch {
             deleteTaskUseCase(task)
-        }
-    }
-
-    private fun simulateNotification(packageName: String, title: String, text: String) {
-        viewModelScope.launch {
-            val task = NotificationTaskParser.parse(packageName, title, text)
-            task?.let {
-                if (_state.value.tasks.none { t -> t.title == it.title && t.description == it.description }) {
-                    addManualTaskUseCase(it)
-                }
-            }
         }
     }
 
@@ -261,10 +242,6 @@ class TaskBlocViewModel(
                 _state.update { it.copy(error = error.message) }
             }
         }
-    }
-
-    private fun openNotificationAccessSettings() {
-        openNotificationAccessSettingsUseCase()
     }
 
     private fun exportTasksCsv() {

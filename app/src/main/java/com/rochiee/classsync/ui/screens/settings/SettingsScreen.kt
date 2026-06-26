@@ -94,7 +94,7 @@ fun SettingsScreen(
                 }
                 Text(
                     text = if (authState.isOAuthConfigured) {
-                        "Classroom sync is your primary semester source. Gmail remains optional for catching academic reminders."
+                        "Classroom sync is your primary semester source. Gmail remains optional for catching academic reminders. Automatic background sync refreshes about every 12 hours."
                     } else {
                         "Google sync is disabled until a local OAuth client ID is configured on this machine."
                     },
@@ -149,14 +149,8 @@ fun SettingsScreen(
                 onCheckedChange = { onSettingsEvent(SettingsEvent.SetGmailSyncEnabled(it)) }
             )
             SettingsToggleRow(
-                title = "Notification parsing",
-                description = "Allow notification-based local task/event extraction.",
-                checked = settingsState.notificationParsingEnabled,
-                onCheckedChange = { onSettingsEvent(SettingsEvent.SetNotificationParsingEnabled(it)) }
-            )
-            SettingsToggleRow(
                 title = "Background sync",
-                description = "Enable WorkManager-based periodic sync jobs.",
+                description = "Enable WorkManager-based periodic sync jobs that refresh Gmail and Classroom roughly every 12 hours.",
                 checked = settingsState.backgroundSyncEnabled,
                 onCheckedChange = { onSettingsEvent(SettingsEvent.SetBackgroundSyncEnabled(it)) }
             )

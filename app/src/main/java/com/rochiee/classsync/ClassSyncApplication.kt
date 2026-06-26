@@ -7,6 +7,7 @@ import com.rochiee.classsync.digest.DigestNotificationHelper
 import com.rochiee.classsync.reminder.DueSoonNotificationHelper
 import com.rochiee.classsync.reminder.ReminderNotificationHelper
 import com.rochiee.classsync.worker.WorkScheduler
+import kotlinx.coroutines.runBlocking
 
 class ClassSyncApplication : Application() {
     lateinit var container: AppContainer
@@ -20,5 +21,8 @@ class ClassSyncApplication : Application() {
         WorkScheduler.scheduleWidgetRefresh(this)
         WorkScheduler.scheduleDueSoonNotificationRefresh(this)
         WorkScheduler.runOneTimeDueSoonNotificationRefresh(this)
+        runBlocking {
+            container.scheduleBackgroundSyncUseCase()
+        }
     }
 }

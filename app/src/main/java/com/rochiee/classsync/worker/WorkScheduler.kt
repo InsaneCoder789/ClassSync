@@ -5,6 +5,7 @@ import androidx.work.*
 import java.util.concurrent.TimeUnit
 
 object WorkScheduler {
+    private const val AUTO_SYNC_HOURS = 12L
     const val GMAIL_SYNC_WORK = "GMAIL_SYNC_WORK"
     const val CLASSROOM_SYNC_WORK = "CLASSROOM_SYNC_WORK"
     const val FULL_SYNC_WORK = "FULL_SYNC_WORK"
@@ -16,7 +17,7 @@ object WorkScheduler {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val request = PeriodicWorkRequestBuilder<GmailSyncWorker>(3, TimeUnit.HOURS)
+        val request = PeriodicWorkRequestBuilder<GmailSyncWorker>(AUTO_SYNC_HOURS, TimeUnit.HOURS)
             .setConstraints(constraints)
             .build()
 
@@ -32,7 +33,7 @@ object WorkScheduler {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val request = PeriodicWorkRequestBuilder<ClassroomSyncWorker>(6, TimeUnit.HOURS)
+        val request = PeriodicWorkRequestBuilder<ClassroomSyncWorker>(AUTO_SYNC_HOURS, TimeUnit.HOURS)
             .setConstraints(constraints)
             .build()
 
@@ -48,7 +49,7 @@ object WorkScheduler {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val request = PeriodicWorkRequestBuilder<FullSyncWorker>(6, TimeUnit.HOURS)
+        val request = PeriodicWorkRequestBuilder<FullSyncWorker>(AUTO_SYNC_HOURS, TimeUnit.HOURS)
             .setConstraints(constraints)
             .build()
 
@@ -99,6 +100,7 @@ object WorkScheduler {
         workManager.cancelUniqueWork(CLASSROOM_SYNC_WORK)
         workManager.cancelUniqueWork(FULL_SYNC_WORK)
         workManager.cancelUniqueWork(WIDGET_REFRESH_WORK)
+        workManager.cancelUniqueWork(DUE_SOON_NOTIFICATION_WORK)
     }
 
     fun runOneTimeFullSync(context: Context) {

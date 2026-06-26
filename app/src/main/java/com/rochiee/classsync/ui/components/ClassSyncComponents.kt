@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
@@ -36,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
@@ -102,7 +102,7 @@ fun ElevatedInfoCard(
                 )
                 .border(
                     width = 1.dp,
-                    color = Color.White.copy(alpha = 0.32f),
+                    color = SilverBorderSoft,
                     shape = RoundedCornerShape(28.dp)
                 )
                 .padding(horizontal = spacing.md, vertical = spacing.md),
@@ -310,7 +310,7 @@ fun TintedPanel(
     val spacing = LocalSpacing.current
     val topColor = accentColor?.copy(alpha = 0.14f) ?: MaterialTheme.colorScheme.surface.copy(alpha = 0.86f)
     val bottomColor = accentColor?.copy(alpha = 0.08f) ?: MaterialTheme.colorScheme.surface.copy(alpha = 0.68f)
-    val borderColor = accentColor?.copy(alpha = 0.24f) ?: Color.White.copy(alpha = 0.28f)
+    val borderColor = accentColor?.copy(alpha = 0.24f) ?: SilverBorderSoft
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(28.dp),
@@ -348,10 +348,11 @@ fun LiquidGlassButton(
     selected: Boolean = false,
     content: @Composable RowScope.() -> Unit
 ) {
+    val shape: Shape = RoundedCornerShape(24.dp)
     val baseColor = if (selected) {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
     } else {
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.42f)
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.78f)
     }
     val borderColor = if (selected) {
         SilverBorder
@@ -362,26 +363,26 @@ fun LiquidGlassButton(
 
     Surface(
         modifier = modifier
-            .clip(RoundedCornerShape(26.dp))
+            .clip(shape)
             .clickable(enabled = enabled, onClick = onClick),
         color = Color.Transparent,
         contentColor = contentColor,
-        shape = RoundedCornerShape(26.dp)
+        shape = shape
     ) {
         Row(
             modifier = Modifier
                 .background(
-                    brush = Brush.linearGradient(
+                    brush = Brush.verticalGradient(
                         listOf(
-                            baseColor.copy(alpha = 0.92f),
-                            baseColor.copy(alpha = 0.78f)
+                            baseColor.copy(alpha = 0.96f),
+                            baseColor.copy(alpha = 0.82f)
                         )
                     ),
-                    shape = RoundedCornerShape(26.dp)
+                    shape = shape
                 )
                 .fillMaxWidth()
-                .border(1.2.dp, borderColor, RoundedCornerShape(26.dp))
-                .padding(horizontal = 16.dp, vertical = 13.dp),
+                .border(1.1.dp, borderColor, shape)
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
             content = content
@@ -396,7 +397,7 @@ fun LiquidGlassTextButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     selected: Boolean = false,
-    showArrow: Boolean = text.length > 4
+    showArrow: Boolean = false
 ) {
     LiquidGlassButton(
         onClick = onClick,
@@ -404,34 +405,15 @@ fun LiquidGlassTextButton(
         enabled = enabled,
         selected = selected
     ) {
-        if (showArrow) {
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = LocalContentColor.current,
-                    maxLines = 1,
-                    softWrap = false,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            ButtonArrowBadge()
-        } else {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.titleMedium,
-                color = LocalContentColor.current,
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center
-            )
-        }
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            color = LocalContentColor.current,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -450,27 +432,6 @@ fun ResponsiveFlowRow(
         verticalArrangement = Arrangement.spacedBy(spacing.sm)
     ) {
         content()
-    }
-}
-
-@Composable
-fun ButtonArrowBadge(
-    modifier: Modifier = Modifier,
-    dark: Boolean = true
-) {
-    val background = if (dark) Color(0xFF122B52) else Color.White.copy(alpha = 0.22f)
-    val foreground = if (dark) Color.White else Color(0xFF122B52)
-    Box(
-        modifier = modifier
-            .background(background, RoundedCornerShape(18.dp))
-            .padding(horizontal = 10.dp, vertical = 7.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-            contentDescription = null,
-            tint = foreground
-        )
     }
 }
 

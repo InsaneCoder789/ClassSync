@@ -24,10 +24,6 @@ class ReminderScheduler(
         }
 
         val settings = settingsRepository.observeSettings().first()
-        if (!settings.notificationParsingEnabled) {
-            cancel(task)
-            return
-        }
         val reminderAtMillis = task.dueDate - (settings.defaultReminderHours * 60L * 60L * 1000L)
         if (reminderAtMillis <= System.currentTimeMillis()) {
             cancel(task)

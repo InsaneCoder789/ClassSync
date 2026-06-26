@@ -17,7 +17,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.rounded.AssignmentTurnedIn
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.School
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -228,10 +227,6 @@ fun AppNavHost(
                     onAuthEvent = onAuthEvent,
                     onSyncEvent = onSyncEvent,
                     onSettingsEvent = onSettingsEvent,
-                    onOpenNotificationAccess = { onTaskEvent(TaskEvent.OpenNotificationAccessSettings) },
-                    onRequestReminderPermissionExplained = {
-                        onSettingsEvent(SettingsEvent.SetNotificationPermissionExplained(true))
-                    },
                     onComplete = {
                         onSettingsEvent(SettingsEvent.SetOnboardingCompleted(true))
                     }
@@ -379,7 +374,6 @@ private fun iconForDestination(destination: AppDestination): ImageVector {
     return when (destination) {
         AppDestination.Home -> Icons.Rounded.Home
         AppDestination.Tasks -> Icons.Rounded.AssignmentTurnedIn
-        AppDestination.Classroom -> Icons.Rounded.School
         AppDestination.Planner -> Icons.Rounded.CalendarMonth
         AppDestination.Settings -> Icons.Rounded.Settings
         else -> Icons.Rounded.Home

@@ -46,7 +46,6 @@ import com.rochiee.classsync.bloc.settings.SettingsEvent
 import com.rochiee.classsync.bloc.settings.SettingsState
 import com.rochiee.classsync.bloc.sync.SyncEvent
 import com.rochiee.classsync.bloc.sync.SyncState
-import com.rochiee.classsync.ui.components.ButtonArrowBadge
 import com.rochiee.classsync.ui.theme.LocalSpacing
 
 @Composable
@@ -59,8 +58,6 @@ fun OnboardingScreen(
     onAuthEvent: (AuthEvent) -> Unit,
     onSyncEvent: (SyncEvent) -> Unit,
     onSettingsEvent: (SettingsEvent) -> Unit,
-    onOpenNotificationAccess: () -> Unit,
-    onRequestReminderPermissionExplained: () -> Unit,
     onComplete: () -> Unit
 ) {
     val spacing = LocalSpacing.current
@@ -73,7 +70,6 @@ fun OnboardingScreen(
             OnboardingStepArt(R.drawable.onboarding_opening),
             OnboardingStepArt(R.drawable.onboarding_google_connect),
             OnboardingStepArt(R.drawable.onboarding_classroom_access),
-            OnboardingStepArt(R.drawable.onboarding_notification_access),
             OnboardingStepArt(R.drawable.onboarding_reminder_setup),
             OnboardingStepArt(R.drawable.onboarding_sync_setup),
             OnboardingStepArt(R.drawable.onboarding_ready)
@@ -83,7 +79,7 @@ fun OnboardingScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            onRequestReminderPermissionExplained()
+            step = 4
         }
     }
     val googleSignInLauncher = rememberLauncherForActivityResult(
@@ -175,22 +171,8 @@ fun OnboardingScreen(
                 )
             }
             3 -> FullScreenOnboardingStep(
-                art = OnboardingStepArt(R.drawable.onboarding_notification_access),
-                step = 3,
-                totalSteps = steps.size
-            ) {
-                OnboardingWhiteButton(
-                    label = "Open access settings",
-                    onClick = {
-                        onOpenNotificationAccess()
-                        onSettingsEvent(SettingsEvent.SetNotificationPermissionExplained(true))
-                        step += 1
-                    }
-                )
-            }
-            4 -> FullScreenOnboardingStep(
                 art = OnboardingStepArt(R.drawable.onboarding_reminder_setup),
-                step = 4,
+                step = 3,
                 totalSteps = steps.size
             ) {
                 OnboardingWhiteButton(
@@ -199,15 +181,14 @@ fun OnboardingScreen(
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         } else {
-                            onRequestReminderPermissionExplained()
+                            step = 4
                         }
-                        step += 1
                     }
                 )
             }
-            5 -> FullScreenOnboardingStep(
+            4 -> FullScreenOnboardingStep(
                 art = OnboardingStepArt(R.drawable.onboarding_sync_setup),
-                step = 5,
+                step = 4,
                 totalSteps = steps.size,
                 infoText = syncState.errorMessage
             ) {
@@ -217,7 +198,7 @@ fun OnboardingScreen(
                         onClick = {
                             onSettingsEvent(SettingsEvent.SetGmailSyncEnabled(false))
                             onSettingsEvent(SettingsEvent.SetGmailPermissionExplained(true))
-                            step += 1
+                            step = 5
                         }
                     )
                     OnboardingWhiteButton(
@@ -243,7 +224,7 @@ fun OnboardingScreen(
             }
             else -> FullScreenOnboardingStep(
                 art = OnboardingStepArt(R.drawable.onboarding_ready),
-                step = 6,
+                step = 5,
                 totalSteps = steps.size
             ) {
                 OnboardingWhiteButton(
@@ -367,20 +348,16 @@ private fun OnboardingWhiteButton(
                     color = Color.White.copy(alpha = 0.92f),
                     shape = RoundedCornerShape(30.dp)
                 )
-                .padding(horizontal = 14.dp, vertical = 14.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
         ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.titleMedium,
                 color = Color(0xFF14213D),
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 10.dp)
+                fontWeight = FontWeight.SemiBold
             )
-            ButtonArrowBadge()
         }
     }
 }

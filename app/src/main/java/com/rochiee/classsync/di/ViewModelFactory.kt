@@ -31,7 +31,6 @@ class ViewModelFactory(
                     container.scheduleBackgroundSyncUseCase,
                     container.cancelBackgroundSyncUseCase,
                     container.runOneTimeFullSyncUseCase,
-                    container.openNotificationAccessSettingsUseCase,
                     container.addSyncLogUseCase,
                     container.exportTasksCsvUseCase,
                     container.exportTasksJsonUseCase
@@ -70,7 +69,9 @@ class ViewModelFactory(
                     container.setThemeModeUseCase,
                     container.scheduleDailyDigestUseCase,
                     container.cancelDailyDigestUseCase,
-                    container.previewDailyDigestUseCase
+                    container.previewDailyDigestUseCase,
+                    container.scheduleBackgroundSyncUseCase,
+                    container.cancelBackgroundSyncUseCase
                 ) as T
             }
             modelClass.isAssignableFrom(EventBlocViewModel::class.java) -> {

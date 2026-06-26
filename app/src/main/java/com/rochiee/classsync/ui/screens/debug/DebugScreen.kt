@@ -76,7 +76,7 @@ fun DebugScreen(
             }
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
                 LiquidGlassTextButton(text = "Full Sync", onClick = { onSyncEvent(SyncEvent.RunManualFullSync) }, modifier = Modifier.weight(1f))
-                LiquidGlassTextButton(text = "Notification Access", onClick = { onTaskEvent(TaskEvent.OpenNotificationAccessSettings) }, modifier = Modifier.weight(1f))
+                LiquidGlassTextButton(text = "Export CSV", onClick = { onTaskEvent(TaskEvent.ExportTasksCsv) }, modifier = Modifier.weight(1f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
                 LiquidGlassTextButton(text = "Sample Announcement", onClick = { onEventEvent(EventEvent.AddSampleAnnouncementEvent) }, modifier = Modifier.weight(1f))
