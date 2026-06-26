@@ -16,9 +16,7 @@ import com.rochiee.classsync.domain.usecase.settings.SetDigestIncludeMaterialsUs
 import com.rochiee.classsync.domain.usecase.settings.SetGmailSyncEnabledUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetGmailPermissionExplainedUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetClassroomPermissionExplainedUseCase
-import com.rochiee.classsync.domain.usecase.settings.SetNotificationPermissionExplainedUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetOnboardingCompletedUseCase
-import com.rochiee.classsync.domain.usecase.settings.SetNotificationParsingEnabledUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetThemeModeUseCase
 import com.rochiee.classsync.domain.usecase.worker.CancelBackgroundSyncUseCase
 import com.rochiee.classsync.domain.usecase.worker.ScheduleBackgroundSyncUseCase
@@ -36,10 +34,8 @@ class SettingsBlocViewModel(
     private val setBackgroundSyncEnabledUseCase: SetBackgroundSyncEnabledUseCase,
     private val setGmailSyncEnabledUseCase: SetGmailSyncEnabledUseCase,
     private val setClassroomSyncEnabledUseCase: SetClassroomSyncEnabledUseCase,
-    private val setNotificationParsingEnabledUseCase: SetNotificationParsingEnabledUseCase,
     private val setDefaultReminderHoursUseCase: SetDefaultReminderHoursUseCase,
     private val setOnboardingCompletedUseCase: SetOnboardingCompletedUseCase,
-    private val setNotificationPermissionExplainedUseCase: SetNotificationPermissionExplainedUseCase,
     private val setClassroomPermissionExplainedUseCase: SetClassroomPermissionExplainedUseCase,
     private val setGmailPermissionExplainedUseCase: SetGmailPermissionExplainedUseCase,
     private val setDigestEnabledUseCase: SetDigestEnabledUseCase,
@@ -67,10 +63,8 @@ class SettingsBlocViewModel(
             is SettingsEvent.SetBackgroundSyncEnabled -> updateBackgroundSyncEnabled(event.enabled)
             is SettingsEvent.SetGmailSyncEnabled -> updateSyncSourceSetting { setGmailSyncEnabledUseCase(event.enabled) }
             is SettingsEvent.SetClassroomSyncEnabled -> updateSyncSourceSetting { setClassroomSyncEnabledUseCase(event.enabled) }
-            is SettingsEvent.SetNotificationParsingEnabled -> updateSetting { setNotificationParsingEnabledUseCase(event.enabled) }
             is SettingsEvent.SetDefaultReminderHours -> updateSetting { setDefaultReminderHoursUseCase(event.hours) }
             is SettingsEvent.SetOnboardingCompleted -> updateSetting { setOnboardingCompletedUseCase(event.completed) }
-            is SettingsEvent.SetNotificationPermissionExplained -> updateSetting { setNotificationPermissionExplainedUseCase(event.explained) }
             is SettingsEvent.SetClassroomPermissionExplained -> updateSetting { setClassroomPermissionExplainedUseCase(event.explained) }
             is SettingsEvent.SetGmailPermissionExplained -> updateSetting { setGmailPermissionExplainedUseCase(event.explained) }
             is SettingsEvent.SetDigestEnabled -> updateDigestEnabled(event.enabled)
@@ -92,11 +86,9 @@ class SettingsBlocViewModel(
                         backgroundSyncEnabled = settings.backgroundSyncEnabled,
                         gmailSyncEnabled = settings.gmailSyncEnabled,
                         classroomSyncEnabled = settings.classroomSyncEnabled,
-                        notificationParsingEnabled = settings.notificationParsingEnabled,
                         defaultReminderHours = settings.defaultReminderHours,
                         lastSyncTimeMillis = settings.lastSyncTimeMillis,
                         onboardingCompleted = settings.onboardingCompleted,
-                        notificationPermissionExplained = settings.notificationPermissionExplained,
                         classroomPermissionExplained = settings.classroomPermissionExplained,
                         gmailPermissionExplained = settings.gmailPermissionExplained,
                         digestEnabled = settings.digestEnabled,

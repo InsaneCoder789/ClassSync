@@ -1,20 +1,24 @@
 package com.rochiee.classsync.ui.screens.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.rochiee.classsync.bloc.auth.AuthUiState
 import com.rochiee.classsync.bloc.settings.SettingsEvent
@@ -31,6 +35,7 @@ import com.rochiee.classsync.ui.components.TintedPanel
 import com.rochiee.classsync.ui.components.formatDateTime
 import com.rochiee.classsync.ui.theme.LocalSpacing
 import com.rochiee.classsync.ui.theme.MintGreen
+import com.rochiee.classsync.ui.theme.SilverBorder
 import com.rochiee.classsync.ui.theme.SkyBlue
 import com.rochiee.classsync.ui.theme.Sun
 
@@ -53,7 +58,31 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(spacing.lg)
     ) {
         TintedPanel {
-            AppLogoLockup(subtitle = "Control sync, reminders, and your 4th semester workspace from one place")
+            Box(
+                modifier = Modifier
+                    .background(
+                        brush = Brush.linearGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                SilverBorder.copy(alpha = 0.18f)
+                            )
+                        ),
+                        shape = RoundedCornerShape(18.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = "settings",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            AppLogoLockup(subtitle = "Control sync, reminders, and the local study experience from one place")
+            Text(
+                text = "Adjust what stays connected, what gets refreshed, and how ClassSync reminds you before urgent work slips.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             ResponsiveFlowRow(maxItemsInEachRow = 2) {
                 ElevatedInfoCard(
                     title = "Account",
@@ -110,19 +139,19 @@ fun SettingsScreen(
                 }
                 ResponsiveFlowRow(maxItemsInEachRow = 2) {
                     LiquidGlassTextButton(
-                        text = if (syncState.isSyncing) "Syncing..." else "Sync Classroom",
+                        text = if (syncState.isSyncing) "Syncing..." else "Refresh classroom",
                         onClick = { onSyncEvent(SyncEvent.RunClassroomSync) },
                         modifier = Modifier.widthIn(min = 148.dp),
                         enabled = authState.isSignedIn && settingsState.classroomSyncEnabled && !syncState.isSyncing
                     )
                     LiquidGlassTextButton(
-                        text = if (syncState.isSyncing) "Syncing..." else "Sync Gmail",
+                        text = if (syncState.isSyncing) "Syncing..." else "Refresh Gmail",
                         onClick = { onSyncEvent(SyncEvent.RunGmailSync) },
                         modifier = Modifier.widthIn(min = 148.dp),
                         enabled = authState.isSignedIn && settingsState.gmailSyncEnabled && !syncState.isSyncing
                     )
                     LiquidGlassTextButton(
-                        text = if (syncState.isSyncing) "Syncing..." else "Full Sync",
+                        text = if (syncState.isSyncing) "Syncing..." else "Run full refresh",
                         onClick = { onSyncEvent(SyncEvent.RunManualFullSync) },
                         modifier = Modifier.widthIn(min = 148.dp),
                         enabled = authState.isSignedIn && !syncState.isSyncing
@@ -160,9 +189,9 @@ fun SettingsScreen(
             TintedPanel {
                 Text(text = "Reminder lead time: ${settingsState.defaultReminderHours}h", style = MaterialTheme.typography.titleMedium)
                 ResponsiveFlowRow(maxItemsInEachRow = 3) {
-                    LiquidGlassTextButton(text = "1h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(1)) }, modifier = Modifier.widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 1)
-                    LiquidGlassTextButton(text = "2h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(2)) }, modifier = Modifier.widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 2)
-                    LiquidGlassTextButton(text = "6h", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(6)) }, modifier = Modifier.widthIn(min = 84.dp), selected = settingsState.defaultReminderHours == 6)
+                    LiquidGlassTextButton(text = "1 hour", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(1)) }, modifier = Modifier.widthIn(min = 92.dp), selected = settingsState.defaultReminderHours == 1)
+                    LiquidGlassTextButton(text = "2 hours", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(2)) }, modifier = Modifier.widthIn(min = 92.dp), selected = settingsState.defaultReminderHours == 2)
+                    LiquidGlassTextButton(text = "6 hours", onClick = { onSettingsEvent(SettingsEvent.SetDefaultReminderHours(6)) }, modifier = Modifier.widthIn(min = 92.dp), selected = settingsState.defaultReminderHours == 6)
                 }
                 Text(
                     text = "Live due-soon notifications and assignment reminders use this value as the default lead window.",
@@ -221,7 +250,7 @@ fun SettingsScreen(
                     LiquidGlassTextButton(text = "12 PM", onClick = { onSettingsEvent(SettingsEvent.SetDigestHourOfDay(12)) }, modifier = Modifier.widthIn(min = 92.dp), selected = settingsState.digestHourOfDay == 12)
                     LiquidGlassTextButton(text = "8 PM", onClick = { onSettingsEvent(SettingsEvent.SetDigestHourOfDay(20)) }, modifier = Modifier.widthIn(min = 92.dp), selected = settingsState.digestHourOfDay == 20)
                 }
-                LiquidGlassTextButton(text = "Preview Today's Digest", onClick = { onSettingsEvent(SettingsEvent.PreviewDigest) }, modifier = Modifier.fillMaxWidth())
+                LiquidGlassTextButton(text = "Preview today’s digest", onClick = { onSettingsEvent(SettingsEvent.PreviewDigest) }, modifier = Modifier.fillMaxWidth())
             }
         }
 
@@ -237,7 +266,7 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 LiquidGlassTextButton(
-                    text = "Open Debug Tools",
+                    text = "Open debug tools",
                     onClick = onNavigateToDebug,
                     modifier = Modifier.fillMaxWidth()
                 )

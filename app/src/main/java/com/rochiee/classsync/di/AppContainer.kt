@@ -55,7 +55,6 @@ import com.rochiee.classsync.domain.usecase.event.SaveClassroomEventUseCase
 import com.rochiee.classsync.domain.usecase.export.ExportTasksCsvUseCase
 import com.rochiee.classsync.domain.usecase.export.ExportTasksJsonUseCase
 import com.rochiee.classsync.domain.usecase.gmail.SyncGmailTasksUseCase
-import com.rochiee.classsync.domain.usecase.notification.OpenNotificationAccessSettingsUseCase
 import com.rochiee.classsync.domain.usecase.settings.ObserveSettingsUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetBackgroundSyncEnabledUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetClassroomSyncEnabledUseCase
@@ -68,8 +67,6 @@ import com.rochiee.classsync.domain.usecase.settings.SetDigestIncludeMaterialsUs
 import com.rochiee.classsync.domain.usecase.settings.SetGmailSyncEnabledUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetGmailPermissionExplainedUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetLastSyncTimeUseCase
-import com.rochiee.classsync.domain.usecase.settings.SetNotificationPermissionExplainedUseCase
-import com.rochiee.classsync.domain.usecase.settings.SetNotificationParsingEnabledUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetOnboardingCompletedUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetThemeModeUseCase
 import com.rochiee.classsync.domain.usecase.synclog.AddSyncLogUseCase
@@ -117,18 +114,15 @@ interface AppContainer {
     val addManualTaskUseCase: AddManualTaskUseCase
     val markTaskCompletedUseCase: MarkTaskCompletedUseCase
     val deleteTaskUseCase: DeleteTaskUseCase
-    val openNotificationAccessSettingsUseCase: OpenNotificationAccessSettingsUseCase
     val exportTasksCsvUseCase: ExportTasksCsvUseCase
     val exportTasksJsonUseCase: ExportTasksJsonUseCase
     val observeSettingsUseCase: ObserveSettingsUseCase
     val setBackgroundSyncEnabledUseCase: SetBackgroundSyncEnabledUseCase
     val setGmailSyncEnabledUseCase: SetGmailSyncEnabledUseCase
     val setClassroomSyncEnabledUseCase: SetClassroomSyncEnabledUseCase
-    val setNotificationParsingEnabledUseCase: SetNotificationParsingEnabledUseCase
     val setDefaultReminderHoursUseCase: SetDefaultReminderHoursUseCase
     val setLastSyncTimeUseCase: SetLastSyncTimeUseCase
     val setOnboardingCompletedUseCase: SetOnboardingCompletedUseCase
-    val setNotificationPermissionExplainedUseCase: SetNotificationPermissionExplainedUseCase
     val setClassroomPermissionExplainedUseCase: SetClassroomPermissionExplainedUseCase
     val setGmailPermissionExplainedUseCase: SetGmailPermissionExplainedUseCase
     val setDigestEnabledUseCase: SetDigestEnabledUseCase
@@ -291,10 +285,6 @@ class AppContainerImpl(private val context: Context) : AppContainer {
         DeleteTaskUseCase(taskRepository)
     }
 
-    override val openNotificationAccessSettingsUseCase: OpenNotificationAccessSettingsUseCase by lazy {
-        OpenNotificationAccessSettingsUseCase(context.applicationContext)
-    }
-
     override val exportTasksCsvUseCase: ExportTasksCsvUseCase by lazy {
         ExportTasksCsvUseCase(taskRepository, taskExportManager)
     }
@@ -319,10 +309,6 @@ class AppContainerImpl(private val context: Context) : AppContainer {
         SetClassroomSyncEnabledUseCase(settingsRepository)
     }
 
-    override val setNotificationParsingEnabledUseCase: SetNotificationParsingEnabledUseCase by lazy {
-        SetNotificationParsingEnabledUseCase(settingsRepository)
-    }
-
     override val setDefaultReminderHoursUseCase: SetDefaultReminderHoursUseCase by lazy {
         SetDefaultReminderHoursUseCase(settingsRepository)
     }
@@ -333,10 +319,6 @@ class AppContainerImpl(private val context: Context) : AppContainer {
 
     override val setOnboardingCompletedUseCase: SetOnboardingCompletedUseCase by lazy {
         SetOnboardingCompletedUseCase(settingsRepository)
-    }
-
-    override val setNotificationPermissionExplainedUseCase: SetNotificationPermissionExplainedUseCase by lazy {
-        SetNotificationPermissionExplainedUseCase(settingsRepository)
     }
 
     override val setClassroomPermissionExplainedUseCase: SetClassroomPermissionExplainedUseCase by lazy {

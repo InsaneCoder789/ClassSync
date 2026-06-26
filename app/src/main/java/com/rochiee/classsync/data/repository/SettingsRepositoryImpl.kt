@@ -23,10 +23,6 @@ class SettingsRepositoryImpl(
         settingsDataStore.setClassroomSyncEnabled(enabled)
     }
 
-    override suspend fun setNotificationParsingEnabled(enabled: Boolean) {
-        settingsDataStore.setNotificationParsingEnabled(enabled)
-    }
-
     override suspend fun setDefaultReminderHours(hours: Int) {
         settingsDataStore.setDefaultReminderHours(hours)
     }
@@ -37,10 +33,6 @@ class SettingsRepositoryImpl(
 
     override suspend fun setOnboardingCompleted(completed: Boolean) {
         settingsDataStore.setOnboardingCompleted(completed)
-    }
-
-    override suspend fun setNotificationPermissionExplained(explained: Boolean) {
-        settingsDataStore.setNotificationPermissionExplained(explained)
     }
 
     override suspend fun setClassroomPermissionExplained(explained: Boolean) {

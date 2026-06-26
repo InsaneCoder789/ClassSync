@@ -63,7 +63,6 @@ import com.rochiee.classsync.ui.components.AppLogoLockup
 import com.rochiee.classsync.ui.screens.activity.ActivityScreen
 import com.rochiee.classsync.ui.screens.activity.EventDetailScreen
 import com.rochiee.classsync.ui.screens.auth.AuthScreen
-import com.rochiee.classsync.ui.screens.classroom.ClassroomScreen
 import com.rochiee.classsync.ui.screens.debug.DebugScreen
 import com.rochiee.classsync.ui.screens.exam.ExamModeScreen
 import com.rochiee.classsync.ui.screens.home.HomeScreen
@@ -252,12 +251,6 @@ fun AppNavHost(
                     onSyncEvent = onSyncEvent
                 )
             }
-            composable(AppDestination.Classroom.route) {
-                ClassroomScreen(
-                    classroomState = classroomState,
-                    onClassroomEvent = onClassroomEvent
-                )
-            }
             composable(AppDestination.Planner.route) {
                 PlannerScreen(
                     plannerState = plannerState,
@@ -385,7 +378,6 @@ private fun titleForRoute(route: String?): String {
         route == null -> AppDestination.Home
         route == AppDestination.Home.route -> AppDestination.Home
         route == AppDestination.Tasks.route -> AppDestination.Tasks
-        route == AppDestination.Classroom.route -> AppDestination.Classroom
         route == AppDestination.Planner.route -> AppDestination.Planner
         route == AppDestination.Settings.route -> AppDestination.Settings
         route == AppDestination.Debug.route -> AppDestination.Debug

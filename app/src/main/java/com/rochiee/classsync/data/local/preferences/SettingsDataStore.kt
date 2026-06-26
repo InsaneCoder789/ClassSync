@@ -21,11 +21,9 @@ class SettingsDataStore(private val context: Context) {
             backgroundSyncEnabled = preferences[Keys.backgroundSyncEnabled] ?: true,
             gmailSyncEnabled = preferences[Keys.gmailSyncEnabled] ?: false,
             classroomSyncEnabled = preferences[Keys.classroomSyncEnabled] ?: true,
-            notificationParsingEnabled = preferences[Keys.notificationParsingEnabled] ?: true,
             defaultReminderHours = preferences[Keys.defaultReminderHours] ?: 2,
             lastSyncTimeMillis = preferences[Keys.lastSyncTimeMillis],
             onboardingCompleted = preferences[Keys.onboardingCompleted] ?: false,
-            notificationPermissionExplained = preferences[Keys.notificationPermissionExplained] ?: false,
             classroomPermissionExplained = preferences[Keys.classroomPermissionExplained] ?: false,
             gmailPermissionExplained = preferences[Keys.gmailPermissionExplained] ?: false,
             digestEnabled = preferences[Keys.digestEnabled] ?: false,
@@ -52,10 +50,6 @@ class SettingsDataStore(private val context: Context) {
         update { it[Keys.classroomSyncEnabled] = enabled }
     }
 
-    suspend fun setNotificationParsingEnabled(enabled: Boolean) {
-        update { it[Keys.notificationParsingEnabled] = enabled }
-    }
-
     suspend fun setDefaultReminderHours(hours: Int) {
         update { it[Keys.defaultReminderHours] = hours }
     }
@@ -66,10 +60,6 @@ class SettingsDataStore(private val context: Context) {
 
     suspend fun setOnboardingCompleted(completed: Boolean) {
         update { it[Keys.onboardingCompleted] = completed }
-    }
-
-    suspend fun setNotificationPermissionExplained(explained: Boolean) {
-        update { it[Keys.notificationPermissionExplained] = explained }
     }
 
     suspend fun setClassroomPermissionExplained(explained: Boolean) {
@@ -142,11 +132,9 @@ class SettingsDataStore(private val context: Context) {
         val backgroundSyncEnabled = booleanPreferencesKey("background_sync_enabled")
         val gmailSyncEnabled = booleanPreferencesKey("gmail_sync_enabled")
         val classroomSyncEnabled = booleanPreferencesKey("classroom_sync_enabled")
-        val notificationParsingEnabled = booleanPreferencesKey("notification_parsing_enabled")
         val defaultReminderHours = intPreferencesKey("default_reminder_hours")
         val lastSyncTimeMillis = longPreferencesKey("last_sync_time_millis")
         val onboardingCompleted = booleanPreferencesKey("onboarding_completed")
-        val notificationPermissionExplained = booleanPreferencesKey("notification_permission_explained")
         val classroomPermissionExplained = booleanPreferencesKey("classroom_permission_explained")
         val gmailPermissionExplained = booleanPreferencesKey("gmail_permission_explained")
         val digestEnabled = booleanPreferencesKey("digest_enabled")

@@ -67,7 +67,6 @@ class TaskBlocViewModel(
             is TaskEvent.DeleteTask -> {
                 deleteTask(event.task)
             }
-            is TaskEvent.SimulateNotificationTask -> Unit
             TaskEvent.SyncGmailTasks -> {
                 syncGmailTasks()
             }

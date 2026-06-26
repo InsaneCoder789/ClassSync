@@ -13,11 +13,6 @@ sealed class TaskEvent {
     ) : TaskEvent()
     data class ToggleTaskCompletion(val taskId: Int, val isCompleted: Boolean) : TaskEvent()
     data class DeleteTask(val task: AcademicTask) : TaskEvent()
-    data class SimulateNotificationTask(
-        val packageName: String,
-        val title: String,
-        val text: String
-    ) : TaskEvent()
     object SyncGmailTasks : TaskEvent()
     object SyncClassroomTasks : TaskEvent()
     
