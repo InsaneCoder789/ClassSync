@@ -35,7 +35,7 @@ import com.rochiee.classsync.ui.components.formatDate
 import com.rochiee.classsync.ui.theme.LocalSpacing
 import com.rochiee.classsync.ui.theme.Negative
 import com.rochiee.classsync.ui.theme.SkyBlue
-import com.rochiee.classsync.ui.theme.Sun
+import com.rochiee.classsync.ui.theme.MintGreen
 
 private enum class PlannerMode {
     Today, Week, Month, Range
@@ -115,7 +115,7 @@ fun PlannerScreen(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(spacing.lg)
     ) {
-        ScreenSection(title = "Planner", subtitle = "Today, weekly, and monthly views on top of the existing planner backend.") {
+        ScreenSection(title = "Planner", subtitle = "Today, weekly, and monthly views sync with your academic schedule.") {
             ResponsiveFlowRow(maxItemsInEachRow = 2) {
                 LiquidGlassTextButton(text = "Today", onClick = { mode = PlannerMode.Today }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Today)
                 LiquidGlassTextButton(text = "Week", onClick = { mode = PlannerMode.Week }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Week)
@@ -136,11 +136,11 @@ fun PlannerScreen(
                         accent = Negative
                     )
                     ElevatedInfoCard(
-                        title = "High priority",
+                        title = "Priority",
                         value = (day?.highPriorityItems?.size ?: 0).toString(),
-                        supportingText = "Hot items surfaced by the planner",
+                        supportingText = "Important tasks identified for today",
                         modifier = Modifier.fillMaxWidth(),
-                        accent = Sun
+                        accent = SkyBlue
                     )
                 }
             }
@@ -176,9 +176,9 @@ fun PlannerScreen(
                     ElevatedInfoCard(
                         title = "Assessments",
                         value = (month?.quizExamCount ?: 0).toString(),
-                        supportingText = "Quizzes and exams in view",
+                        supportingText = "Quizzes and exams currently in view",
                         modifier = Modifier.fillMaxWidth(),
-                        accent = Sun
+                        accent = MintGreen
                     )
                 }
             }

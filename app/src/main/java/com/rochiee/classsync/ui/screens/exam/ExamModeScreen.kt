@@ -26,7 +26,6 @@ import com.rochiee.classsync.ui.theme.LocalSpacing
 import com.rochiee.classsync.ui.theme.MintGreen
 import com.rochiee.classsync.ui.theme.Negative
 import com.rochiee.classsync.ui.theme.SkyBlue
-import com.rochiee.classsync.ui.theme.Sun
 
 @Composable
 fun ExamModeScreen(
@@ -82,7 +81,7 @@ fun ExamModeScreen(
                             StatusChip(label = item.courseName, color = SkyBlue)
                             StatusChip(
                                 label = item.countdownLabel,
-                                color = if (item.daysLeft <= 1) Negative else Sun
+                                color = if (item.daysLeft <= 1) Negative else SkyBlue
                             )
                         }
                         Text(text = "Pending tasks: ${item.pendingTaskTitles.joinToString().ifBlank { "None" }}", style = MaterialTheme.typography.bodyMedium)
