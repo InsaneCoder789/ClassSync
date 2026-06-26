@@ -27,7 +27,7 @@ fun RangePlannerView(
                 val tone = day.dueItems.minByOrNull { it.dueDateMillis ?: Long.MAX_VALUE }?.let {
                     deadlineToneFor(it.dueDateMillis, it.isCompleted)
                 } ?: DeadlineTone.NONE
-                TintedPanel {
+                TintedPanel(accentColor = tone.color) {
                     Text(text = day.dateStartMillis.formatDate(), style = MaterialTheme.typography.titleMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
                         Text(

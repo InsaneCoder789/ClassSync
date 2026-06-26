@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,11 +27,16 @@ import com.rochiee.classsync.bloc.event.EventState
 import com.rochiee.classsync.bloc.sync.SyncState
 import com.rochiee.classsync.bloc.task.TaskState
 import com.rochiee.classsync.domain.model.AcademicTask
+import com.rochiee.classsync.ui.components.ElevatedInfoCard
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
+import com.rochiee.classsync.ui.components.ResponsiveFlowRow
 import com.rochiee.classsync.ui.components.TintedPanel
 import com.rochiee.classsync.ui.components.deadlineTone
 import com.rochiee.classsync.ui.components.formatDateTime
 import com.rochiee.classsync.ui.theme.LocalSpacing
+import com.rochiee.classsync.ui.theme.Negative
+import com.rochiee.classsync.ui.theme.SafeGreen
+import com.rochiee.classsync.ui.theme.SilverBorder
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -52,6 +57,10 @@ fun HomeScreen(
     val spacing = LocalSpacing.current
     val openTasks = taskState.tasks.filter { !it.isCompleted && it.dueDate != null }.sortedBy { it.dueDate }
     val now = System.currentTimeMillis()
+    val urgentCount = openTasks.count { task ->
+        val due = task.dueDate ?: return@count false
+        due <= now + 24L * 60L * 60L * 1000L
+    }
     val ongoingTask = openTasks.firstOrNull { task ->
         val due = task.dueDate ?: return@firstOrNull false
         due in now..(now + 2L * 60L * 60L * 1000L)
@@ -74,26 +83,57 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(spacing.lg)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
-            Text(
-                text = "Schedule",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+        TintedPanel {
+            Box(
+                modifier = Modifier
+                    .size(46.dp)
+                    .background(
+                        brush = Brush.linearGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                SilverBorder.copy(alpha = 0.18f)
+                            )
+                        ),
+                        shape = RoundedCornerShape(16.dp)
+                    )
             )
-            Text(
-                text = if (authState.isSignedIn) {
-                    "Working as ${authState.userEmail ?: authState.displayName ?: "student"}"
-                } else {
-                    "Connect Google from settings to unlock live Classroom work"
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                Text(
+                    text = "Today at a glance",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = if (authState.isSignedIn) {
+                        "Signed in as ${authState.userEmail ?: authState.displayName ?: "student"}"
+                    } else {
+                        "Connect Google from settings to unlock live Classroom timelines."
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                ElevatedInfoCard(
+                    title = "Open work",
+                    value = openTasks.size.toString(),
+                    supportingText = "Incomplete assignments currently in your queue",
+                    modifier = Modifier.fillMaxWidth(),
+                    accent = MaterialTheme.colorScheme.primary
+                )
+                ElevatedInfoCard(
+                    title = "Urgent soon",
+                    value = urgentCount.toString(),
+                    supportingText = "Assignments due within the next 24 hours",
+                    modifier = Modifier.fillMaxWidth(),
+                    accent = if (urgentCount > 0) Negative else SafeGreen
+                )
+            }
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
             Text(
-                text = "Ongoing",
+                text = "Now in motion",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -106,7 +146,7 @@ fun HomeScreen(
 
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
             Text(
-                text = "Upcoming",
+                text = "Coming up next",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -133,7 +173,7 @@ fun HomeScreen(
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = "Last sync ${syncState.lastSyncMillis.formatDateTime()} • ${eventState.recentEvents.size} recent changes",
+                    text = "Last sync ${syncState.lastSyncMillis.formatDateTime()} • ${eventState.recentEvents.size} recent changes captured locally",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -146,20 +186,20 @@ fun HomeScreen(
                         .padding(horizontal = 10.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        text = "${taskState.tasks.count { !it.isCompleted }} open",
+                        text = "${taskState.tasks.count { !it.isCompleted }} open items",
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
-                LiquidGlassTextButton(text = "Activity", onClick = onNavigateToActivity, modifier = Modifier.weight(1f))
-                LiquidGlassTextButton(text = "Study", onClick = onNavigateToStudyPlanner, modifier = Modifier.weight(1f))
+                LiquidGlassTextButton(text = "Activity log", onClick = onNavigateToActivity, modifier = Modifier.weight(1f))
+                LiquidGlassTextButton(text = "Study planner", onClick = onNavigateToStudyPlanner, modifier = Modifier.weight(1f))
             }
-            LiquidGlassTextButton(text = "Exam", onClick = onNavigateToExamMode, modifier = Modifier.fillMaxWidth())
+            LiquidGlassTextButton(text = "Exam focus mode", onClick = onNavigateToExamMode, modifier = Modifier.fillMaxWidth())
             if (!authState.isSignedIn) {
                 LiquidGlassTextButton(
-                    text = "Connect Google",
+                    text = "Connect Google account",
                     onClick = onNavigateToAuth,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -199,7 +239,7 @@ private fun ScheduleFeatureCard(
             ) {
                 Text(
                     text = task.courseName,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.labelLarge,
                     color = tone.color
                 )
                 Text(
