@@ -12,15 +12,22 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
@@ -194,12 +202,13 @@ fun OnboardingScreen(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                     OnboardingWhiteButton(
-                        label = "Keep Gmail off (recommended)",
+                        label = "Keep Gmail off",
                         onClick = {
                             onSettingsEvent(SettingsEvent.SetGmailSyncEnabled(false))
                             onSettingsEvent(SettingsEvent.SetGmailPermissionExplained(true))
                             step = 5
-                        }
+                        },
+                        variant = OnboardingButtonVariant.Secondary
                     )
                     OnboardingWhiteButton(
                         label = if (pendingAction == OnboardingPendingAction.GmailSync || syncState.isSyncing) {
@@ -295,15 +304,19 @@ private fun FullScreenOnboardingStep(
                 verticalArrangement = Arrangement.spacedBy(spacing.sm)
             ) {
                 infoText?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White.copy(alpha = 0.96f),
+                    Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(24.dp))
-                            .background(Color.White.copy(alpha = 0.12f))
+                            .background(Color.Black.copy(alpha = 0.34f))
+                            .border(1.dp, Color.White.copy(alpha = 0.18f), RoundedCornerShape(24.dp))
                             .padding(horizontal = 16.dp, vertical = 14.dp)
-                    )
+                    ) {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.97f)
+                        )
+                    }
                 }
                 bottomContent()
             }
@@ -329,37 +342,94 @@ private fun OnboardingWhiteButton(
     label: String,
     onClick: () -> Unit,
     selected: Boolean = false,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    variant: OnboardingButtonVariant = OnboardingButtonVariant.Primary,
+    showArrow: Boolean = true
 ) {
+    val buttonShape = RoundedCornerShape(22.dp)
+    val arrowShape = RoundedCornerShape(15.dp)
+    val isPrimary = variant == OnboardingButtonVariant.Primary
+    val isLightMode = MaterialTheme.colorScheme.background.luminance() > 0.5f
+    val shellGradient = if (isPrimary) {
+        listOf(
+            Color.White.copy(alpha = if (enabled) 0.34f else 0.18f),
+            Color(0xFFDCE8FA).copy(alpha = if (enabled) 0.24f else 0.12f)
+        )
+    } else {
+        listOf(
+            Color.White.copy(alpha = if (enabled) 0.22f else 0.12f),
+            Color(0xFFC7D7F0).copy(alpha = if (enabled) 0.14f else 0.08f)
+        )
+    }
+    val borderColor = if (isPrimary) {
+        Color.White.copy(alpha = if (enabled) 0.42f else 0.20f)
+    } else {
+        Color.White.copy(alpha = if (enabled) 0.28f else 0.14f)
+    }
+    val textColor = if (enabled) Color.White.copy(alpha = if (isPrimary) 0.98f else 0.92f) else Color.White.copy(alpha = 0.52f)
+    val arrowContainerColor = if (isLightMode) {
+        if (isPrimary) Color.White.copy(alpha = 0.82f) else Color.White.copy(alpha = 0.68f)
+    } else {
+        if (isPrimary) Color.White.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.16f)
+    }
+    val arrowTint = if (isLightMode) Color(0xFF173055) else Color.White
     Surface(
         onClick = onClick,
         enabled = enabled,
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(30.dp),
-        color = if (selected) Color(0xFFF4F8FF) else Color.White.copy(alpha = if (enabled) 0.98f else 0.72f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 74.dp),
+        shape = buttonShape,
+        color = Color.Transparent,
         tonalElevation = 0.dp,
-        shadowElevation = 10.dp
+        shadowElevation = 0.dp
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(
                     width = 1.dp,
-                    color = Color.White.copy(alpha = 0.92f),
-                    shape = RoundedCornerShape(30.dp)
+                    color = borderColor,
+                    shape = buttonShape
                 )
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.Center,
+                .background(
+                    brush = Brush.verticalGradient(
+                        shellGradient
+                    ),
+                    shape = buttonShape
+                )
+                .padding(start = 24.dp, end = 14.dp, top = 15.dp, bottom = 15.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.titleMedium,
-                color = Color(0xFF14213D),
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.titleLarge,
+                color = textColor,
+                fontWeight = FontWeight.Bold
             )
+            Surface(
+                modifier = Modifier.size(42.dp),
+                shape = arrowShape,
+                color = arrowContainerColor,
+                shadowElevation = 0.dp
+            ) {
+                Box(contentAlignment = androidx.compose.ui.Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                        contentDescription = null,
+                        tint = arrowTint,
+                        modifier = Modifier.size(19.dp)
+                    )
+                }
+            }
         }
     }
+}
+
+private enum class OnboardingButtonVariant {
+    Primary,
+    Secondary
 }
 
 private data class OnboardingStepArt(

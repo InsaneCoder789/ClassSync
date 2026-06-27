@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -102,13 +103,21 @@ fun AppNavHost(
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
+    val initialRoute = remember(settingsState.isLoading, settingsState.onboardingCompleted, requestedStartRoute) {
+        when {
+            settingsState.isLoading -> null
+            settingsState.onboardingCompleted -> requestedStartRoute ?: AppDestination.Home.route
+            else -> AppDestination.Onboarding.route
+        }
+    }
     val showBottomBar = remember(backStackEntry) {
         AppDestination.bottomBarDestinations.any { it.route == backStackEntry?.destination?.route }
     }
-    val showTopBar = currentRoute != AppDestination.Onboarding.route
+    val showTopBar = currentRoute != null && currentRoute != AppDestination.Onboarding.route
     val isHomeRoute = currentRoute == AppDestination.Home.route
 
-    LaunchedEffect(settingsState.onboardingCompleted) {
+    LaunchedEffect(settingsState.isLoading, settingsState.onboardingCompleted, requestedStartRoute) {
+        if (settingsState.isLoading) return@LaunchedEffect
         val target = if (settingsState.onboardingCompleted) {
             requestedStartRoute ?: AppDestination.Home.route
         } else {
@@ -211,118 +220,126 @@ fun AppNavHost(
             }
         }
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = AppDestination.Onboarding.route,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(AppDestination.Onboarding.route) {
-                OnboardingScreen(
-                    authState = authState,
-                    settingsState = settingsState,
-                    syncState = syncState,
-                    onBeginGoogleSignIn = onBeginGoogleSignIn,
-                    onCompleteGoogleSignIn = onCompleteGoogleSignIn,
-                    onAuthEvent = onAuthEvent,
-                    onSyncEvent = onSyncEvent,
-                    onSettingsEvent = onSettingsEvent,
-                    onComplete = {
-                        onSettingsEvent(SettingsEvent.SetOnboardingCompleted(true))
-                    }
-                )
-            }
-            composable(AppDestination.Home.route) {
-                HomeScreen(
-                    authState = authState,
-                    taskState = taskState,
-                    syncState = syncState,
-                    eventState = eventState,
-                    onNavigateToActivity = { navController.navigate(AppDestination.Activity.route) },
-                    onNavigateToStudyPlanner = { navController.navigate(AppDestination.StudyPlanner.route) },
-                    onNavigateToExamMode = { navController.navigate(AppDestination.ExamMode.route) },
-                    onNavigateToAuth = { navController.navigate(AppDestination.Auth.route) }
-                )
-            }
-            composable(AppDestination.Tasks.route) {
-                TasksScreen(
-                    taskState = taskState,
-                    syncState = syncState,
-                    onTaskEvent = onTaskEvent,
-                    onSyncEvent = onSyncEvent
-                )
-            }
-            composable(AppDestination.Planner.route) {
-                PlannerScreen(
-                    plannerState = plannerState,
-                    classroomState = classroomState,
-                    onPlannerEvent = onPlannerEvent
-                )
-            }
-            composable(AppDestination.Settings.route) {
-                SettingsScreen(
-                    settingsState = settingsState,
-                    authState = authState,
-                    syncState = syncState,
-                    onSettingsEvent = onSettingsEvent,
-                    onSyncEvent = onSyncEvent,
-                    onNavigateToDebug = { navController.navigate(AppDestination.Debug.route) },
-                    onNavigateToAuth = { navController.navigate(AppDestination.Auth.route) }
-                )
-            }
-            composable(AppDestination.Debug.route) {
-                DebugScreen(
-                    authState = authState,
-                    taskState = taskState,
-                    syncState = syncState,
-                    settingsState = settingsState,
-                    eventState = eventState,
-                    plannerState = plannerState,
-                    onBeginGoogleSignIn = onBeginGoogleSignIn,
-                    onCompleteGoogleSignIn = onCompleteGoogleSignIn,
-                    onAuthEvent = onAuthEvent,
-                    onTaskEvent = onTaskEvent,
-                    onSyncEvent = onSyncEvent,
-                    onSettingsEvent = onSettingsEvent,
-                    onEventEvent = onEventEvent,
-                    onPlannerEvent = onPlannerEvent
-                )
-            }
-            composable(AppDestination.Auth.route) {
-                AuthScreen(
-                    authState = authState,
-                    syncState = syncState,
-                    onBeginGoogleSignIn = onBeginGoogleSignIn,
-                    onCompleteGoogleSignIn = onCompleteGoogleSignIn,
-                    onAuthEvent = onAuthEvent,
-                    onSyncEvent = onSyncEvent
-                )
-            }
-            composable(AppDestination.Activity.route) {
-                ActivityScreen(
-                    eventState = eventState,
-                    onOpenEvent = { eventId -> navController.navigate("${AppDestination.EventDetail.route}/$eventId") }
-                )
-            }
-            composable("${AppDestination.EventDetail.route}/{eventId}") { backStack ->
-                val eventId = backStack.arguments?.getString("eventId").orEmpty()
-                EventDetailScreen(
-                    eventId = eventId,
-                    state = eventDetailState,
-                    onEvent = onEventDetailEvent
-                )
-            }
-            composable(AppDestination.StudyPlanner.route) {
-                StudyPlannerScreen(
-                    state = studyPlanState,
-                    onEvent = onStudyPlanEvent
-                )
-            }
-            composable(AppDestination.ExamMode.route) {
-                ExamModeScreen(
-                    state = examModeState,
-                    onEvent = onExamModeEvent,
-                    onOpenStudyPlanner = { navController.navigate(AppDestination.StudyPlanner.route) }
-                )
+        if (initialRoute == null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            )
+        } else {
+            NavHost(
+                navController = navController,
+                startDestination = initialRoute,
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                composable(AppDestination.Onboarding.route) {
+                    OnboardingScreen(
+                        authState = authState,
+                        settingsState = settingsState,
+                        syncState = syncState,
+                        onBeginGoogleSignIn = onBeginGoogleSignIn,
+                        onCompleteGoogleSignIn = onCompleteGoogleSignIn,
+                        onAuthEvent = onAuthEvent,
+                        onSyncEvent = onSyncEvent,
+                        onSettingsEvent = onSettingsEvent,
+                        onComplete = {
+                            onSettingsEvent(SettingsEvent.SetOnboardingCompleted(true))
+                        }
+                    )
+                }
+                composable(AppDestination.Home.route) {
+                    HomeScreen(
+                        authState = authState,
+                        taskState = taskState,
+                        syncState = syncState,
+                        eventState = eventState,
+                        onNavigateToActivity = { navController.navigate(AppDestination.Activity.route) },
+                        onNavigateToStudyPlanner = { navController.navigate(AppDestination.StudyPlanner.route) },
+                        onNavigateToExamMode = { navController.navigate(AppDestination.ExamMode.route) },
+                        onNavigateToAuth = { navController.navigate(AppDestination.Auth.route) }
+                    )
+                }
+                composable(AppDestination.Tasks.route) {
+                    TasksScreen(
+                        taskState = taskState,
+                        syncState = syncState,
+                        onTaskEvent = onTaskEvent,
+                        onSyncEvent = onSyncEvent
+                    )
+                }
+                composable(AppDestination.Planner.route) {
+                    PlannerScreen(
+                        plannerState = plannerState,
+                        classroomState = classroomState,
+                        onPlannerEvent = onPlannerEvent
+                    )
+                }
+                composable(AppDestination.Settings.route) {
+                    SettingsScreen(
+                        settingsState = settingsState,
+                        authState = authState,
+                        syncState = syncState,
+                        onSettingsEvent = onSettingsEvent,
+                        onSyncEvent = onSyncEvent,
+                        onNavigateToDebug = { navController.navigate(AppDestination.Debug.route) },
+                        onNavigateToAuth = { navController.navigate(AppDestination.Auth.route) }
+                    )
+                }
+                composable(AppDestination.Debug.route) {
+                    DebugScreen(
+                        authState = authState,
+                        taskState = taskState,
+                        syncState = syncState,
+                        settingsState = settingsState,
+                        eventState = eventState,
+                        plannerState = plannerState,
+                        onBeginGoogleSignIn = onBeginGoogleSignIn,
+                        onCompleteGoogleSignIn = onCompleteGoogleSignIn,
+                        onAuthEvent = onAuthEvent,
+                        onTaskEvent = onTaskEvent,
+                        onSyncEvent = onSyncEvent,
+                        onSettingsEvent = onSettingsEvent,
+                        onEventEvent = onEventEvent,
+                        onPlannerEvent = onPlannerEvent
+                    )
+                }
+                composable(AppDestination.Auth.route) {
+                    AuthScreen(
+                        authState = authState,
+                        syncState = syncState,
+                        onBeginGoogleSignIn = onBeginGoogleSignIn,
+                        onCompleteGoogleSignIn = onCompleteGoogleSignIn,
+                        onAuthEvent = onAuthEvent,
+                        onSyncEvent = onSyncEvent
+                    )
+                }
+                composable(AppDestination.Activity.route) {
+                    ActivityScreen(
+                        eventState = eventState,
+                        onOpenEvent = { eventId -> navController.navigate("${AppDestination.EventDetail.route}/$eventId") }
+                    )
+                }
+                composable("${AppDestination.EventDetail.route}/{eventId}") { backStack ->
+                    val eventId = backStack.arguments?.getString("eventId").orEmpty()
+                    EventDetailScreen(
+                        eventId = eventId,
+                        state = eventDetailState,
+                        onEvent = onEventDetailEvent
+                    )
+                }
+                composable(AppDestination.StudyPlanner.route) {
+                    StudyPlannerScreen(
+                        state = studyPlanState,
+                        onEvent = onStudyPlanEvent
+                    )
+                }
+                composable(AppDestination.ExamMode.route) {
+                    ExamModeScreen(
+                        state = examModeState,
+                        onEvent = onExamModeEvent,
+                        onOpenStudyPlanner = { navController.navigate(AppDestination.StudyPlanner.route) }
+                    )
+                }
             }
         }
     }

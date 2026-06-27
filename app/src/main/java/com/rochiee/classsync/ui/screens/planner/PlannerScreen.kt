@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -113,93 +113,100 @@ fun PlannerScreen(
         }
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
+            .fillMaxSize()
             .padding(spacing.md)
-            .verticalScroll(rememberScrollState()),
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spacing.lg)
     ) {
-        TintedPanel {
-            Box(
-                modifier = Modifier
-                    .background(
-                        brush = Brush.linearGradient(
-                            listOf(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                SilverBorder.copy(alpha = 0.18f)
-                            )
-                        ),
-                        shape = RoundedCornerShape(18.dp)
+        item {
+            TintedPanel {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                    SilverBorder.copy(alpha = 0.18f)
+                                )
+                            ),
+                            shape = RoundedCornerShape(18.dp)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "PLANNER",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            ) {
+                }
                 Text(
-                    text = "planner",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    text = "Plan by today, week, month, or a custom range.",
+                    style = MaterialTheme.typography.headlineSmall
                 )
-            }
-            Text(
-                text = "Plan by today, week, month, or a custom range.",
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Text(
-                text = "This view keeps short-term deadlines, assessments, and schedule pressure in one place.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            ResponsiveFlowRow(maxItemsInEachRow = 2) {
-                LiquidGlassTextButton(text = "Today", onClick = { mode = PlannerMode.Today }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Today)
-                LiquidGlassTextButton(text = "This week", onClick = { mode = PlannerMode.Week }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Week)
-                LiquidGlassTextButton(text = "This month", onClick = { mode = PlannerMode.Month }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Month)
-                LiquidGlassTextButton(text = "Custom range", onClick = { mode = PlannerMode.Range }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Range)
+                Text(
+                    text = "This view keeps short-term deadlines, assessments, and schedule pressure in one place.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                    LiquidGlassTextButton(text = "Today", onClick = { mode = PlannerMode.Today }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Today)
+                    LiquidGlassTextButton(text = "This week", onClick = { mode = PlannerMode.Week }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Week)
+                    LiquidGlassTextButton(text = "This month", onClick = { mode = PlannerMode.Month }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Month)
+                    LiquidGlassTextButton(text = "Custom range", onClick = { mode = PlannerMode.Range }, modifier = Modifier.widthIn(min = 136.dp), selected = mode == PlannerMode.Range)
+                }
             }
         }
 
         when (mode) {
             PlannerMode.Today -> {
                 val day = plannerState.today
-                ResponsiveFlowRow(maxItemsInEachRow = 2) {
-                    ElevatedInfoCard(
-                        title = "Due today",
-                        value = (day?.dueItems?.size ?: 0).toString(),
-                        supportingText = "Items that need attention before tonight",
-                        modifier = Modifier.fillMaxWidth(),
-                        accent = Negative
-                    )
-                    ElevatedInfoCard(
-                        title = "Priority lane",
-                        value = (day?.highPriorityItems?.size ?: 0).toString(),
-                        supportingText = "Important tasks identified for today",
-                        modifier = Modifier.fillMaxWidth(),
-                        accent = SkyBlue
-                    )
+                item {
+                    ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                        ElevatedInfoCard(
+                            title = "Due today",
+                            value = (day?.dueItems?.size ?: 0).toString(),
+                            supportingText = "Items that need attention before tonight",
+                            modifier = Modifier.fillMaxWidth(),
+                            accent = Negative
+                        )
+                        ElevatedInfoCard(
+                            title = "Priority lane",
+                            value = (day?.highPriorityItems?.size ?: 0).toString(),
+                            supportingText = "Important tasks identified for today",
+                            modifier = Modifier.fillMaxWidth(),
+                            accent = SkyBlue
+                        )
+                    }
                 }
             }
 
             PlannerMode.Week -> {
                 val week = plannerState.currentWeek
-                ResponsiveFlowRow(maxItemsInEachRow = 2) {
-                    ElevatedInfoCard(
-                        title = "Week load",
-                        value = (week?.totalTaskCount ?: 0).toString(),
-                        supportingText = "Scheduled work across this week",
-                        modifier = Modifier.fillMaxWidth(),
-                        accent = SkyBlue
-                    )
-                    ElevatedInfoCard(
-                        title = "Overdue",
-                        value = (week?.overdueTaskCount ?: 0).toString(),
-                        supportingText = "Items already running behind",
-                        modifier = Modifier.fillMaxWidth(),
-                        accent = Negative
-                    )
+                item {
+                    ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                        ElevatedInfoCard(
+                            title = "Week load",
+                            value = (week?.totalTaskCount ?: 0).toString(),
+                            supportingText = "Scheduled work across this week",
+                            modifier = Modifier.fillMaxWidth(),
+                            accent = SkyBlue
+                        )
+                        ElevatedInfoCard(
+                            title = "Overdue",
+                            value = (week?.overdueTaskCount ?: 0).toString(),
+                            supportingText = "Items already running behind",
+                            modifier = Modifier.fillMaxWidth(),
+                            accent = Negative
+                        )
+                    }
                 }
             }
 
             PlannerMode.Month -> {
                 val month = plannerState.currentMonth
-                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                item { ResponsiveFlowRow(maxItemsInEachRow = 2) {
                     ElevatedInfoCard(
                         title = "Month load",
                         value = (month?.totalTaskCount ?: 0).toString(),
@@ -214,11 +221,11 @@ fun PlannerScreen(
                         modifier = Modifier.fillMaxWidth(),
                         accent = MintGreen
                     )
-                }
+                } }
             }
 
             PlannerMode.Range -> {
-                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                item { ResponsiveFlowRow(maxItemsInEachRow = 2) {
                     ElevatedInfoCard(
                         title = "Range span",
                         value = selectedRangeLengthDays.toString(),
@@ -233,100 +240,106 @@ fun PlannerScreen(
                         modifier = Modifier.fillMaxWidth(),
                         accent = Negative
                     )
-                }
+                } }
             }
         }
 
-        PlannerFilterSheet(
-            current = plannerState.activeFilter,
-            availableCourseIds = classroomState.catalog.semesters
-                .flatMap { semester -> semester.sections.map { section -> section.sectionId to section.sectionId } },
-            onApply = { filter ->
-                onPlannerEvent(PlannerEvent.SetFilter(filter))
-                when (mode) {
-                    PlannerMode.Today -> onPlannerEvent(PlannerEvent.LoadToday)
-                    PlannerMode.Week -> onPlannerEvent(PlannerEvent.LoadCurrentWeek)
-                    PlannerMode.Month -> onPlannerEvent(PlannerEvent.LoadCurrentMonth)
-                    PlannerMode.Range -> {
-                        val start = plannerState.selectedRangeStartMillis ?: System.currentTimeMillis()
-                        val end = plannerState.selectedRangeEndMillis ?: (start + 2L * 24L * 60L * 60L * 1000L)
-                        onPlannerEvent(PlannerEvent.LoadRange(start, end))
+        item {
+            PlannerFilterSheet(
+                current = plannerState.activeFilter,
+                availableCourseIds = classroomState.catalog.semesters
+                    .flatMap { semester -> semester.sections.map { section -> section.sectionId to section.sectionId } },
+                onApply = { filter ->
+                    onPlannerEvent(PlannerEvent.SetFilter(filter))
+                    when (mode) {
+                        PlannerMode.Today -> onPlannerEvent(PlannerEvent.LoadToday)
+                        PlannerMode.Week -> onPlannerEvent(PlannerEvent.LoadCurrentWeek)
+                        PlannerMode.Month -> onPlannerEvent(PlannerEvent.LoadCurrentMonth)
+                        PlannerMode.Range -> {
+                            val start = plannerState.selectedRangeStartMillis ?: System.currentTimeMillis()
+                            val end = plannerState.selectedRangeEndMillis ?: (start + 2L * 24L * 60L * 60L * 1000L)
+                            onPlannerEvent(PlannerEvent.LoadRange(start, end))
+                        }
                     }
                 }
-            }
-        )
+            )
+        }
 
         if (mode == PlannerMode.Range) {
-            TintedPanel {
-                Text(
-                    text = "Selected range",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = "${plannerState.selectedRangeStartMillis.formatDate()} to ${plannerState.selectedRangeEndMillis.formatDate()}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                LiquidGlassTextButton(
-                    text = "Pick custom dates",
-                    onClick = { showRangePicker = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    selected = true
-                )
+            item {
+                TintedPanel {
+                    Text(
+                        text = "Selected range",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = "${plannerState.selectedRangeStartMillis.formatDate()} to ${plannerState.selectedRangeEndMillis.formatDate()}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    LiquidGlassTextButton(
+                        text = "Pick custom dates",
+                        onClick = { showRangePicker = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        selected = true
+                    )
+                }
             }
-            ResponsiveFlowRow(maxItemsInEachRow = 2) {
-                LiquidGlassTextButton(
-                    text = "Next 3 days",
-                    onClick = {
-                        val now = System.currentTimeMillis()
-                        onPlannerEvent(PlannerEvent.LoadRange(now, now + 2L * 24L * 60L * 60L * 1000L))
-                    },
-                    modifier = Modifier.widthIn(min = 132.dp)
-                )
-                LiquidGlassTextButton(
-                    text = "Next 7 days",
-                    onClick = {
-                        val now = System.currentTimeMillis()
-                        onPlannerEvent(PlannerEvent.LoadRange(now, now + 6L * 24L * 60L * 60L * 1000L))
-                    },
-                    modifier = Modifier.widthIn(min = 132.dp)
-                )
-                LiquidGlassTextButton(
-                    text = "Next 14 days",
-                    onClick = {
-                        val now = System.currentTimeMillis()
-                        onPlannerEvent(PlannerEvent.LoadRange(now, now + 13L * 24L * 60L * 60L * 1000L))
-                    },
-                    modifier = Modifier.widthIn(min = 132.dp)
-                )
+            item {
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                    LiquidGlassTextButton(
+                        text = "Next 3 days",
+                        onClick = {
+                            val now = System.currentTimeMillis()
+                            onPlannerEvent(PlannerEvent.LoadRange(now, now + 2L * 24L * 60L * 60L * 1000L))
+                        },
+                        modifier = Modifier.widthIn(min = 132.dp)
+                    )
+                    LiquidGlassTextButton(
+                        text = "Next 7 days",
+                        onClick = {
+                            val now = System.currentTimeMillis()
+                            onPlannerEvent(PlannerEvent.LoadRange(now, now + 6L * 24L * 60L * 60L * 1000L))
+                        },
+                        modifier = Modifier.widthIn(min = 132.dp)
+                    )
+                    LiquidGlassTextButton(
+                        text = "Next 14 days",
+                        onClick = {
+                            val now = System.currentTimeMillis()
+                            onPlannerEvent(PlannerEvent.LoadRange(now, now + 13L * 24L * 60L * 60L * 1000L))
+                        },
+                        modifier = Modifier.widthIn(min = 132.dp)
+                    )
+                }
             }
         }
 
         when (mode) {
             PlannerMode.Today -> {
                 val items = (plannerState.today?.tasks ?: emptyList()) + (plannerState.today?.events ?: emptyList())
-                TodayPlannerView(items = items)
+                item { TodayPlannerView(items = items) }
             }
             PlannerMode.Week -> {
-                WeekPlannerView(
+                item { WeekPlannerView(
                     days = plannerState.currentWeek?.days ?: emptyList(),
                     onSelectDay = { day ->
                         mode = PlannerMode.Range
                         onPlannerEvent(PlannerEvent.LoadRange(day.dateStartMillis, day.dateEndMillis))
                     }
-                )
+                ) }
             }
             PlannerMode.Month -> {
-                MonthPlannerView(
+                item { MonthPlannerView(
                     month = plannerState.currentMonth,
                     onSelectDay = { day ->
                         mode = PlannerMode.Range
                         onPlannerEvent(PlannerEvent.LoadRange(day.dateStartMillis, day.dateEndMillis))
                     }
-                )
+                ) }
             }
             PlannerMode.Range -> {
-                RangePlannerView(days = plannerState.selectedRangeDays)
+                item { RangePlannerView(days = plannerState.selectedRangeDays) }
             }
         }
     }

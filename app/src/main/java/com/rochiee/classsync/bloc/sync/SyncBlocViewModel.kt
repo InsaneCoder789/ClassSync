@@ -35,6 +35,7 @@ class SyncBlocViewModel(
         when (event) {
             SyncEvent.ObserveLogs -> observeLogs()
             SyncEvent.RunManualFullSync -> runManualFullSync()
+            SyncEvent.RunAutoRefreshOnOpen -> runAutoRefreshOnOpen()
             SyncEvent.RunGmailSync -> runGmailSync()
             SyncEvent.RunClassroomSync -> runClassroomSync()
             SyncEvent.ClearLogs -> clearLogs()
@@ -70,6 +71,11 @@ class SyncBlocViewModel(
                 _state.update { it.copy(isSyncing = false, errorMessage = error.message) }
             }
         }
+    }
+
+    private fun runAutoRefreshOnOpen() {
+        if (_state.value.isSyncing) return
+        runManualFullSync()
     }
 
     private fun runGmailSync() {

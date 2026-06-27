@@ -1,16 +1,18 @@
 package com.rochiee.classsync.ui.screens.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -19,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.rochiee.classsync.bloc.auth.AuthUiState
 import com.rochiee.classsync.bloc.settings.SettingsEvent
@@ -51,64 +55,99 @@ fun SettingsScreen(
     onNavigateToAuth: () -> Unit
 ) {
     val spacing = LocalSpacing.current
-    Column(
+    LazyColumn(
         modifier = Modifier
+            .fillMaxSize()
             .padding(spacing.md)
-            .verticalScroll(rememberScrollState()),
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spacing.lg)
     ) {
-        TintedPanel {
-            Box(
-                modifier = Modifier
-                    .background(
-                        brush = Brush.linearGradient(
-                            listOf(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                SilverBorder.copy(alpha = 0.18f)
-                            )
-                        ),
-                        shape = RoundedCornerShape(18.dp)
+        item { ScreenSection(title = "Control center", subtitle = "Keep the essentials aligned before you tweak the deeper settings below.") {
+            TintedPanel {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                    SilverBorder.copy(alpha = 0.18f)
+                                )
+                            ),
+                            shape = RoundedCornerShape(18.dp)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "SETTINGS",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            ) {
+                }
+                AppLogoLockup(
+                    subtitle = "Control sync, reminders, and the local study experience from one place",
+                    compact = true
+                )
                 Text(
-                    text = "settings",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    text = "Adjust what stays connected, what gets refreshed, and how ClassSync reminds you before urgent work slips.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                    val useSingleColumn = maxWidth < 420.dp
+                    if (useSingleColumn) {
+                        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+                            SettingsHeroStatCard(
+                                title = "Account",
+                                value = if (authState.isSignedIn) "Connected" else "Needs setup",
+                                supportingText = authState.userEmail ?: authState.displayName ?: "Google not connected yet",
+                                accent = SkyBlue
+                            )
+                            SettingsHeroStatCard(
+                                title = "Last sync",
+                                value = settingsState.lastSyncTimeMillis.formatDateTime(),
+                                supportingText = if (syncState.isSyncing) "A sync is currently running" else "Latest successful local refresh",
+                                accent = Sun
+                            )
+                            SettingsHeroStatCard(
+                                title = "Reminder lead",
+                                value = "${settingsState.defaultReminderHours}h",
+                                supportingText = "Default notice before deadlines",
+                                accent = MintGreen
+                            )
+                        }
+                    } else {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(spacing.sm)
+                        ) {
+                            SettingsHeroStatCard(
+                                title = "Account",
+                                value = if (authState.isSignedIn) "Connected" else "Needs setup",
+                                supportingText = authState.userEmail ?: authState.displayName ?: "Google not connected yet",
+                                modifier = Modifier.weight(1f),
+                                accent = SkyBlue
+                            )
+                            SettingsHeroStatCard(
+                                title = "Last sync",
+                                value = settingsState.lastSyncTimeMillis.formatDateTime(),
+                                supportingText = if (syncState.isSyncing) "A sync is currently running" else "Latest successful local refresh",
+                                modifier = Modifier.weight(1f),
+                                accent = Sun
+                            )
+                        }
+                        SettingsHeroStatCard(
+                            title = "Reminder lead",
+                            value = "${settingsState.defaultReminderHours}h",
+                            supportingText = "Default notice before deadlines",
+                            modifier = Modifier.fillMaxWidth(),
+                            accent = MintGreen
+                        )
+                    }
+                }
             }
-            AppLogoLockup(subtitle = "Control sync, reminders, and the local study experience from one place")
-            Text(
-                text = "Adjust what stays connected, what gets refreshed, and how ClassSync reminds you before urgent work slips.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            ResponsiveFlowRow(maxItemsInEachRow = 2) {
-                ElevatedInfoCard(
-                    title = "Account",
-                    value = if (authState.isSignedIn) "Connected" else "Needs setup",
-                    supportingText = authState.userEmail ?: authState.displayName ?: "Google not connected yet",
-                    modifier = Modifier.fillMaxWidth(),
-                    accent = SkyBlue
-                )
-                ElevatedInfoCard(
-                    title = "Last sync",
-                    value = settingsState.lastSyncTimeMillis.formatDateTime(),
-                    supportingText = if (syncState.isSyncing) "A sync is currently running" else "Latest successful local refresh",
-                    modifier = Modifier.fillMaxWidth(),
-                    accent = Sun
-                )
-                ElevatedInfoCard(
-                    title = "Reminder lead",
-                    value = "${settingsState.defaultReminderHours}h",
-                    supportingText = "Default notice before deadlines",
-                    modifier = Modifier.fillMaxWidth(),
-                    accent = MintGreen
-                )
-            }
-        }
+        } }
 
-        ScreenSection(title = "Sync hub", subtitle = "Keep live academic data fresh and decide which sources ClassSync should use.") {
+        item { ScreenSection(title = "Sync hub", subtitle = "Keep live academic data fresh and decide which sources ClassSync should use.") {
             TintedPanel {
                 if (authState.isSignedIn) {
                     Text(
@@ -183,9 +222,9 @@ fun SettingsScreen(
                 checked = settingsState.backgroundSyncEnabled,
                 onCheckedChange = { onSettingsEvent(SettingsEvent.SetBackgroundSyncEnabled(it)) }
             )
-        }
+        } }
 
-        ScreenSection(title = "Reminders first", subtitle = "Critical due work and ongoing alerts should be easy to control.") {
+        item { ScreenSection(title = "Reminders first", subtitle = "Critical due work and ongoing alerts should be easy to control.") {
             TintedPanel {
                 Text(text = "Reminder lead time: ${settingsState.defaultReminderHours}h", style = MaterialTheme.typography.titleMedium)
                 ResponsiveFlowRow(maxItemsInEachRow = 3) {
@@ -199,9 +238,9 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-        }
+        } }
 
-        ScreenSection(title = "Appearance", subtitle = "Pick the mode that feels best on your device.") {
+        item { ScreenSection(title = "Appearance", subtitle = "Pick the mode that feels best on your device.") {
             TintedPanel {
                 Text(
                     text = "Theme mode",
@@ -222,9 +261,9 @@ fun SettingsScreen(
                     )
                 }
             }
-        }
+        } }
 
-        ScreenSection(title = "Daily digest", subtitle = "A once-a-day local digest of due work, exams, and course updates.") {
+        item { ScreenSection(title = "Daily digest", subtitle = "A once-a-day local digest of due work, exams, and course updates.") {
             SettingsToggleRow(
                 title = "Enable daily digest",
                 description = "Receive a short academic overview each day.",
@@ -252,9 +291,9 @@ fun SettingsScreen(
                 }
                 LiquidGlassTextButton(text = "Preview today’s digest", onClick = { onSettingsEvent(SettingsEvent.PreviewDigest) }, modifier = Modifier.fillMaxWidth())
             }
-        }
+        } }
 
-        ScreenSection(title = "Advanced", subtitle = "Developer controls live here so the main workflow stays clean.") {
+        item { ScreenSection(title = "Advanced", subtitle = "Developer controls live here so the main workflow stays clean.") {
             TintedPanel {
                 Text(
                     text = "Debug tools",
@@ -271,7 +310,50 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+        } }
+    }
+}
+
+@Composable
+private fun SettingsHeroStatCard(
+    title: String,
+    value: String,
+    supportingText: String,
+    accent: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    TintedPanel(
+        modifier = modifier,
+        accentColor = accent
+    ) {
+        Box(
+            modifier = Modifier
+                .background(accent.copy(alpha = 0.14f), RoundedCornerShape(16.dp))
+                .padding(horizontal = 12.dp, vertical = 6.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelLarge,
+                color = accent,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = supportingText,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 

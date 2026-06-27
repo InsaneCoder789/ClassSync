@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -67,8 +67,9 @@ fun HomeScreen(
     } ?: openTasks.firstOrNull()
     val upcomingTasks = openTasks.filterNot { it.id == ongoingTask?.id }.take(3)
 
-    Column(
+    LazyColumn(
         modifier = Modifier
+            .fillMaxSize()
             .fillMaxWidth()
             .background(
                 brush = Brush.verticalGradient(
@@ -79,117 +80,124 @@ fun HomeScreen(
                     )
                 )
             )
-            .padding(horizontal = spacing.md, vertical = spacing.sm)
-            .verticalScroll(rememberScrollState()),
+            .padding(horizontal = spacing.md, vertical = spacing.sm),
         verticalArrangement = Arrangement.spacedBy(spacing.lg)
     ) {
-        TintedPanel {
-            Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
-                Text(
-                    text = "Today at a glance",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    text = if (authState.isSignedIn) {
-                        "Signed in as ${authState.userEmail ?: authState.displayName ?: "student"}"
-                    } else {
-                        "Connect Google from settings to unlock live Classroom timelines."
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            ResponsiveFlowRow(maxItemsInEachRow = 2) {
-                ElevatedInfoCard(
-                    title = "Open work",
-                    value = openTasks.size.toString(),
-                    supportingText = "Incomplete assignments currently in your queue",
-                    modifier = Modifier.fillMaxWidth(),
-                    accent = MaterialTheme.colorScheme.primary
-                )
-                ElevatedInfoCard(
-                    title = "Urgent soon",
-                    value = urgentCount.toString(),
-                    supportingText = "Assignments due within the next 24 hours",
-                    modifier = Modifier.fillMaxWidth(),
-                    accent = if (urgentCount > 0) Negative else SafeGreen
-                )
-            }
-        }
-
-        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            Text(
-                text = "Now in motion",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            ScheduleFeatureCard(
-                task = ongoingTask,
-                fallbackTitle = "No live assignment right now",
-                fallbackSubtitle = "Your next timed work will appear here once Classroom dates are synced."
-            )
-        }
-
-        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            Text(
-                text = "Coming up next",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            if (upcomingTasks.isEmpty()) {
-                TintedPanel {
+        item {
+            TintedPanel {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
                     Text(
-                        text = "No upcoming assignments are queued right now.",
-                        style = MaterialTheme.typography.bodyMedium
+                        text = "Today at a glance",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = if (authState.isSignedIn) {
+                            "Signed in as ${authState.userEmail ?: authState.displayName ?: "student"}"
+                        } else {
+                            "Connect Google from settings to unlock live Classroom timelines."
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            } else {
-                Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-                    upcomingTasks.forEach { task ->
-                        ScheduleCompactCard(task = task)
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                    ElevatedInfoCard(
+                        title = "Open work",
+                        value = openTasks.size.toString(),
+                        supportingText = "Incomplete assignments currently in your queue",
+                        modifier = Modifier.fillMaxWidth(),
+                        accent = MaterialTheme.colorScheme.primary
+                    )
+                    ElevatedInfoCard(
+                        title = "Urgent soon",
+                        value = urgentCount.toString(),
+                        supportingText = "Assignments due within the next 24 hours",
+                        modifier = Modifier.fillMaxWidth(),
+                        accent = if (urgentCount > 0) Negative else SafeGreen
+                    )
+                }
+            }
+        }
+
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+                Text(
+                    text = "Now in motion",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                ScheduleFeatureCard(
+                    task = ongoingTask,
+                    fallbackTitle = "No live assignment right now",
+                    fallbackSubtitle = "Your next timed work will appear here once Classroom dates are synced."
+                )
+            }
+        }
+
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+                Text(
+                    text = "Coming up next",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                if (upcomingTasks.isEmpty()) {
+                    TintedPanel {
+                        Text(
+                            text = "No upcoming assignments are queued right now.",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+                        upcomingTasks.forEach { task ->
+                            ScheduleCompactCard(task = task)
+                        }
                     }
                 }
             }
         }
 
-        TintedPanel {
-            Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-                Text(
-                    text = "Operations",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = "Last sync ${syncState.lastSyncMillis.formatDateTime()} • ${eventState.recentEvents.size} recent changes captured locally",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                            shape = RoundedCornerShape(14.dp)
-                        )
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                ) {
+        item {
+            TintedPanel {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                     Text(
-                        text = "${taskState.tasks.count { !it.isCompleted }} open items",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary
+                        text = "Operations",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = "Last sync ${syncState.lastSyncMillis.formatDateTime()} • ${eventState.recentEvents.size} recent changes captured locally",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                                shape = RoundedCornerShape(14.dp)
+                            )
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "${taskState.tasks.count { !it.isCompleted }} open items",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
+                    LiquidGlassTextButton(text = "Activity log", onClick = onNavigateToActivity, modifier = Modifier.weight(1f))
+                    LiquidGlassTextButton(text = "Study planner", onClick = onNavigateToStudyPlanner, modifier = Modifier.weight(1f))
+                }
+                LiquidGlassTextButton(text = "Exam focus mode", onClick = onNavigateToExamMode, modifier = Modifier.fillMaxWidth())
+                if (!authState.isSignedIn) {
+                    LiquidGlassTextButton(
+                        text = "Connect Google account",
+                        onClick = onNavigateToAuth,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
-                LiquidGlassTextButton(text = "Activity log", onClick = onNavigateToActivity, modifier = Modifier.weight(1f))
-                LiquidGlassTextButton(text = "Study planner", onClick = onNavigateToStudyPlanner, modifier = Modifier.weight(1f))
-            }
-            LiquidGlassTextButton(text = "Exam focus mode", onClick = onNavigateToExamMode, modifier = Modifier.fillMaxWidth())
-            if (!authState.isSignedIn) {
-                LiquidGlassTextButton(
-                    text = "Connect Google account",
-                    onClick = onNavigateToAuth,
-                    modifier = Modifier.fillMaxWidth()
-                )
             }
         }
     }

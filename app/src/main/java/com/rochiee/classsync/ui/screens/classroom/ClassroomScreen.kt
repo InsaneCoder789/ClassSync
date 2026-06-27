@@ -8,13 +8,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.CalendarMonth
@@ -76,8 +77,9 @@ fun ClassroomScreen(
     var selectedDayIndex by remember(selectedSection?.sectionId) { mutableIntStateOf(0) }
     val selectedDay = selectedSection?.days?.getOrNull(selectedDayIndex)
 
-    Column(
+    LazyColumn(
         modifier = Modifier
+            .fillMaxSize()
             .fillMaxWidth()
             .background(
                 brush = Brush.verticalGradient(
@@ -88,51 +90,58 @@ fun ClassroomScreen(
                     )
                 )
             )
-            .padding(spacing.md)
-            .verticalScroll(rememberScrollState()),
+            .padding(spacing.md),
         verticalArrangement = Arrangement.spacedBy(spacing.lg)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
-            Text(
-                text = if (selectedSection == null) "Timetable" else selectedSection.sectionId,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = when {
-                    selectedSection != null -> "Semester ${selectedSemester ?: "-"} timetable"
-                    selectedSemester != null -> "Choose a section for Semester $selectedSemester"
-                    else -> "Semester Selection → Section Selection → Timetable"
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                Text(
+                    text = if (selectedSection == null) "Timetable" else selectedSection.sectionId,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = when {
+                        selectedSection != null -> "Semester ${selectedSemester ?: "-"} timetable"
+                        selectedSemester != null -> "Choose a section for Semester $selectedSemester"
+                        else -> "Semester Selection → Section Selection → Timetable"
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
 
         when {
-            classroomState.isLoading -> LoadingState("Loading classroom catalog...")
-            classroomState.errorMessage != null -> ErrorState(classroomState.errorMessage)
-            selectedSemester == null -> SemesterSelectionStep(
-                semesterOptions = semesterOptions,
-                catalogState = classroomState,
-                onSelectSemester = { onClassroomEvent(ClassroomScreenEvent.SelectSemester(it)) }
-            )
-            selectedSection == null -> SectionSelectionStep(
-                semester = selectedSemester,
-                state = classroomState,
-                onBack = { onClassroomEvent(ClassroomScreenEvent.BackToSemesters) },
-                onRefresh = { onClassroomEvent(ClassroomScreenEvent.RefreshData) },
-                onSelectSection = { onClassroomEvent(ClassroomScreenEvent.SelectSection(it)) }
-            )
-            else -> TimetableDetailStep(
-                semester = selectedSemester,
-                section = selectedSection,
-                selectedDay = selectedDay,
-                selectedDayIndex = selectedDayIndex,
-                onSelectDay = { selectedDayIndex = it },
-                onBack = { onClassroomEvent(ClassroomScreenEvent.BackToSections) },
-                onChangeSemester = { onClassroomEvent(ClassroomScreenEvent.BackToSemesters) }
-            )
+            classroomState.isLoading -> item { LoadingState("Loading classroom catalog...") }
+            classroomState.errorMessage != null -> item { ErrorState(classroomState.errorMessage) }
+            selectedSemester == null -> item {
+                SemesterSelectionStep(
+                    semesterOptions = semesterOptions,
+                    catalogState = classroomState,
+                    onSelectSemester = { onClassroomEvent(ClassroomScreenEvent.SelectSemester(it)) }
+                )
+            }
+            selectedSection == null -> item {
+                SectionSelectionStep(
+                    semester = selectedSemester,
+                    state = classroomState,
+                    onBack = { onClassroomEvent(ClassroomScreenEvent.BackToSemesters) },
+                    onRefresh = { onClassroomEvent(ClassroomScreenEvent.RefreshData) },
+                    onSelectSection = { onClassroomEvent(ClassroomScreenEvent.SelectSection(it)) }
+                )
+            }
+            else -> item {
+                TimetableDetailStep(
+                    semester = selectedSemester,
+                    section = selectedSection,
+                    selectedDay = selectedDay,
+                    selectedDayIndex = selectedDayIndex,
+                    onSelectDay = { selectedDayIndex = it },
+                    onBack = { onClassroomEvent(ClassroomScreenEvent.BackToSections) },
+                    onChangeSemester = { onClassroomEvent(ClassroomScreenEvent.BackToSemesters) }
+                )
+            }
         }
     }
 }

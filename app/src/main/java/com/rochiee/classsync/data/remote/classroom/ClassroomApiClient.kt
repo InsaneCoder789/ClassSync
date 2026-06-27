@@ -36,7 +36,7 @@ class ClassroomApiClient(private val authTokenProvider: AuthTokenProvider) {
                 .execute()
             response.courses ?: emptyList()
         } catch (e: Exception) {
-            throw IllegalStateException(e.message ?: "Failed to fetch Classroom courses.", e)
+            throw IllegalStateException(ClassroomErrorInterpreter.toUserMessage(e, "read your Classroom courses"), e)
         }
     }
 
@@ -47,7 +47,7 @@ class ClassroomApiClient(private val authTokenProvider: AuthTokenProvider) {
                 .execute()
             response.courseWork ?: emptyList()
         } catch (e: Exception) {
-            throw IllegalStateException(e.message ?: "Failed to fetch Classroom coursework.", e)
+            throw IllegalStateException(ClassroomErrorInterpreter.toUserMessage(e, "read your Classroom assignments"), e)
         }
     }
 
@@ -57,7 +57,7 @@ class ClassroomApiClient(private val authTokenProvider: AuthTokenProvider) {
             val response = service.courses().announcements().list(courseId).execute()
             response.announcements ?: emptyList()
         } catch (e: Exception) {
-            throw IllegalStateException(e.message ?: "Failed to fetch Classroom announcements.", e)
+            throw IllegalStateException(ClassroomErrorInterpreter.toUserMessage(e, "read Classroom announcements"), e)
         }
     }
 
@@ -67,7 +67,7 @@ class ClassroomApiClient(private val authTokenProvider: AuthTokenProvider) {
             val response = service.courses().courseWorkMaterials().list(courseId).execute()
             response.courseWorkMaterial ?: emptyList()
         } catch (e: Exception) {
-            throw IllegalStateException(e.message ?: "Failed to fetch Classroom materials.", e)
+            throw IllegalStateException(ClassroomErrorInterpreter.toUserMessage(e, "read Classroom materials"), e)
         }
     }
 
@@ -78,7 +78,7 @@ class ClassroomApiClient(private val authTokenProvider: AuthTokenProvider) {
                 .execute()
             response.studentSubmissions ?: emptyList()
         } catch (e: Exception) {
-            throw IllegalStateException(e.message ?: "Failed to fetch Classroom submissions.", e)
+            throw IllegalStateException(ClassroomErrorInterpreter.toUserMessage(e, "read your submission status"), e)
         }
     }
 }

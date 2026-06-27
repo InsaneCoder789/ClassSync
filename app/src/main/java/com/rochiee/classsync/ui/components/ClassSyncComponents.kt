@@ -24,8 +24,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
@@ -140,13 +141,19 @@ fun ElevatedInfoCard(
 
 @Composable
 fun StatusChip(label: String, color: Color) {
+    val isDarkPalette = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     AssistChip(
         onClick = {},
         enabled = false,
-        label = { Text(label) },
+        label = {
+            Text(
+                text = label,
+                color = if (isDarkPalette) Color.White else color
+            )
+        },
         colors = AssistChipDefaults.assistChipColors(
-            disabledContainerColor = color.copy(alpha = 0.16f),
-            disabledLabelColor = color
+            disabledContainerColor = if (isDarkPalette) color.copy(alpha = 0.24f) else color.copy(alpha = 0.16f),
+            disabledLabelColor = if (isDarkPalette) Color.White else color
         )
     )
 }
@@ -210,7 +217,8 @@ fun DeadlineText(
     dueMillis: Long?,
     isCompleted: Boolean,
     modifier: Modifier = Modifier,
-    prefix: String = "Due "
+    prefix: String = "Due ",
+    colorOverride: Color? = null
 ) {
     val tone = remember(dueMillis, isCompleted) {
         deadlineToneFor(dueMillis = dueMillis, isCompleted = isCompleted)
@@ -218,7 +226,7 @@ fun DeadlineText(
     Text(
         text = "$prefix${dueMillis.formatDate()}",
         style = MaterialTheme.typography.bodyMedium,
-        color = tone.color,
+        color = colorOverride ?: tone.color,
         modifier = modifier,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
@@ -359,7 +367,11 @@ fun LiquidGlassButton(
     } else {
         if (enabled) SilverBorderSoft else SilverBorderSoft.copy(alpha = 0.45f)
     }
-    val contentColor = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f)
+    val contentColor = when {
+        !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f)
+        selected -> Color.White
+        else -> MaterialTheme.colorScheme.onSurface
+    }
 
     Surface(
         modifier = modifier
@@ -439,29 +451,30 @@ fun ResponsiveFlowRow(
 fun AppLogoLockup(
     modifier: Modifier = Modifier,
     titleColor: Color = MaterialTheme.colorScheme.onSurface,
-    subtitle: String? = null
+    subtitle: String? = null,
+    compact: Boolean = false
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(if (compact) 10.dp else 12.dp)
     ) {
         Box(
             modifier = Modifier
                 .background(Color.White.copy(alpha = 0.3f), RoundedCornerShape(18.dp))
-                .padding(6.dp),
+                .padding(if (compact) 5.dp else 6.dp),
             contentAlignment = Alignment.Center
         ) {
             androidx.compose.foundation.Image(
                 painter = androidx.compose.ui.res.painterResource(id = com.rochiee.classsync.R.mipmap.ic_launcher),
                 contentDescription = "ClassSync logo",
-                modifier = Modifier.width(34.dp).height(34.dp)
+                modifier = Modifier.width(if (compact) 28.dp else 34.dp).height(if (compact) 28.dp else 34.dp)
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
                 text = "ClassSync",
-                style = MaterialTheme.typography.titleLarge,
+                style = if (compact) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleLarge,
                 color = titleColor,
                 fontWeight = FontWeight.SemiBold
             )
@@ -469,7 +482,9 @@ fun AppLogoLockup(
                 Text(
                     text = it,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = if (compact) 2 else 3,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

@@ -41,7 +41,9 @@ class WidgetDataProvider(
         val urgentTasks = getUrgentTasks()
         val overdueTasks = getOverdueTasks()
         val now = System.currentTimeMillis()
-        val allDatedTasks = taskRepository.getTasksSnapshot()
+        val taskSnapshot = taskRepository.getTasksSnapshot()
+        val allOpenTasks = taskSnapshot.filter { !it.isCompleted }
+        val allDatedTasks = allOpenTasks
             .filter { !it.isCompleted && it.dueDate != null }
             .sortedBy { it.dueDate }
         val upcomingTasks = allDatedTasks.filter { (it.dueDate ?: 0L) >= now }
@@ -50,13 +52,15 @@ class WidgetDataProvider(
         }
         val primaryTask = redZoneTasks.firstOrNull() ?: upcomingTasks.firstOrNull()
         return WidgetSummary(
+            openTaskCount = allOpenTasks.size,
             todayTaskCount = todayTasks.size,
             urgentTaskCount = urgentTasks.size,
             overdueTaskCount = overdueTasks.size,
             primaryTaskTitle = primaryTask?.title,
             primaryTaskCourseName = primaryTask?.courseName,
             primaryTaskDueMillis = primaryTask?.dueDate,
-            redZoneOverflowCount = (redZoneTasks.size - 1).coerceAtLeast(0)
+            redZoneOverflowCount = (redZoneTasks.size - 1).coerceAtLeast(0),
+            updatedAtMillis = taskSnapshot.maxOfOrNull { it.updatedAtMillis } ?: now
         )
     }
 

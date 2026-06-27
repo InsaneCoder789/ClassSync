@@ -5,8 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.rochiee.classsync.domain.model.ThemeMode
 import com.rochiee.classsync.bloc.auth.AuthBlocViewModel
 import com.rochiee.classsync.bloc.auth.AuthEvent
@@ -27,6 +32,8 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val EXTRA_START_DESTINATION = "classsync.extra.START_DESTINATION"
     }
+
+    private var refreshOnOpenSignal by mutableIntStateOf(0)
 
     private val taskViewModel: TaskBlocViewModel by viewModels {
         ViewModelFactory((application as ClassSyncApplication).container)
@@ -60,7 +67,12 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        refreshOnOpenSignal++
+        splashScreen.setKeepOnScreenCondition {
+            settingsViewModel.state.value.isLoading
+        }
         enableEdgeToEdge()
         authViewModel.onEvent(AuthEvent.CheckAuthState)
 
@@ -77,6 +89,11 @@ class MainActivity : ComponentActivity() {
             val examModeState by examModeViewModel.state.collectAsState()
 
             ClassSyncTheme(darkTheme = settingsState.themeMode == ThemeMode.DARK) {
+                LaunchedEffect(refreshOnOpenSignal, authState.isSignedIn, settingsState.isLoading) {
+                    if (!settingsState.isLoading && authState.isSignedIn) {
+                        syncViewModel.onEvent(com.rochiee.classsync.bloc.sync.SyncEvent.RunAutoRefreshOnOpen)
+                    }
+                }
                 AppNavHost(
                     requestedStartRoute = intent?.getStringExtra(EXTRA_START_DESTINATION),
                     authState = authState,
@@ -104,5 +121,11 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        refreshOnOpenSignal++
     }
 }

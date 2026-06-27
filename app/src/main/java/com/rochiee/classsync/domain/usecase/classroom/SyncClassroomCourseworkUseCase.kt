@@ -50,29 +50,75 @@ class SyncClassroomCourseworkUseCase(
             var materialEventCount = 0
             var submissionEventCount = 0
             var gradeEventCount = 0
+            val partialFailures = mutableListOf<String>()
 
             remoteCourses.forEach { courseDto ->
-                val courseWorkSync = syncCourseWork(courseDto)
-                courseworkEventCount += courseWorkSync.eventCount
-                importedTaskCount += courseWorkSync.importedTasks
-                announcementEventCount += syncAnnouncements(courseDto)
-                val materialSync = syncMaterials(courseDto)
-                materialEventCount += materialSync.eventCount
-                importedTaskCount += materialSync.importedTasks
-                val submissionSync = syncSubmissions(courseDto)
-                submissionEventCount += submissionSync.submissionEvents
-                gradeEventCount += submissionSync.gradeEvents
+                runCatching { syncCourseWork(courseDto) }
+                    .onSuccess { courseWorkSync ->
+                        courseworkEventCount += courseWorkSync.eventCount
+                        importedTaskCount += courseWorkSync.importedTasks
+                    }
+                    .onFailure { error ->
+                        partialFailures += "${courseDto.name}: ${error.message ?: "Coursework access failed."}"
+                    }
+
+                runCatching { syncAnnouncements(courseDto) }
+                    .onSuccess { announcementCount ->
+                        announcementEventCount += announcementCount
+                    }
+                    .onFailure { error ->
+                        partialFailures += "${courseDto.name}: ${error.message ?: "Announcement access failed."}"
+                    }
+
+                runCatching { syncMaterials(courseDto) }
+                    .onSuccess { materialSync ->
+                        materialEventCount += materialSync.eventCount
+                        importedTaskCount += materialSync.importedTasks
+                    }
+                    .onFailure { error ->
+                        partialFailures += "${courseDto.name}: ${error.message ?: "Material access failed."}"
+                    }
+
+                // Student submission endpoints are commonly restricted or much slower on
+                // institution-managed accounts. The main ClassSync flow prioritizes courses,
+                // coursework, announcements, and materials so onboarding can complete reliably.
             }
 
             val totalEvents = courseworkEventCount + announcementEventCount + materialEventCount + submissionEventCount + gradeEventCount
+            if (totalEvents == 0 && importedTaskCount == 0 && partialFailures.isNotEmpty()) {
+                throw IllegalStateException(partialFailures.first())
+            }
+
+            val savedEventsMessage = "Saved $totalEvents Classroom events ($courseworkEventCount coursework, $announcementEventCount announcements, $materialEventCount materials, $submissionEventCount submission updates, $gradeEventCount grade updates) and imported $importedTaskCount tasks from ${remoteCourses.size} courses."
+
             syncLogRepository.addLog(
                 SyncLog(
                     source = "CLASSROOM_TASKS",
                     status = "SUCCESS",
-                    message = "Saved $totalEvents Classroom events ($courseworkEventCount coursework, $announcementEventCount announcements, $materialEventCount materials, $submissionEventCount submission updates, $gradeEventCount grade updates) and imported $importedTaskCount tasks from ${remoteCourses.size} courses.",
+                    message = savedEventsMessage,
                     timestamp = System.currentTimeMillis()
                 )
             )
+            if (partialFailures.isNotEmpty()) {
+                syncLogRepository.addLog(
+                    SyncLog(
+                        source = "CLASSROOM_TASKS",
+                        status = "WARNING",
+                        message = "Classroom sync completed with some skipped endpoints. ${partialFailures.first()}",
+                        timestamp = System.currentTimeMillis()
+                    )
+                )
+            }
+            if (totalEvents == 0 && importedTaskCount == 0 && remoteCourses.isNotEmpty()) {
+                syncLogRepository.addLog(
+                    SyncLog(
+                        source = "CLASSROOM_TASKS",
+                        status = "WARNING",
+                        message = "Classroom courses were found, but no coursework, announcements, or materials were imported yet.",
+                        timestamp = System.currentTimeMillis()
+                    )
+                )
+            }
             setLastSyncTimeUseCase(System.currentTimeMillis())
             refreshWidgetsUseCase()
         } catch (error: Exception) {

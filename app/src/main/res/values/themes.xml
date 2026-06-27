@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.Classsync" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.Classsync.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#0A0A0C</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.Classsync</item>
+    </style>
 </resources>
