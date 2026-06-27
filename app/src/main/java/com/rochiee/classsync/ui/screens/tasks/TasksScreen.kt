@@ -1,13 +1,15 @@
 package com.rochiee.classsync.ui.screens.tasks
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -19,19 +21,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.rochiee.classsync.bloc.sync.SyncState
 import com.rochiee.classsync.bloc.task.TaskEvent
 import com.rochiee.classsync.bloc.task.TaskState
-import com.rochiee.classsync.bloc.sync.SyncState
 import com.rochiee.classsync.ui.components.CourseChip
 import com.rochiee.classsync.ui.components.DeadlineChip
 import com.rochiee.classsync.ui.components.DeadlineText
 import com.rochiee.classsync.ui.components.EmptyState
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
 import com.rochiee.classsync.ui.components.ResponsiveFlowRow
-import com.rochiee.classsync.ui.components.ScreenSection
 import com.rochiee.classsync.ui.components.TintedPanel
 import com.rochiee.classsync.ui.components.deadlineTone
 import com.rochiee.classsync.ui.theme.LocalSpacing
+import com.rochiee.classsync.ui.theme.Negative
+import com.rochiee.classsync.ui.theme.SafeGreen
+import com.rochiee.classsync.ui.theme.SilverBorder
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -43,6 +50,9 @@ fun TasksScreen(
     onSyncEvent: (com.rochiee.classsync.bloc.sync.SyncEvent) -> Unit
 ) {
     val spacing = LocalSpacing.current
+    val openTasks = remember(taskState.tasks) { taskState.tasks.filterNot { it.isCompleted } }
+    val completedTasks = remember(taskState.tasks) { taskState.tasks.filter { it.isCompleted } }
+    var showComposer by remember { mutableStateOf(false) }
     var title by remember { mutableStateOf("") }
     var course by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -54,23 +64,80 @@ fun TasksScreen(
         verticalArrangement = Arrangement.spacedBy(spacing.lg)
     ) {
         item {
-            ScreenSection(title = "Tasks", subtitle = "Assignments, reminders, and manually added work.") {
-                syncState.errorMessage?.let { error ->
-                    TintedPanel {
-                        Text(text = error, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
-                    }
+            TintedPanel {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                    SilverBorder.copy(alpha = 0.18f)
+                                )
+                            ),
+                            shape = RoundedCornerShape(18.dp)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "work desk",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
                 Text(
-                    text = "Sync actions have moved to Settings so this space stays focused on actual work.",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = "Tasks",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "Assignments, reminders, and your own manual reference tasks live together here.",
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                syncState.errorMessage?.let { error ->
+                    Text(
+                        text = error,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                    TaskStatCard(
+                        title = "Open",
+                        value = openTasks.size.toString(),
+                        supporting = "Still waiting on you",
+                        toneColor = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TaskStatCard(
+                        title = "Completed",
+                        value = completedTasks.size.toString(),
+                        supporting = "Already checked off",
+                        toneColor = if (completedTasks.isNotEmpty()) SafeGreen else Negative,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                LiquidGlassTextButton(
+                    text = if (showComposer) "Hide task composer" else "Add a task",
+                    onClick = {
+                        showComposer = !showComposer
+                        if (!showComposer) {
+                            localError = null
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    selected = showComposer
                 )
             }
         }
 
-        item {
-            ScreenSection(title = "Add a task", subtitle = "Keep your own reference tasks next to synced coursework.") {
+        if (showComposer) {
+            item {
                 TintedPanel {
+                    Text(
+                        text = "New task details",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                     OutlinedTextField(
                         value = title,
                         onValueChange = { title = it },
@@ -129,13 +196,15 @@ fun TasksScreen(
                                         description = ""
                                         dueInput = ""
                                         localError = null
+                                        showComposer = false
                                     }
                                 }
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            selected = true
                         )
                         LiquidGlassTextButton(
-                            text = "Clear",
+                            text = "Clear fields",
                             onClick = {
                                 title = ""
                                 course = ""
@@ -150,12 +219,26 @@ fun TasksScreen(
             }
         }
 
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                Text(
+                    text = "Your tasks",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(
+                    text = "The newest and most urgent work stays closest to the top.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
         if (taskState.tasks.isEmpty()) {
             item {
-                EmptyState("No tasks yet", "Create your own task here or let Classroom and Gmail fill this list after the next sync.")
+                EmptyState("No tasks yet", "Create your own task here or let sync bring in live coursework on the next refresh.")
             }
         } else {
-            items(taskState.tasks, key = { it.id }) { task ->
+            items(taskState.tasks.sortedWith(compareBy({ it.isCompleted }, { it.dueDate ?: Long.MAX_VALUE })), key = { it.id }) { task ->
                 val tone = task.deadlineTone()
                 TintedPanel(accentColor = tone.color) {
                     Row(
@@ -195,6 +278,32 @@ fun TasksScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun TaskStatCard(
+    title: String,
+    value: String,
+    supporting: String,
+    toneColor: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier
+) {
+    TintedPanel(modifier = modifier, accentColor = toneColor) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelLarge,
+            color = toneColor
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Text(
+            text = supporting,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

@@ -6,7 +6,7 @@
     android:background="@drawable/widget_root_surface_dark"
     android:gravity="top"
     android:orientation="vertical"
-    android:padding="18dp">
+    android:padding="14dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,8 +16,8 @@
 
         <ImageView
             android:id="@+id/widgetLogo"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:contentDescription="@string/app_name"
             android:src="@mipmap/ic_launcher" />
 
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:text="ClassSync"
                 android:textColor="#F7FAFC"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -44,8 +44,7 @@
                 android:layout_marginTop="2dp"
                 android:text="All clear for now"
                 android:textColor="#C0CEE0"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textSize="10sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -53,10 +52,10 @@
         android:id="@+id/widgetNextTaskContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:background="@drawable/widget_card_surface_dark"
         android:orientation="vertical"
-        android:padding="18dp">
+        android:padding="15dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -68,9 +67,9 @@
                 android:id="@+id/widgetNextTaskLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Focus now"
+                android:text="Primary focus"
                 android:textColor="#B7C8DF"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -81,7 +80,7 @@
                 android:gravity="end"
                 android:text="No due time"
                 android:textColor="#9EC2FF"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -89,32 +88,31 @@
             android:id="@+id/widgetNextTaskTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:ellipsize="end"
             android:maxLines="2"
             android:text="No academic tasks yet"
             android:textColor="#F7FAFC"
-            android:textSize="20sp"
+            android:textSize="17sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/widgetNextTaskCourse"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="5dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Academic focus"
             android:textColor="#D4DEEA"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:textSize="11sp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/widgetStatsRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="10dp"
         android:baselineAligned="false"
         android:orientation="horizontal">
 
@@ -122,29 +120,29 @@
             android:id="@+id/widgetTodayCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
+            android:layout_marginEnd="4dp"
             android:layout_weight="1"
             android:background="@drawable/widget_card_surface_dark"
             android:orientation="vertical"
-            android:padding="15dp">
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/widgetTodayLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Today"
+                android:text="Due today"
                 android:textColor="#C2D2E8"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widgetTodayCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="5dp"
                 android:text="0"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp"
+                android:textSize="17sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -157,25 +155,25 @@
             android:layout_weight="1"
             android:background="@drawable/widget_card_surface_dark"
             android:orientation="vertical"
-            android:padding="15dp">
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/widgetUrgentLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Urgent"
+                android:text="Need now"
                 android:textColor="#FFD18A"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widgetUrgentCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="5dp"
                 android:text="0"
                 android:textColor="#FFC169"
-                android:textSize="20sp"
+                android:textSize="17sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -183,29 +181,29 @@
             android:id="@+id/widgetOverdueCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="4dp"
             android:layout_weight="1"
             android:background="@drawable/widget_card_surface_dark"
             android:orientation="vertical"
-            android:padding="15dp">
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/widgetOverdueLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Overdue"
+                android:text="Late"
                 android:textColor="#FFB8B8"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widgetOverdueCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="5dp"
                 android:text="0"
                 android:textColor="#FF9B9B"
-                android:textSize="20sp"
+                android:textSize="17sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>

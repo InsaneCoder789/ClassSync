@@ -84,19 +84,6 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(spacing.lg)
     ) {
         TintedPanel {
-            Box(
-                modifier = Modifier
-                    .size(46.dp)
-                    .background(
-                        brush = Brush.linearGradient(
-                            listOf(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                SilverBorder.copy(alpha = 0.18f)
-                            )
-                        ),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-            )
             Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
                 Text(
                     text = "Today at a glance",

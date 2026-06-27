@@ -53,6 +53,10 @@ object ClassSyncWidgetUpdater {
                     R.id.widgetSummaryText,
                     formatter.relativeSummary(summary.todayTaskCount, summary.urgentTaskCount)
                 )
+                setTextViewText(R.id.widgetTodayLabel, "Due today")
+                setTextViewText(R.id.widgetUrgentLabel, "Need now")
+                setTextViewText(R.id.widgetOverdueLabel, "Late")
+                setTextViewText(R.id.widgetNextTaskLabel, "Primary focus")
                 setInt(R.id.widgetTodayCard, "setBackgroundResource", neutralCardSurface)
                 setInt(R.id.widgetUrgentCard, "setBackgroundResource", neutralCardSurface)
                 setInt(R.id.widgetOverdueCard, "setBackgroundResource", neutralCardSurface)

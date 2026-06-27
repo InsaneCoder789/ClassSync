@@ -66,11 +66,6 @@ fun ScreenSection(
     val spacing = LocalSpacing.current
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(spacing.md)) {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
-            Text(
-                text = title.lowercase(),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
             Text(text = title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
             subtitle?.let {
                 Text(text = it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
