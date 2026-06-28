@@ -137,8 +137,7 @@ dependencies {
     implementation(libs.google.api.services.gmail)
     implementation(libs.google.api.services.classroom)
     implementation(libs.google.oauth.client.jetty)
-    implementation(libs.tensorflow.lite)
-    implementation(libs.tensorflow.lite.select.tf.ops)
+    implementation(libs.litert)
 
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.datastore.preferences)

@@ -3,6 +3,7 @@ package com.rochiee.classsync.ui.screens.classroom
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
@@ -34,6 +35,7 @@ enum class CourseTab(val label: String) {
     Completed("Completed")
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CourseDetailScreen(
     summary: CourseDashboardSummary,
@@ -116,6 +118,7 @@ private fun CourseSimpleList(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun CourseTaskList(
     tasks: List<AcademicTask>,

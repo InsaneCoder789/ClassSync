@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import com.rochiee.classsync.bloc.event.EventState
 import com.rochiee.classsync.bloc.sync.SyncState
 import com.rochiee.classsync.bloc.task.TaskState
 import com.rochiee.classsync.domain.model.AcademicTask
+import com.rochiee.classsync.ui.components.ClassSyncProgressWidget
 import com.rochiee.classsync.ui.components.ElevatedInfoCard
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
 import com.rochiee.classsync.ui.components.ResponsiveFlowRow
@@ -43,6 +45,7 @@ import java.util.Locale
 
 private val homeTimeFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun HomeScreen(
     authState: AuthUiState,
@@ -66,6 +69,10 @@ fun HomeScreen(
         due in now..(now + 2L * 60L * 60L * 1000L)
     } ?: openTasks.firstOrNull()
     val upcomingTasks = openTasks.filterNot { it.id == ongoingTask?.id }.take(3)
+    val totalTasks = taskState.tasks.size
+    val completedTasks = taskState.tasks.count { it.isCompleted }
+    val tasksLeft = (totalTasks - completedTasks).coerceAtLeast(0)
+    val progressPercent = if (totalTasks == 0) 0 else ((completedTasks * 100f) / totalTasks).toInt()
 
     LazyColumn(
         modifier = Modifier
@@ -101,6 +108,17 @@ fun HomeScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+                ClassSyncProgressWidget(
+                    progressPercent = progressPercent.coerceIn(0, 100),
+                    completedTasks = completedTasks,
+                    totalTasks = totalTasks,
+                    tasksLeft = tasksLeft,
+                    progressCaption = if (openTasks.isEmpty()) {
+                        "All current work is under control"
+                    } else {
+                        "${openTasks.size} live academic items are still active"
+                    }
+                )
                 ResponsiveFlowRow(maxItemsInEachRow = 2) {
                     ElevatedInfoCard(
                         title = "Open work",

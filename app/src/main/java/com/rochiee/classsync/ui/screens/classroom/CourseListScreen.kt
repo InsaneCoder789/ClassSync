@@ -3,6 +3,7 @@ package com.rochiee.classsync.ui.screens.classroom
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,6 +31,7 @@ import com.rochiee.classsync.ui.theme.Negative
 import com.rochiee.classsync.ui.theme.SkyBlue
 import com.rochiee.classsync.ui.theme.Sun
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CourseListScreen(
     summaries: List<CourseDashboardSummary>,

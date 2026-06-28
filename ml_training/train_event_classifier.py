@@ -29,7 +29,10 @@ LABELS = [
 TEXT_FALLBACK_COLUMNS = ["title", "body", "course_name"]
 REPORT_DIR_NAME = "reports"
 MODEL_DIR_NAME = "saved_model"
-VECTORIZER_DIR_NAME = "vectorizer_vocabulary.txt"
+VECTOR_VOCAB_FILE_NAME = "classsync_event_vocabulary.tsv"
+KERAS_MODEL_FILE_NAME = "classsync_event_classifier.keras"
+SEQUENCE_LENGTH = 120
+VOCAB_SIZE = 15000
 
 
 @dataclass
@@ -114,19 +117,25 @@ def split_dataset(frame: pd.DataFrame, random_seed: int = 42) -> DatasetSplits:
     )
 
 
-def build_model(train_texts: Iterable[str], label_count: int) -> tuple[tf.keras.Model, tf.keras.layers.TextVectorization]:
+def build_vectorizer(train_texts: Iterable[str]) -> tf.keras.layers.TextVectorization:
     vectorizer = tf.keras.layers.TextVectorization(
-        max_tokens=15000,
+        max_tokens=VOCAB_SIZE,
         standardize="lower_and_strip_punctuation",
         split="whitespace",
         output_mode="int",
-        output_sequence_length=120,
+        output_sequence_length=SEQUENCE_LENGTH,
     )
     vectorizer.adapt(tf.data.Dataset.from_tensor_slices(list(train_texts)).batch(256))
+    return vectorizer
 
-    inputs = tf.keras.Input(shape=(1,), dtype=tf.string, name="text")
-    x = vectorizer(inputs)
-    x = tf.keras.layers.Embedding(input_dim=15000, output_dim=64, name="embedding")(x)
+
+def vectorize_texts(vectorizer: tf.keras.layers.TextVectorization, texts: np.ndarray) -> np.ndarray:
+    return vectorizer(tf.convert_to_tensor(texts)).numpy().astype(np.int32)
+
+
+def build_model(label_count: int) -> tf.keras.Model:
+    inputs = tf.keras.Input(shape=(SEQUENCE_LENGTH,), dtype=tf.int32, name="token_ids")
+    x = tf.keras.layers.Embedding(input_dim=VOCAB_SIZE, output_dim=64, name="embedding", mask_zero=True)(inputs)
     x = tf.keras.layers.GlobalAveragePooling1D()(x)
     x = tf.keras.layers.Dense(96, activation="relu")(x)
     x = tf.keras.layers.Dropout(0.25)(x)
@@ -138,18 +147,18 @@ def build_model(train_texts: Iterable[str], label_count: int) -> tuple[tf.keras.
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),
         metrics=["accuracy"],
     )
-    return model, vectorizer
+    return model
 
 
-def build_tf_dataset(texts: np.ndarray, labels: np.ndarray, batch_size: int, shuffle: bool) -> tf.data.Dataset:
-    dataset = tf.data.Dataset.from_tensor_slices((texts, labels))
+def build_tf_dataset(features: np.ndarray, labels: np.ndarray, batch_size: int, shuffle: bool) -> tf.data.Dataset:
+    dataset = tf.data.Dataset.from_tensor_slices((features, labels))
     if shuffle:
-        dataset = dataset.shuffle(buffer_size=len(texts), reshuffle_each_iteration=True)
+        dataset = dataset.shuffle(buffer_size=len(features), reshuffle_each_iteration=True)
     return dataset.batch(batch_size).prefetch(tf.data.AUTOTUNE)
 
 
-def build_prediction_dataset(texts: np.ndarray, batch_size: int) -> tf.data.Dataset:
-    return tf.data.Dataset.from_tensor_slices(texts.astype(object)).batch(batch_size).prefetch(tf.data.AUTOTUNE)
+def build_prediction_dataset(features: np.ndarray, batch_size: int) -> tf.data.Dataset:
+    return tf.data.Dataset.from_tensor_slices(features).batch(batch_size).prefetch(tf.data.AUTOTUNE)
 
 
 def accuracy_by_column(frame: pd.DataFrame, predictions: np.ndarray, column: str) -> dict[str, float]:
@@ -212,7 +221,8 @@ def copy_reports_to_project_root(output_dir: Path, project_root: Path) -> None:
 
 def save_vectorizer_vocabulary(output_dir: Path, vectorizer: tf.keras.layers.TextVectorization) -> None:
     vocabulary = vectorizer.get_vocabulary()
-    (output_dir / VECTORIZER_DIR_NAME).write_text("\n".join(vocabulary), encoding="utf-8")
+    lines = [f"{index}\t{token}" for index, token in enumerate(vocabulary)]
+    (output_dir / VECTOR_VOCAB_FILE_NAME).write_text("\n".join(lines), encoding="utf-8")
 
 
 def export_tflite_model(model: tf.keras.Model, output_dir: Path) -> Path:
@@ -220,10 +230,6 @@ def export_tflite_model(model: tf.keras.Model, output_dir: Path) -> Path:
     model.export(str(saved_model_dir))
     converter = tf.lite.TFLiteConverter.from_saved_model(str(saved_model_dir))
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
-    converter.target_spec.supported_ops = [
-        tf.lite.OpsSet.TFLITE_BUILTINS,
-        tf.lite.OpsSet.SELECT_TF_OPS,
-    ]
     tflite_model = converter.convert()
     tflite_path = output_dir / "classsync_event_classifier.tflite"
     tflite_path.write_bytes(tflite_model)
@@ -237,6 +243,10 @@ def copy_assets(output_dir: Path, project_root: Path) -> None:
         (output_dir / "classsync_event_classifier.tflite").read_bytes()
     )
     (assets_dir / "classsync_event_labels.txt").write_text("\n".join(LABELS), encoding="utf-8")
+    (assets_dir / VECTOR_VOCAB_FILE_NAME).write_text(
+        (output_dir / VECTOR_VOCAB_FILE_NAME).read_text(encoding="utf-8"),
+        encoding="utf-8"
+    )
 
 
 def main() -> None:
@@ -254,9 +264,14 @@ def main() -> None:
     frame = load_dataset(args.csv.resolve())
     splits = split_dataset(frame)
 
-    model, vectorizer = build_model(splits.train_texts, len(LABELS))
-    train_ds = build_tf_dataset(splits.train_texts, splits.train_labels, args.batch_size, shuffle=True)
-    val_ds = build_tf_dataset(splits.val_texts, splits.val_labels, args.batch_size, shuffle=False)
+    vectorizer = build_vectorizer(splits.train_texts)
+    train_tokens = vectorize_texts(vectorizer, splits.train_texts)
+    val_tokens = vectorize_texts(vectorizer, splits.val_texts)
+    test_tokens = vectorize_texts(vectorizer, splits.test_texts)
+
+    model = build_model(len(LABELS))
+    train_ds = build_tf_dataset(train_tokens, splits.train_labels, args.batch_size, shuffle=True)
+    val_ds = build_tf_dataset(val_tokens, splits.val_labels, args.batch_size, shuffle=False)
 
     history = model.fit(
         train_ds,
@@ -273,7 +288,7 @@ def main() -> None:
     )
 
     test_predictions = model.predict(
-        build_prediction_dataset(splits.test_texts, args.batch_size),
+        build_prediction_dataset(test_tokens, args.batch_size),
         verbose=0,
     )
     predicted_indices = np.argmax(test_predictions, axis=1)
@@ -284,6 +299,7 @@ def main() -> None:
     report_metrics = write_reports(output_dir, test_frame, truth_labels, predicted_labels)
     copy_reports_to_project_root(output_dir, project_root)
     save_vectorizer_vocabulary(output_dir, vectorizer)
+    model.save(output_dir / KERAS_MODEL_FILE_NAME)
     export_tflite_model(model, output_dir)
     (output_dir / "classsync_event_labels.txt").write_text("\n".join(LABELS), encoding="utf-8")
     copy_assets(output_dir, project_root)

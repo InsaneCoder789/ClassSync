@@ -5,6 +5,7 @@ import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.Locale
 
 class TfLiteEventClassifier(
     context: Context
@@ -38,7 +39,7 @@ class TfLiteEventClassifier(
                 }
 
                 val output = Array(1) { FloatArray(outputSize) }
-                val inputArray = arrayOf(arrayOf(inputText))
+                val inputArray = arrayOf(session.tokenizer.tokenize(inputText))
                 session.interpreter.run(inputArray, output)
 
                 val probabilities = output.firstOrNull() ?: return null
@@ -69,8 +70,9 @@ class TfLiteEventClassifier(
             attemptedSessionLoad = true
 
             val labels = loadLabels()
+            val tokenizer = loadTokenizer()
             val modelBuffer = loadModelBuffer()
-            if (labels.isEmpty() || modelBuffer == null) {
+            if (labels.isEmpty() || tokenizer == null || modelBuffer == null) {
                 return null
             }
 
@@ -85,7 +87,8 @@ class TfLiteEventClassifier(
 
             return ClassifierSession(
                 interpreter = interpreter,
-                labels = labels
+                labels = labels,
+                tokenizer = tokenizer
             ).also { cachedSession = it }
         }
     }
@@ -96,6 +99,22 @@ class TfLiteEventClassifier(
                 lines.map(String::trim).filter(String::isNotBlank).toList()
             }
         }.getOrDefault(emptyList())
+    }
+
+    private fun loadTokenizer(): EventTextTokenizer? {
+        return runCatching {
+            val tokenToIndex = linkedMapOf<String, Int>()
+            appContext.assets.open(VOCAB_ASSET_PATH).bufferedReader().useLines { lines ->
+                lines.forEach { line ->
+                    val separatorIndex = line.indexOf('\t')
+                    if (separatorIndex <= 0) return@forEach
+                    val index = line.substring(0, separatorIndex).toIntOrNull() ?: return@forEach
+                    val token = line.substring(separatorIndex + 1)
+                    tokenToIndex[token] = index
+                }
+            }
+            EventTextTokenizer(tokenToIndex = tokenToIndex)
+        }.getOrNull()
     }
 
     private fun loadModelBuffer(): ByteBuffer? {
@@ -131,10 +150,43 @@ class TfLiteEventClassifier(
     companion object {
         private const val MODEL_ASSET_PATH = "classsync_event_classifier.tflite"
         private const val LABELS_ASSET_PATH = "classsync_event_labels.txt"
+        private const val VOCAB_ASSET_PATH = "classsync_event_vocabulary.tsv"
     }
 
     private data class ClassifierSession(
         val interpreter: Interpreter,
-        val labels: List<String>
+        val labels: List<String>,
+        val tokenizer: EventTextTokenizer
     )
+
+    private class EventTextTokenizer(
+        private val tokenToIndex: Map<String, Int>
+    ) {
+        fun tokenize(text: String): IntArray {
+            val tokens = normalize(text)
+                .split(Regex("\\s+"))
+                .filter { it.isNotBlank() }
+                .take(SEQUENCE_LENGTH)
+
+            return IntArray(SEQUENCE_LENGTH).apply {
+                tokens.forEachIndexed { index, token ->
+                    this[index] = tokenToIndex[token] ?: UNKNOWN_TOKEN_INDEX
+                }
+            }
+        }
+
+        private fun normalize(text: String): String {
+            return text
+                .lowercase(Locale.getDefault())
+                .replace(PUNCTUATION_REGEX, " ")
+                .replace(Regex("\\s+"), " ")
+                .trim()
+        }
+
+        companion object {
+            private val PUNCTUATION_REGEX = Regex("[!\"#$%&()*,\\-./:;<=>?@\\[\\\\\\]^_`{|}~']")
+            private const val SEQUENCE_LENGTH = 120
+            private const val UNKNOWN_TOKEN_INDEX = 1
+        }
+    }
 }

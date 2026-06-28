@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.TypedValue
 import android.widget.RemoteViews
 import com.rochiee.classsync.ClassSyncApplication
@@ -51,11 +52,13 @@ object ClassSyncWidgetUpdater {
             val contentCardHeightDp = ((widgetHeightDp - 104) * 0.58f).roundToInt().coerceIn(118, 164)
             val views = RemoteViews(context.packageName, R.layout.classsync_widget_layout).apply {
                 setInt(R.id.widgetRoot, "setBackgroundResource", rootSurface)
-                setViewLayoutHeight(
-                    R.id.widgetNextTaskContainer,
-                    contentCardHeightDp.toFloat(),
-                    TypedValue.COMPLEX_UNIT_DIP
-                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    setViewLayoutHeight(
+                        R.id.widgetNextTaskContainer,
+                        contentCardHeightDp.toFloat(),
+                        TypedValue.COMPLEX_UNIT_DIP
+                    )
+                }
                 setImageViewResource(R.id.widgetLogo, R.mipmap.ic_launcher)
                 setTextViewText(R.id.widgetTitle, "ClassSync")
                 setTextViewText(

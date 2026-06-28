@@ -2,6 +2,7 @@ package com.rochiee.classsync.ui.screens.planner
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +21,7 @@ import com.rochiee.classsync.ui.theme.Negative
 import com.rochiee.classsync.ui.theme.SafeGreen
 import com.rochiee.classsync.ui.theme.SkyBlue
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TodayPlannerView(
     items: List<PlannerItem>
