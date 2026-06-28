@@ -36,7 +36,14 @@ class ClassroomApiClient(private val authTokenProvider: AuthTokenProvider) {
                 .execute()
             response.courses ?: emptyList()
         } catch (e: Exception) {
-            throw IllegalStateException(ClassroomErrorInterpreter.toUserMessage(e, "read your Classroom courses"), e)
+            throw IllegalStateException(
+                ClassroomErrorInterpreter.toUserMessage(
+                    error = e,
+                    action = "read your Classroom courses",
+                    accountEmail = authTokenProvider.selectedAccountEmail()
+                ),
+                e
+            )
         }
     }
 
@@ -47,7 +54,14 @@ class ClassroomApiClient(private val authTokenProvider: AuthTokenProvider) {
                 .execute()
             response.courseWork ?: emptyList()
         } catch (e: Exception) {
-            throw IllegalStateException(ClassroomErrorInterpreter.toUserMessage(e, "read your Classroom assignments"), e)
+            throw IllegalStateException(
+                ClassroomErrorInterpreter.toUserMessage(
+                    error = e,
+                    action = "read your Classroom assignments",
+                    accountEmail = authTokenProvider.selectedAccountEmail()
+                ),
+                e
+            )
         }
     }
 
@@ -57,7 +71,14 @@ class ClassroomApiClient(private val authTokenProvider: AuthTokenProvider) {
             val response = service.courses().announcements().list(courseId).execute()
             response.announcements ?: emptyList()
         } catch (e: Exception) {
-            throw IllegalStateException(ClassroomErrorInterpreter.toUserMessage(e, "read Classroom announcements"), e)
+            throw IllegalStateException(
+                ClassroomErrorInterpreter.toUserMessage(
+                    error = e,
+                    action = "read Classroom announcements",
+                    accountEmail = authTokenProvider.selectedAccountEmail()
+                ),
+                e
+            )
         }
     }
 
@@ -67,7 +88,14 @@ class ClassroomApiClient(private val authTokenProvider: AuthTokenProvider) {
             val response = service.courses().courseWorkMaterials().list(courseId).execute()
             response.courseWorkMaterial ?: emptyList()
         } catch (e: Exception) {
-            throw IllegalStateException(ClassroomErrorInterpreter.toUserMessage(e, "read Classroom materials"), e)
+            throw IllegalStateException(
+                ClassroomErrorInterpreter.toUserMessage(
+                    error = e,
+                    action = "read Classroom materials",
+                    accountEmail = authTokenProvider.selectedAccountEmail()
+                ),
+                e
+            )
         }
     }
 
@@ -78,7 +106,14 @@ class ClassroomApiClient(private val authTokenProvider: AuthTokenProvider) {
                 .execute()
             response.studentSubmissions ?: emptyList()
         } catch (e: Exception) {
-            throw IllegalStateException(ClassroomErrorInterpreter.toUserMessage(e, "read your submission status"), e)
+            throw IllegalStateException(
+                ClassroomErrorInterpreter.toUserMessage(
+                    error = e,
+                    action = "read your submission status",
+                    accountEmail = authTokenProvider.selectedAccountEmail()
+                ),
+                e
+            )
         }
     }
 }

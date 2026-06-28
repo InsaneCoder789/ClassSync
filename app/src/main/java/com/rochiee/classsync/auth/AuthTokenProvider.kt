@@ -7,8 +7,10 @@ class AuthTokenProvider(
     private val context: Context,
     private val googleAuthManager: GoogleAuthManager
 ) {
+    fun selectedAccountEmail(): String? = googleAuthManager.selectedAccountEmail()
+
     fun getGoogleAccountCredential(): GoogleAccountCredential? {
-        val email = googleAuthManager.selectedAccountEmail() ?: return null
+        val email = selectedAccountEmail() ?: return null
         return GoogleAccountCredential
             .usingOAuth2(context.applicationContext, GoogleScopes.ALL_SCOPES)
             .setSelectedAccountName(email)

@@ -62,13 +62,26 @@ class SyncBlocViewModel(
     private fun runManualFullSync() {
         _state.update { it.copy(isSyncing = true, errorMessage = null) }
         viewModelScope.launch {
-            try {
+            val failures = mutableListOf<String>()
+
+            runCatching {
                 syncClassroomCoursesUseCase()
                 syncClassroomCourseworkUseCase()
+            }.onFailure { error ->
+                failures += error.message ?: "Classroom sync failed."
+            }
+
+            runCatching {
                 syncGmailTasksUseCase()
-                _state.update { it.copy(isSyncing = false) }
-            } catch (error: Exception) {
-                _state.update { it.copy(isSyncing = false, errorMessage = error.message) }
+            }.onFailure { error ->
+                failures += error.message ?: "Gmail sync failed."
+            }
+
+            _state.update {
+                it.copy(
+                    isSyncing = false,
+                    errorMessage = failures.takeIf { messages -> messages.isNotEmpty() }?.joinToString("\n\n")
+                )
             }
         }
     }

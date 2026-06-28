@@ -72,7 +72,6 @@ fun OnboardingScreen(
     val context = androidx.compose.ui.platform.LocalContext.current
     var step by remember { mutableIntStateOf(0) }
     var pendingAction by remember { mutableStateOf<OnboardingPendingAction?>(null) }
-    var observedSyncStart by remember { mutableStateOf(false) }
     val steps = remember {
         listOf(
             OnboardingStepArt(R.drawable.onboarding_opening),
@@ -104,21 +103,6 @@ fun OnboardingScreen(
             pendingAction = null
         } else if (pendingAction == OnboardingPendingAction.Auth && !authState.isLoading && !authState.isSignedIn) {
             pendingAction = null
-        }
-    }
-
-    LaunchedEffect(syncState.isSyncing, syncState.errorMessage, pendingAction, observedSyncStart) {
-        if (pendingAction == OnboardingPendingAction.ClassroomSync || pendingAction == OnboardingPendingAction.GmailSync) {
-            if (syncState.isSyncing) {
-                observedSyncStart = true
-            } else if (observedSyncStart) {
-                val failed = !syncState.errorMessage.isNullOrBlank()
-                if (!failed) {
-                    step += 1
-                }
-                pendingAction = null
-                observedSyncStart = false
-            }
         }
     }
 
@@ -159,29 +143,39 @@ fun OnboardingScreen(
                 art = OnboardingStepArt(R.drawable.onboarding_classroom_access),
                 step = 2,
                 totalSteps = steps.size,
-                infoText = syncState.errorMessage
+                infoText = if (!syncState.errorMessage.isNullOrBlank() && settingsState.classroomPermissionExplained) {
+                    syncState.errorMessage
+                } else {
+                    null
+                }
             ) {
                 OnboardingWhiteButton(
-                    label = if (pendingAction == OnboardingPendingAction.ClassroomSync || syncState.isSyncing) {
-                        "Syncing Classroom..."
+                    label = if (syncState.isSyncing) {
+                        "Continue with Classroom"
                     } else {
                         "Connect Classroom"
                     },
                     onClick = {
                         onSettingsEvent(SettingsEvent.SetClassroomPermissionExplained(true))
                         onSettingsEvent(SettingsEvent.SetClassroomSyncEnabled(true))
-                        pendingAction = OnboardingPendingAction.ClassroomSync
-                        observedSyncStart = false
                         onSyncEvent(SyncEvent.ClearError)
-                        onSyncEvent(SyncEvent.RunClassroomSync)
+                        if (!syncState.isSyncing) {
+                            onSyncEvent(SyncEvent.RunClassroomSync)
+                        }
+                        step = 3
                     },
-                    enabled = !syncState.isSyncing
+                    enabled = true
                 )
             }
             3 -> FullScreenOnboardingStep(
                 art = OnboardingStepArt(R.drawable.onboarding_reminder_setup),
                 step = 3,
-                totalSteps = steps.size
+                totalSteps = steps.size,
+                infoText = if (syncState.isSyncing && settingsState.classroomSyncEnabled) {
+                    "Classroom sync is continuing in the background. You can keep setting up ClassSync while your classes and assignments import."
+                } else {
+                    null
+                }
             ) {
                 OnboardingWhiteButton(
                     label = "Allow reminders",
@@ -198,7 +192,11 @@ fun OnboardingScreen(
                 art = OnboardingStepArt(R.drawable.onboarding_sync_setup),
                 step = 4,
                 totalSteps = steps.size,
-                infoText = syncState.errorMessage
+                infoText = when {
+                    !syncState.errorMessage.isNullOrBlank() && settingsState.gmailPermissionExplained -> syncState.errorMessage
+                    syncState.isSyncing && settingsState.classroomSyncEnabled -> "Classroom import is still running in the background. You can finish onboarding now and everything will keep syncing."
+                    else -> null
+                }
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                     OnboardingWhiteButton(
@@ -211,8 +209,8 @@ fun OnboardingScreen(
                         variant = OnboardingButtonVariant.Secondary
                     )
                     OnboardingWhiteButton(
-                        label = if (pendingAction == OnboardingPendingAction.GmailSync || syncState.isSyncing) {
-                            "Syncing Gmail..."
+                        label = if (syncState.isSyncing) {
+                            "Enable Gmail in background"
                         } else if (settingsState.gmailSyncEnabled) {
                             "Enable Gmail too"
                         } else {
@@ -221,13 +219,14 @@ fun OnboardingScreen(
                         onClick = {
                             onSettingsEvent(SettingsEvent.SetGmailSyncEnabled(true))
                             onSettingsEvent(SettingsEvent.SetGmailPermissionExplained(true))
-                            pendingAction = OnboardingPendingAction.GmailSync
-                            observedSyncStart = false
                             onSyncEvent(SyncEvent.ClearError)
-                            onSyncEvent(SyncEvent.RunGmailSync)
+                            if (!syncState.isSyncing) {
+                                onSyncEvent(SyncEvent.RunGmailSync)
+                            }
+                            step = 5
                         },
                         selected = settingsState.gmailSyncEnabled,
-                        enabled = !syncState.isSyncing
+                        enabled = true
                     )
                 }
             }
@@ -249,9 +248,7 @@ fun OnboardingScreen(
 }
 
 private enum class OnboardingPendingAction {
-    Auth,
-    ClassroomSync,
-    GmailSync
+    Auth
 }
 
 @Composable
