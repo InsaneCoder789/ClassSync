@@ -9,6 +9,7 @@ data class SettingsPreferences(
     val createTasksFromActionableNoDateAnnouncements: Boolean = true,
     val defaultReminderHours: Int = 2,
     val lastSyncTimeMillis: Long? = null,
+    val lastAppOpenTimeMillis: Long? = null,
     val onboardingCompleted: Boolean = false,
     val classroomPermissionExplained: Boolean = false,
     val gmailPermissionExplained: Boolean = false,
@@ -16,7 +17,7 @@ data class SettingsPreferences(
     val digestHourOfDay: Int = 7,
     val digestIncludeAnnouncements: Boolean = true,
     val digestIncludeMaterials: Boolean = true,
-    val themeMode: ThemeMode = ThemeMode.LIGHT,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val persistedStudyPlanJson: String? = null,
     val persistedExamChecklistJson: String? = null
 )

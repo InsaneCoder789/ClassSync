@@ -1,16 +1,21 @@
 package com.rochiee.classsync
 
 import android.os.Bundle
+import android.content.res.Configuration
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.rochiee.classsync.domain.model.ThemeMode
 import com.rochiee.classsync.bloc.auth.AuthBlocViewModel
@@ -26,14 +31,17 @@ import com.rochiee.classsync.bloc.sync.SyncBlocViewModel
 import com.rochiee.classsync.bloc.task.TaskBlocViewModel
 import com.rochiee.classsync.di.ViewModelFactory
 import com.rochiee.classsync.ui.navigation.AppNavHost
+import com.rochiee.classsync.ui.screens.startup.ReturnWelcomeScreen
 import com.rochiee.classsync.ui.theme.ClassSyncTheme
+import kotlinx.coroutines.delay
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     companion object {
         const val EXTRA_START_DESTINATION = "classsync.extra.START_DESTINATION"
+        private const val APP_SPLASH_MIN_DURATION_MILLIS = 2600L
+        private const val APP_SPLASH_MAX_DURATION_MILLIS = 3900L
     }
-
-    private var refreshOnOpenSignal by mutableIntStateOf(0)
 
     private val taskViewModel: TaskBlocViewModel by viewModels {
         ViewModelFactory((application as ClassSyncApplication).container)
@@ -69,7 +77,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        refreshOnOpenSignal++
         splashScreen.setKeepOnScreenCondition {
             settingsViewModel.state.value.isLoading
         }
@@ -87,38 +94,74 @@ class MainActivity : ComponentActivity() {
             val eventDetailState by eventDetailViewModel.state.collectAsState()
             val studyPlanState by studyPlanViewModel.state.collectAsState()
             val examModeState by examModeViewModel.state.collectAsState()
+            val followsSystemDark = isSystemInDarkTheme()
+            val useDarkTheme = when (settingsState.themeMode) {
+                ThemeMode.SYSTEM -> followsSystemDark
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+            }
 
-            ClassSyncTheme(darkTheme = settingsState.themeMode == ThemeMode.DARK) {
-                LaunchedEffect(refreshOnOpenSignal, authState.isSignedIn, settingsState.isLoading) {
-                    if (!settingsState.isLoading && authState.isSignedIn) {
+            ClassSyncTheme(darkTheme = useDarkTheme) {
+                val launchDurationMillis = remember {
+                    Random.nextLong(
+                        from = APP_SPLASH_MIN_DURATION_MILLIS,
+                        until = APP_SPLASH_MAX_DURATION_MILLIS + 1L
+                    )
+                }
+                var showLaunchSplash by remember {
+                    mutableStateOf(true)
+                }
+
+                LaunchedEffect(settingsState.isLoading) {
+                    if (settingsState.isLoading) return@LaunchedEffect
+                    delay(launchDurationMillis)
+                    showLaunchSplash = false
+                    settingsViewModel.onEvent(
+                        com.rochiee.classsync.bloc.settings.SettingsEvent.SetLastAppOpenTime(
+                            System.currentTimeMillis()
+                        )
+                    )
+                }
+
+                LaunchedEffect(authState.isSignedIn, settingsState.isLoading, showLaunchSplash) {
+                    if (!settingsState.isLoading && !showLaunchSplash && authState.isSignedIn) {
                         syncViewModel.onEvent(com.rochiee.classsync.bloc.sync.SyncEvent.RunAutoRefreshOnOpen)
                     }
                 }
-                AppNavHost(
-                    requestedStartRoute = intent?.getStringExtra(EXTRA_START_DESTINATION),
-                    authState = authState,
-                    settingsState = settingsState,
-                    taskState = taskState,
-                    syncState = syncState,
-                    eventState = eventState,
-                    eventDetailState = eventDetailState,
-                    plannerState = plannerState,
-                    classroomState = classroomState,
-                    studyPlanState = studyPlanState,
-                    examModeState = examModeState,
-                    onBeginGoogleSignIn = authViewModel::beginSignInIntent,
-                    onCompleteGoogleSignIn = authViewModel::completeSignIn,
-                    onAuthEvent = authViewModel::onEvent,
-                    onTaskEvent = taskViewModel::onEvent,
-                    onSyncEvent = syncViewModel::onEvent,
-                    onSettingsEvent = settingsViewModel::onEvent,
-                    onEventEvent = eventViewModel::onEvent,
-                    onEventDetailEvent = eventDetailViewModel::onEvent,
-                    onPlannerEvent = plannerViewModel::onEvent,
-                    onClassroomEvent = classroomViewModel::onEvent,
-                    onStudyPlanEvent = studyPlanViewModel::onEvent,
-                    onExamModeEvent = examModeViewModel::onEvent
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AppNavHost(
+                        requestedStartRoute = intent?.getStringExtra(EXTRA_START_DESTINATION),
+                        authState = authState,
+                        settingsState = settingsState,
+                        taskState = taskState,
+                        syncState = syncState,
+                        eventState = eventState,
+                        eventDetailState = eventDetailState,
+                        plannerState = plannerState,
+                        classroomState = classroomState,
+                        studyPlanState = studyPlanState,
+                        examModeState = examModeState,
+                        onBeginGoogleSignIn = authViewModel::beginSignInIntent,
+                        onCompleteGoogleSignIn = authViewModel::completeSignIn,
+                        onAuthEvent = authViewModel::onEvent,
+                        onTaskEvent = taskViewModel::onEvent,
+                        onSyncEvent = syncViewModel::onEvent,
+                        onSettingsEvent = settingsViewModel::onEvent,
+                        onEventEvent = eventViewModel::onEvent,
+                        onEventDetailEvent = eventDetailViewModel::onEvent,
+                        onPlannerEvent = plannerViewModel::onEvent,
+                        onClassroomEvent = classroomViewModel::onEvent,
+                        onStudyPlanEvent = studyPlanViewModel::onEvent,
+                        onExamModeEvent = examModeViewModel::onEvent
+                    )
+                    if (showLaunchSplash) {
+                        ReturnWelcomeScreen(
+                            darkTheme = useDarkTheme,
+                            durationMillis = launchDurationMillis.toInt(),
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
             }
         }
     }
@@ -126,6 +169,5 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        refreshOnOpenSignal++
     }
 }

@@ -65,6 +65,7 @@ class ViewModelFactory(
                     container.setDigestIncludeAnnouncementsUseCase,
                     container.setDigestIncludeMaterialsUseCase,
                     container.setThemeModeUseCase,
+                    container.setLastAppOpenTimeUseCase,
                     container.scheduleDailyDigestUseCase,
                     container.cancelDailyDigestUseCase,
                     container.previewDailyDigestUseCase,

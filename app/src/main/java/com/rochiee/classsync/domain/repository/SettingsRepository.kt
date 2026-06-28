@@ -14,6 +14,7 @@ interface SettingsRepository {
     suspend fun setCreateTasksFromActionableNoDateAnnouncements(enabled: Boolean)
     suspend fun setDefaultReminderHours(hours: Int)
     suspend fun setLastSyncTimeMillis(timeMillis: Long)
+    suspend fun setLastAppOpenTimeMillis(timeMillis: Long)
     suspend fun setOnboardingCompleted(completed: Boolean)
     suspend fun setClassroomPermissionExplained(explained: Boolean)
     suspend fun setGmailPermissionExplained(explained: Boolean)

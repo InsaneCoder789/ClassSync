@@ -43,6 +43,10 @@ class SettingsRepositoryImpl(
         settingsDataStore.setLastSyncTimeMillis(timeMillis)
     }
 
+    override suspend fun setLastAppOpenTimeMillis(timeMillis: Long) {
+        settingsDataStore.setLastAppOpenTimeMillis(timeMillis)
+    }
+
     override suspend fun setOnboardingCompleted(completed: Boolean) {
         settingsDataStore.setOnboardingCompleted(completed)
     }

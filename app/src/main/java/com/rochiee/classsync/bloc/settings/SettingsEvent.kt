@@ -16,6 +16,7 @@ sealed class SettingsEvent {
     data class SetDigestIncludeAnnouncements(val enabled: Boolean) : SettingsEvent()
     data class SetDigestIncludeMaterials(val enabled: Boolean) : SettingsEvent()
     data class SetThemeMode(val themeMode: ThemeMode) : SettingsEvent()
+    data class SetLastAppOpenTime(val timeMillis: Long) : SettingsEvent()
     object PreviewDigest : SettingsEvent()
     object ClearError : SettingsEvent()
 }

@@ -27,6 +27,7 @@ class SettingsDataStore(private val context: Context) {
                 preferences[Keys.createTasksFromActionableNoDateAnnouncements] ?: true,
             defaultReminderHours = preferences[Keys.defaultReminderHours] ?: 2,
             lastSyncTimeMillis = preferences[Keys.lastSyncTimeMillis],
+            lastAppOpenTimeMillis = preferences[Keys.lastAppOpenTimeMillis],
             onboardingCompleted = preferences[Keys.onboardingCompleted] ?: false,
             classroomPermissionExplained = preferences[Keys.classroomPermissionExplained] ?: false,
             gmailPermissionExplained = preferences[Keys.gmailPermissionExplained] ?: false,
@@ -36,7 +37,7 @@ class SettingsDataStore(private val context: Context) {
             digestIncludeMaterials = preferences[Keys.digestIncludeMaterials] ?: true,
             themeMode = preferences[Keys.themeMode]
                 ?.let { stored -> ThemeMode.entries.firstOrNull { it.name == stored } }
-                ?: ThemeMode.LIGHT,
+                ?: ThemeMode.SYSTEM,
             persistedStudyPlanJson = preferences[Keys.persistedStudyPlanJson],
             persistedExamChecklistJson = preferences[Keys.persistedExamChecklistJson]
         )
@@ -72,6 +73,10 @@ class SettingsDataStore(private val context: Context) {
 
     suspend fun setLastSyncTimeMillis(timeMillis: Long) {
         update { it[Keys.lastSyncTimeMillis] = timeMillis }
+    }
+
+    suspend fun setLastAppOpenTimeMillis(timeMillis: Long) {
+        update { it[Keys.lastAppOpenTimeMillis] = timeMillis }
     }
 
     suspend fun setOnboardingCompleted(completed: Boolean) {
@@ -154,6 +159,7 @@ class SettingsDataStore(private val context: Context) {
             booleanPreferencesKey("create_tasks_from_actionable_no_date_announcements")
         val defaultReminderHours = intPreferencesKey("default_reminder_hours")
         val lastSyncTimeMillis = longPreferencesKey("last_sync_time_millis")
+        val lastAppOpenTimeMillis = longPreferencesKey("last_app_open_time_millis")
         val onboardingCompleted = booleanPreferencesKey("onboarding_completed")
         val classroomPermissionExplained = booleanPreferencesKey("classroom_permission_explained")
         val gmailPermissionExplained = booleanPreferencesKey("gmail_permission_explained")

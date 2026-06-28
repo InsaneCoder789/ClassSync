@@ -15,6 +15,7 @@ import com.rochiee.classsync.domain.usecase.settings.SetDigestIncludeAnnouncemen
 import com.rochiee.classsync.domain.usecase.settings.SetDigestIncludeMaterialsUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetGmailSyncEnabledUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetGmailPermissionExplainedUseCase
+import com.rochiee.classsync.domain.usecase.settings.SetLastAppOpenTimeUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetClassroomPermissionExplainedUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetOnboardingCompletedUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetThemeModeUseCase
@@ -43,6 +44,7 @@ class SettingsBlocViewModel(
     private val setDigestIncludeAnnouncementsUseCase: SetDigestIncludeAnnouncementsUseCase,
     private val setDigestIncludeMaterialsUseCase: SetDigestIncludeMaterialsUseCase,
     private val setThemeModeUseCase: SetThemeModeUseCase,
+    private val setLastAppOpenTimeUseCase: SetLastAppOpenTimeUseCase,
     private val scheduleDailyDigestUseCase: ScheduleDailyDigestUseCase,
     private val cancelDailyDigestUseCase: CancelDailyDigestUseCase,
     private val previewDailyDigestUseCase: PreviewDailyDigestUseCase,
@@ -72,6 +74,7 @@ class SettingsBlocViewModel(
             is SettingsEvent.SetDigestIncludeAnnouncements -> updateSetting { setDigestIncludeAnnouncementsUseCase(event.enabled) }
             is SettingsEvent.SetDigestIncludeMaterials -> updateSetting { setDigestIncludeMaterialsUseCase(event.enabled) }
             is SettingsEvent.SetThemeMode -> updateSetting { setThemeModeUseCase(event.themeMode) }
+            is SettingsEvent.SetLastAppOpenTime -> updateSetting { setLastAppOpenTimeUseCase(event.timeMillis) }
             SettingsEvent.PreviewDigest -> previewDigest()
             SettingsEvent.ClearError -> _state.update { it.copy(errorMessage = null) }
         }
@@ -92,6 +95,7 @@ class SettingsBlocViewModel(
                             settings.createTasksFromActionableNoDateAnnouncements,
                         defaultReminderHours = settings.defaultReminderHours,
                         lastSyncTimeMillis = settings.lastSyncTimeMillis,
+                        lastAppOpenTimeMillis = settings.lastAppOpenTimeMillis,
                         onboardingCompleted = settings.onboardingCompleted,
                         classroomPermissionExplained = settings.classroomPermissionExplained,
                         gmailPermissionExplained = settings.gmailPermissionExplained,

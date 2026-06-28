@@ -67,6 +67,7 @@ import com.rochiee.classsync.domain.usecase.settings.SetDigestIncludeAnnouncemen
 import com.rochiee.classsync.domain.usecase.settings.SetDigestIncludeMaterialsUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetGmailSyncEnabledUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetGmailPermissionExplainedUseCase
+import com.rochiee.classsync.domain.usecase.settings.SetLastAppOpenTimeUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetLastSyncTimeUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetOnboardingCompletedUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetThemeModeUseCase
@@ -126,6 +127,7 @@ interface AppContainer {
     val setClassroomSyncEnabledUseCase: SetClassroomSyncEnabledUseCase
     val setDefaultReminderHoursUseCase: SetDefaultReminderHoursUseCase
     val setLastSyncTimeUseCase: SetLastSyncTimeUseCase
+    val setLastAppOpenTimeUseCase: SetLastAppOpenTimeUseCase
     val setOnboardingCompletedUseCase: SetOnboardingCompletedUseCase
     val setClassroomPermissionExplainedUseCase: SetClassroomPermissionExplainedUseCase
     val setGmailPermissionExplainedUseCase: SetGmailPermissionExplainedUseCase
@@ -346,6 +348,10 @@ class AppContainerImpl(private val context: Context) : AppContainer {
 
     override val setLastSyncTimeUseCase: SetLastSyncTimeUseCase by lazy {
         SetLastSyncTimeUseCase(settingsRepository)
+    }
+
+    override val setLastAppOpenTimeUseCase: SetLastAppOpenTimeUseCase by lazy {
+        SetLastAppOpenTimeUseCase(settingsRepository)
     }
 
     override val setOnboardingCompletedUseCase: SetOnboardingCompletedUseCase by lazy {

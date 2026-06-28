@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Classsync" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Classsync" parent="android:Theme.Material.NoActionBar" />
 
     <style name="Theme.Classsync.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#F8FAFC</item>
+        <item name="windowSplashScreenBackground">#0A0A0C</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/transparent_splash_icon</item>
         <item name="postSplashScreenTheme">@style/Theme.Classsync</item>
     </style>
