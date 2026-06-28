@@ -28,6 +28,7 @@ import com.rochiee.classsync.bloc.event.EventState
 import com.rochiee.classsync.bloc.sync.SyncState
 import com.rochiee.classsync.bloc.task.TaskState
 import com.rochiee.classsync.domain.model.AcademicTask
+import com.rochiee.classsync.domain.model.ClassroomEventType
 import com.rochiee.classsync.ui.components.ClassSyncProgressWidget
 import com.rochiee.classsync.ui.components.ElevatedInfoCard
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
@@ -42,6 +43,7 @@ import com.rochiee.classsync.ui.theme.SilverBorder
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 
 private val homeTimeFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
@@ -72,7 +74,22 @@ fun HomeScreen(
     val totalTasks = taskState.tasks.size
     val completedTasks = taskState.tasks.count { it.isCompleted }
     val tasksLeft = (totalTasks - completedTasks).coerceAtLeast(0)
-    val progressPercent = if (totalTasks == 0) 0 else ((completedTasks * 100f) / totalTasks).toInt()
+    val progressPercent = if (totalTasks == 0) 0 else ((completedTasks * 100f) / totalTasks).roundToInt()
+    val dueTodayCount = openTasks.count { task ->
+        val due = task.dueDate ?: return@count false
+        due <= now + 24L * 60L * 60L * 1000L
+    }
+    val overdueCount = openTasks.count { task ->
+        val due = task.dueDate ?: return@count false
+        due < now
+    }
+    val upcomingAssessments = eventState.allEvents.count {
+        (it.eventType == ClassroomEventType.QUIZ || it.eventType == ClassroomEventType.EXAM) &&
+            (it.dueDateMillis ?: Long.MAX_VALUE) >= now
+    }
+    val digestHeadline = eventState.announcements.firstOrNull()?.title
+        ?: eventState.materials.firstOrNull()?.title
+        ?: ongoingTask?.title
 
     LazyColumn(
         modifier = Modifier
@@ -113,10 +130,10 @@ fun HomeScreen(
                     completedTasks = completedTasks,
                     totalTasks = totalTasks,
                     tasksLeft = tasksLeft,
-                    progressCaption = if (openTasks.isEmpty()) {
+                    progressCaption = if (tasksLeft == 0) {
                         "All current work is under control"
                     } else {
-                        "${openTasks.size} live academic items are still active"
+                        "$tasksLeft live academic item${if (tasksLeft == 1) "" else "s"} are still active"
                     }
                 )
                 ResponsiveFlowRow(maxItemsInEachRow = 2) {
@@ -172,6 +189,61 @@ fun HomeScreen(
                         upcomingTasks.forEach { task ->
                             ScheduleCompactCard(task = task)
                         }
+                    }
+                }
+            }
+        }
+
+        item {
+            TintedPanel {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                    Text(
+                        text = "Daily digest preview",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = "A quick local summary of what matters after your immediate queue and before the next sync cycle lands.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                ResponsiveFlowRow(maxItemsInEachRow = 3) {
+                    ElevatedInfoCard(
+                        title = "Due now",
+                        value = dueTodayCount.toString(),
+                        supportingText = "Items due today or within the next 24 hours",
+                        modifier = Modifier.fillMaxWidth(),
+                        accent = if (dueTodayCount > 0) Negative else SafeGreen
+                    )
+                    ElevatedInfoCard(
+                        title = "Overdue",
+                        value = overdueCount.toString(),
+                        supportingText = "Work that needs recovery time immediately",
+                        modifier = Modifier.fillMaxWidth(),
+                        accent = if (overdueCount > 0) Negative else SafeGreen
+                    )
+                    ElevatedInfoCard(
+                        title = "Assessments",
+                        value = upcomingAssessments.toString(),
+                        supportingText = "Quizzes and exams still ahead of you",
+                        modifier = Modifier.fillMaxWidth(),
+                        accent = MaterialTheme.colorScheme.primary
+                    )
+                }
+                if (!digestHeadline.isNullOrBlank()) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                shape = RoundedCornerShape(18.dp)
+                            )
+                            .padding(horizontal = 14.dp, vertical = 12.dp)
+                    ) {
+                        Text(
+                            text = digestHeadline,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }

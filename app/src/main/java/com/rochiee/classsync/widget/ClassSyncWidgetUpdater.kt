@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.util.TypedValue
 import android.widget.RemoteViews
@@ -41,7 +42,13 @@ object ClassSyncWidgetUpdater {
 
         appWidgetIds.forEach { widgetId ->
             val deadlineTone = formatter.deadlineTone(summary.primaryTaskDueMillis)
-            val isDark = themeMode == ThemeMode.DARK
+            val systemIsDark =
+                (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+            val isDark = when (themeMode) {
+                ThemeMode.SYSTEM -> systemIsDark
+                ThemeMode.DARK -> true
+                ThemeMode.LIGHT -> false
+            }
             val rootSurface = if (isDark) R.drawable.widget_root_surface_dark else R.drawable.widget_root_surface
             val neutralCardSurface = if (isDark) R.drawable.widget_panel_surface_dark else R.drawable.widget_panel_surface
             val widgetOptions = appWidgetManager.getAppWidgetOptions(widgetId)
@@ -105,8 +112,8 @@ object ClassSyncWidgetUpdater {
                 val secondaryText = if (isDark) 0xFFAEB8C4.toInt() else 0xFF667085.toInt()
                 val accentText = when (deadlineTone) {
                     WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE,
-                    WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> if (isDark) 0xFFFFF1F1.toInt() else 0xFF5D0F17.toInt()
-                    WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) 0xFFFFF0F0.toInt() else 0xFF711620.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> if (isDark) 0xFFFFF1F1.toInt() else 0xFFFFF3F3.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) 0xFFFFF0F0.toInt() else 0xFFFFF5F5.toInt()
                     WidgetTaskFormatter.WidgetDeadlineTone.SOON -> if (isDark) 0xFFD8E8FF.toInt() else 0xFF1E4F8A.toInt()
                     WidgetTaskFormatter.WidgetDeadlineTone.UPCOMING -> if (isDark) 0xFFDCEBFF.toInt() else 0xFF285D99.toInt()
                     WidgetTaskFormatter.WidgetDeadlineTone.SAFE -> if (isDark) 0xFFD9FFE7.toInt() else 0xFF166534.toInt()
@@ -114,8 +121,8 @@ object ClassSyncWidgetUpdater {
                 }
                 val mutedAccentText = when (deadlineTone) {
                     WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE,
-                    WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> if (isDark) 0xFFFFD0D0.toInt() else 0xFF8F1D2C.toInt()
-                    WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) 0xFFFFD7D7.toInt() else 0xFFA12234.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> if (isDark) 0xFFFFD0D0.toInt() else 0xFFFFDFDF.toInt()
+                    WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) 0xFFFFD7D7.toInt() else 0xFFFFE6E6.toInt()
                     WidgetTaskFormatter.WidgetDeadlineTone.SOON -> if (isDark) 0xFFAFCFFF.toInt() else 0xFF3B73B9.toInt()
                     WidgetTaskFormatter.WidgetDeadlineTone.UPCOMING -> if (isDark) 0xFFBDD8FF.toInt() else 0xFF4D7FC2.toInt()
                     WidgetTaskFormatter.WidgetDeadlineTone.SAFE -> if (isDark) 0xFFA4E0BA.toInt() else 0xFF2F7A4D.toInt()
@@ -137,8 +144,8 @@ object ClassSyncWidgetUpdater {
                     R.id.widgetNextTaskDue,
                     when (deadlineTone) {
                         WidgetTaskFormatter.WidgetDeadlineTone.OVERDUE,
-                        WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> if (isDark) 0xFFFFE3E3.toInt() else 0xFF7A1220.toInt()
-                        WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) 0xFFFFE8E8.toInt() else 0xFF8C1A2A.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.TODAY -> if (isDark) 0xFFFFE3E3.toInt() else 0xFFFFEEEE.toInt()
+                        WidgetTaskFormatter.WidgetDeadlineTone.TOMORROW -> if (isDark) 0xFFFFE8E8.toInt() else 0xFFFFF0F0.toInt()
                         WidgetTaskFormatter.WidgetDeadlineTone.SOON -> if (isDark) 0xFFDCEBFF.toInt() else 0xFF295C99.toInt()
                         WidgetTaskFormatter.WidgetDeadlineTone.UPCOMING -> if (isDark) 0xFFE3F0FF.toInt() else 0xFF376EAF.toInt()
                         WidgetTaskFormatter.WidgetDeadlineTone.SAFE -> if (isDark) 0xFFD9FFE7.toInt() else 0xFF1F7A42.toInt()

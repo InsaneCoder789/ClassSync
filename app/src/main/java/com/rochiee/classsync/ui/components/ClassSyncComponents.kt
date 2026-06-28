@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.FlowRowScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -86,12 +87,13 @@ fun ElevatedInfoCard(
 ) {
     val spacing = LocalSpacing.current
     Card(
-        modifier = modifier,
+        modifier = modifier.height(184.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(28.dp)
     ) {
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
@@ -106,8 +108,8 @@ fun ElevatedInfoCard(
                     color = SilverBorderSoft,
                     shape = RoundedCornerShape(28.dp)
                 )
-                .padding(horizontal = spacing.md, vertical = spacing.md),
-            verticalArrangement = Arrangement.spacedBy(spacing.sm)
+                .padding(horizontal = 14.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -124,15 +126,15 @@ fun ElevatedInfoCard(
             }
             Text(
                 text = value,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = supportingText,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 4,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
         }

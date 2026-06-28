@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -100,48 +101,53 @@ fun SettingsScreen(
                                 title = "Account",
                                 value = if (authState.isSignedIn) "Connected" else "Needs setup",
                                 supportingText = authState.userEmail ?: authState.displayName ?: "Google not connected yet",
+                                modifier = Modifier.fillMaxWidth(),
                                 accent = SkyBlue
                             )
                             SettingsHeroStatCard(
                                 title = "Last sync",
                                 value = settingsState.lastSyncTimeMillis.formatDateTime(),
                                 supportingText = if (syncState.isSyncing) "A sync is currently running" else "Latest successful local refresh",
+                                modifier = Modifier.fillMaxWidth(),
                                 accent = Sun
                             )
                             SettingsHeroStatCard(
                                 title = "Reminder lead",
                                 value = "${settingsState.defaultReminderHours}h",
                                 supportingText = "Default notice before deadlines",
+                                modifier = Modifier.fillMaxWidth(),
                                 accent = MintGreen
                             )
                         }
                     } else {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(spacing.sm)
-                        ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                             SettingsHeroStatCard(
                                 title = "Account",
                                 value = if (authState.isSignedIn) "Connected" else "Needs setup",
                                 supportingText = authState.userEmail ?: authState.displayName ?: "Google not connected yet",
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier.fillMaxWidth(),
                                 accent = SkyBlue
                             )
-                            SettingsHeroStatCard(
-                                title = "Last sync",
-                                value = settingsState.lastSyncTimeMillis.formatDateTime(),
-                                supportingText = if (syncState.isSyncing) "A sync is currently running" else "Latest successful local refresh",
-                                modifier = Modifier.weight(1f),
-                                accent = Sun
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(spacing.sm)
+                            ) {
+                                SettingsHeroStatCard(
+                                    title = "Last sync",
+                                    value = settingsState.lastSyncTimeMillis.formatDateTime(),
+                                    supportingText = if (syncState.isSyncing) "A sync is currently running" else "Latest successful local refresh",
+                                    modifier = Modifier.weight(1f),
+                                    accent = Sun
+                                )
+                                SettingsHeroStatCard(
+                                    title = "Reminder lead",
+                                    value = "${settingsState.defaultReminderHours}h",
+                                    supportingText = "Default notice before deadlines",
+                                    modifier = Modifier.weight(1f),
+                                    accent = MintGreen
+                                )
+                            }
                         }
-                        SettingsHeroStatCard(
-                            title = "Reminder lead",
-                            value = "${settingsState.defaultReminderHours}h",
-                            supportingText = "Default notice before deadlines",
-                            modifier = Modifier.fillMaxWidth(),
-                            accent = MintGreen
-                        )
                     }
                 }
             }
@@ -248,6 +254,12 @@ fun SettingsScreen(
                 )
                 ResponsiveFlowRow(maxItemsInEachRow = 2) {
                     ThemeModeButton(
+                        label = "Same as system",
+                        selected = settingsState.themeMode == ThemeMode.SYSTEM,
+                        onClick = { onSettingsEvent(SettingsEvent.SetThemeMode(ThemeMode.SYSTEM)) },
+                        modifier = Modifier.widthIn(min = 164.dp)
+                    )
+                    ThemeModeButton(
                         label = "Light",
                         selected = settingsState.themeMode == ThemeMode.LIGHT,
                         onClick = { onSettingsEvent(SettingsEvent.SetThemeMode(ThemeMode.LIGHT)) },
@@ -324,36 +336,41 @@ private fun SettingsHeroStatCard(
 ) {
     val spacing = LocalSpacing.current
     TintedPanel(
-        modifier = modifier,
+        modifier = modifier.then(Modifier.height(196.dp)),
         accentColor = accent
     ) {
-        Box(
-            modifier = Modifier
-                .background(accent.copy(alpha = 0.14f), RoundedCornerShape(16.dp))
-                .padding(horizontal = 12.dp, vertical = 6.dp)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            Box(
+                modifier = Modifier
+                    .background(accent.copy(alpha = 0.14f), RoundedCornerShape(16.dp))
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = accent,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             Text(
-                text = title,
-                style = MaterialTheme.typography.labelLarge,
-                color = accent,
-                maxLines = 1,
+                text = value,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = supportingText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
         }
-        Text(
-            text = value,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
-        Text(
-            text = supportingText,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis
-        )
     }
 }
 

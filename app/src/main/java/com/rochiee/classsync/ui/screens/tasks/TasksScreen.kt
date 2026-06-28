@@ -2,19 +2,26 @@ package com.rochiee.classsync.ui.screens.tasks
 
 import android.app.TimePickerDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -250,10 +257,20 @@ fun TasksScreen(
                     OutlinedTextField(
                         value = pickedDueDateMillis.formatComposerDueDate(),
                         onValueChange = {},
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showDatePicker = true },
                         label = { Text("Due date") },
                         singleLine = true,
-                        readOnly = true
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.DateRange,
+                                    contentDescription = "Open due date calendar"
+                                )
+                            }
+                        }
                     )
                     OutlinedTextField(
                         value = description,
@@ -270,11 +287,6 @@ fun TasksScreen(
                         )
                     }
                     ResponsiveFlowRow(maxItemsInEachRow = 2) {
-                        LiquidGlassTextButton(
-                            text = if (pickedDueDateMillis == null) "Open calendar" else "Change due date",
-                            onClick = { showDatePicker = true },
-                            modifier = Modifier.fillMaxWidth()
-                        )
                         LiquidGlassTextButton(
                             text = "Clear due date",
                             onClick = { pickedDueDateMillis = null },
@@ -423,21 +435,29 @@ private fun TaskStatCard(
     toneColor: androidx.compose.ui.graphics.Color,
     modifier: Modifier = Modifier
 ) {
-    TintedPanel(modifier = modifier, accentColor = toneColor) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelLarge,
-            color = toneColor
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.headlineSmall
-        )
-        Text(
-            text = supporting,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+    TintedPanel(modifier = modifier.then(Modifier.height(152.dp)), accentColor = toneColor) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelLarge,
+                color = toneColor,
+                maxLines = 1
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.headlineMedium,
+                maxLines = 1
+            )
+            Text(
+                text = supporting,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2
+            )
+        }
     }
 }
 
