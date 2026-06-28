@@ -1,6 +1,7 @@
 package com.rochiee.classsync.data.repository
 
 import com.rochiee.classsync.data.local.dao.TaskDao
+import com.rochiee.classsync.data.local.preferences.TaskSuppressionStore
 import com.rochiee.classsync.data.local.mapper.toAcademicTask
 import com.rochiee.classsync.data.local.mapper.toTaskEntity
 import com.rochiee.classsync.domain.model.AcademicTask
@@ -16,7 +17,8 @@ import kotlinx.coroutines.flow.map
 class TaskRepositoryImpl(
     private val dao: TaskDao,
     private val reminderScheduler: ReminderScheduler,
-    private val appContext: Context
+    private val appContext: Context,
+    private val suppressionStore: TaskSuppressionStore
 ) : TaskRepository {
     override fun observeTasks(): Flow<List<AcademicTask>> {
         return dao.getAllTasks().map { entities ->
@@ -29,6 +31,10 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun addTask(task: AcademicTask) {
+        if (TaskSuppressionStore.shouldCheckSuppression(task) && suppressionStore.isSuppressed(task)) {
+            return
+        }
+
         val existingTasks = dao.getAllTasksSnapshot().map { it.toAcademicTask() }
         val duplicate = DuplicateTaskDetector.findBestDuplicate(existingTasks, task)
         val taskWithTimestamps = task.copy(
@@ -60,6 +66,9 @@ class TaskRepositoryImpl(
 
     override suspend fun deleteTask(task: AcademicTask) {
         reminderScheduler.cancel(task)
+        if (TaskSuppressionStore.shouldSuppress(task)) {
+            suppressionStore.suppress(task)
+        }
         dao.deleteTask(task.toTaskEntity())
         ClassSyncWidgetUpdater.updateAllWidgets(appContext)
         DueSoonNotificationHelper.refresh(appContext, dao.getAllTasksSnapshot().map { it.toAcademicTask() })

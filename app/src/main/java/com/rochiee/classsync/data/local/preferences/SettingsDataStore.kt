@@ -21,6 +21,10 @@ class SettingsDataStore(private val context: Context) {
             backgroundSyncEnabled = preferences[Keys.backgroundSyncEnabled] ?: true,
             gmailSyncEnabled = preferences[Keys.gmailSyncEnabled] ?: false,
             classroomSyncEnabled = preferences[Keys.classroomSyncEnabled] ?: true,
+            smartClassificationEnabled = preferences[Keys.smartClassificationEnabled] ?: true,
+            tfliteClassificationEnabled = preferences[Keys.tfliteClassificationEnabled] ?: true,
+            createTasksFromActionableNoDateAnnouncements =
+                preferences[Keys.createTasksFromActionableNoDateAnnouncements] ?: true,
             defaultReminderHours = preferences[Keys.defaultReminderHours] ?: 2,
             lastSyncTimeMillis = preferences[Keys.lastSyncTimeMillis],
             onboardingCompleted = preferences[Keys.onboardingCompleted] ?: false,
@@ -48,6 +52,18 @@ class SettingsDataStore(private val context: Context) {
 
     suspend fun setClassroomSyncEnabled(enabled: Boolean) {
         update { it[Keys.classroomSyncEnabled] = enabled }
+    }
+
+    suspend fun setSmartClassificationEnabled(enabled: Boolean) {
+        update { it[Keys.smartClassificationEnabled] = enabled }
+    }
+
+    suspend fun setTfliteClassificationEnabled(enabled: Boolean) {
+        update { it[Keys.tfliteClassificationEnabled] = enabled }
+    }
+
+    suspend fun setCreateTasksFromActionableNoDateAnnouncements(enabled: Boolean) {
+        update { it[Keys.createTasksFromActionableNoDateAnnouncements] = enabled }
     }
 
     suspend fun setDefaultReminderHours(hours: Int) {
@@ -132,6 +148,10 @@ class SettingsDataStore(private val context: Context) {
         val backgroundSyncEnabled = booleanPreferencesKey("background_sync_enabled")
         val gmailSyncEnabled = booleanPreferencesKey("gmail_sync_enabled")
         val classroomSyncEnabled = booleanPreferencesKey("classroom_sync_enabled")
+        val smartClassificationEnabled = booleanPreferencesKey("smart_classification_enabled")
+        val tfliteClassificationEnabled = booleanPreferencesKey("tflite_classification_enabled")
+        val createTasksFromActionableNoDateAnnouncements =
+            booleanPreferencesKey("create_tasks_from_actionable_no_date_announcements")
         val defaultReminderHours = intPreferencesKey("default_reminder_hours")
         val lastSyncTimeMillis = longPreferencesKey("last_sync_time_millis")
         val onboardingCompleted = booleanPreferencesKey("onboarding_completed")

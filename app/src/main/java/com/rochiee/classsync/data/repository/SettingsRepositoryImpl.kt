@@ -23,6 +23,18 @@ class SettingsRepositoryImpl(
         settingsDataStore.setClassroomSyncEnabled(enabled)
     }
 
+    override suspend fun setSmartClassificationEnabled(enabled: Boolean) {
+        settingsDataStore.setSmartClassificationEnabled(enabled)
+    }
+
+    override suspend fun setTfliteClassificationEnabled(enabled: Boolean) {
+        settingsDataStore.setTfliteClassificationEnabled(enabled)
+    }
+
+    override suspend fun setCreateTasksFromActionableNoDateAnnouncements(enabled: Boolean) {
+        settingsDataStore.setCreateTasksFromActionableNoDateAnnouncements(enabled)
+    }
+
     override suspend fun setDefaultReminderHours(hours: Int) {
         settingsDataStore.setDefaultReminderHours(hours)
     }

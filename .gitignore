@@ -9,3 +9,13 @@
 .externalNativeBuild
 .cxx
 local.properties
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+ml_training/.venv/
+ml_training/output/
+ml_training/reports/

@@ -9,6 +9,7 @@ import com.rochiee.classsync.ai.AnnouncementSummarizer
 import com.rochiee.classsync.ai.NoOpAiSummaryProvider
 import com.rochiee.classsync.data.local.database.ClassSyncDatabase
 import com.rochiee.classsync.data.local.preferences.SettingsDataStore
+import com.rochiee.classsync.data.local.preferences.TaskSuppressionStore
 import com.rochiee.classsync.data.remote.classroom.ClassroomApiClient
 import com.rochiee.classsync.data.remote.classroom.ClassroomRemoteDataSource
 import com.rochiee.classsync.data.remote.gmail.GmailApiClient
@@ -86,6 +87,9 @@ import com.rochiee.classsync.export.TaskExportManager
 import com.rochiee.classsync.export.TaskJsonExporter
 import com.rochiee.classsync.eventengine.ClassroomEventParser
 import com.rochiee.classsync.eventengine.EventToTaskConverter
+import com.rochiee.classsync.ml.classifier.HybridEventClassifier
+import com.rochiee.classsync.ml.classifier.RuleBasedEventClassifier
+import com.rochiee.classsync.ml.classifier.TfLiteEventClassifier
 import com.rochiee.classsync.planner.PlannerAggregator
 import com.rochiee.classsync.reminder.ReminderScheduler
 import com.rochiee.classsync.study.StudyPlanGenerator
@@ -202,11 +206,20 @@ class AppContainerImpl(private val context: Context) : AppContainer {
     }
 
     override val taskRepository: TaskRepository by lazy {
-        TaskRepositoryImpl(database.taskDao, reminderScheduler, context.applicationContext)
+        TaskRepositoryImpl(
+            database.taskDao,
+            reminderScheduler,
+            context.applicationContext,
+            taskSuppressionStore
+        )
     }
 
     private val settingsDataStore: SettingsDataStore by lazy {
         SettingsDataStore(context.applicationContext)
+    }
+
+    private val taskSuppressionStore: TaskSuppressionStore by lazy {
+        TaskSuppressionStore(context.applicationContext)
     }
 
     override val settingsRepository: SettingsRepository by lazy {
@@ -225,8 +238,26 @@ class AppContainerImpl(private val context: Context) : AppContainer {
         SyncLogRepositoryImpl(database.syncLogDao)
     }
 
+    private val ruleBasedEventClassifier: RuleBasedEventClassifier by lazy {
+        RuleBasedEventClassifier()
+    }
+
+    private val tfLiteEventClassifier: TfLiteEventClassifier by lazy {
+        TfLiteEventClassifier(context.applicationContext)
+    }
+
+    private val hybridEventClassifier: HybridEventClassifier by lazy {
+        HybridEventClassifier(
+            ruleBasedEventClassifier = ruleBasedEventClassifier,
+            tfLiteEventClassifier = tfLiteEventClassifier
+        )
+    }
+
     override val classroomEventParser: ClassroomEventParser by lazy {
-        ClassroomEventParser()
+        ClassroomEventParser(
+            settingsRepository = settingsRepository,
+            hybridEventClassifier = hybridEventClassifier
+        )
     }
 
     override val eventToTaskConverter: EventToTaskConverter by lazy {

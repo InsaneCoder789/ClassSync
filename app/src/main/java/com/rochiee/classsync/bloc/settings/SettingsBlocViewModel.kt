@@ -86,6 +86,10 @@ class SettingsBlocViewModel(
                         backgroundSyncEnabled = settings.backgroundSyncEnabled,
                         gmailSyncEnabled = settings.gmailSyncEnabled,
                         classroomSyncEnabled = settings.classroomSyncEnabled,
+                        smartClassificationEnabled = settings.smartClassificationEnabled,
+                        tfliteClassificationEnabled = settings.tfliteClassificationEnabled,
+                        createTasksFromActionableNoDateAnnouncements =
+                            settings.createTasksFromActionableNoDateAnnouncements,
                         defaultReminderHours = settings.defaultReminderHours,
                         lastSyncTimeMillis = settings.lastSyncTimeMillis,
                         onboardingCompleted = settings.onboardingCompleted,

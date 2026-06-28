@@ -293,13 +293,14 @@ class SyncClassroomCourseworkUseCase(
         val sourceId = sourceIdForCourseWork(workDto)
         val existingTasks = taskRepository.getTasksSnapshot()
         val matchedTask = existingTasks.firstOrNull { it.sourceId == sourceId } ?: return
+        // Respect the user's local completion choice. Remote submission updates can auto-complete
+        // work, but they should not reopen a task the user already finished.
         val shouldBeCompleted = when (submission.state.uppercase()) {
             "TURNED_IN", "RETURNED" -> true
-            "CREATED", "NEW", "RECLAIMED_BY_STUDENT", "MISSING" -> false
             else -> matchedTask.isCompleted
         }
 
-        if (matchedTask.isCompleted != shouldBeCompleted) {
+        if (!matchedTask.isCompleted && shouldBeCompleted) {
             taskRepository.updateTask(matchedTask.copy(isCompleted = shouldBeCompleted))
         }
     }
