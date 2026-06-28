@@ -232,9 +232,3 @@ Detailed setup guide:
 ./gradlew :app:compileDebugKotlin
 ./gradlew :app:testDebugUnitTest
 ```
-
-## Repo Notes
-
-- Keep secrets and local OAuth JSON files out of version control.
-- Keep generated virtual environments and local training output out of the repo.
-- Commit source code, app assets that are required at runtime, and intentional docs only.
