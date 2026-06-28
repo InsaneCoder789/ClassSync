@@ -1,10 +1,12 @@
 package com.rochiee.classsync.ui.screens.planner
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,7 +33,10 @@ import com.rochiee.classsync.bloc.classroom.ClassroomScreenState
 import com.rochiee.classsync.bloc.planner.PlannerEvent
 import com.rochiee.classsync.bloc.planner.PlannerState
 import com.rochiee.classsync.ui.components.ElevatedInfoCard
+import com.rochiee.classsync.ui.components.EmptyState
+import com.rochiee.classsync.ui.components.ErrorState
 import com.rochiee.classsync.ui.components.LiquidGlassTextButton
+import com.rochiee.classsync.ui.components.LoadingState
 import com.rochiee.classsync.ui.components.ResponsiveFlowRow
 import com.rochiee.classsync.ui.components.TintedPanel
 import com.rochiee.classsync.ui.components.formatDate
@@ -62,6 +67,49 @@ fun PlannerScreen(
             0
         } else {
             (((end - start) / (24L * 60L * 60L * 1000L)).toInt() + 1).coerceAtLeast(1)
+        }
+    }
+    val snapshot = remember(mode, plannerState) {
+        when (mode) {
+            PlannerMode.Today -> {
+                val day = plannerState.today
+                PlannerSnapshot(
+                    title = "Today focus",
+                    total = day?.tasks?.size ?: 0,
+                    due = day?.dueItems?.size ?: 0,
+                    highPriority = day?.highPriorityItems?.size ?: 0,
+                    supporting = "Use this lane to close work that is already live today."
+                )
+            }
+            PlannerMode.Week -> {
+                val week = plannerState.currentWeek
+                PlannerSnapshot(
+                    title = "Week balance",
+                    total = week?.totalTaskCount ?: 0,
+                    due = week?.overdueTaskCount ?: 0,
+                    highPriority = week?.quizExamCount ?: 0,
+                    supporting = "See how much work is stacking up across the next seven days."
+                )
+            }
+            PlannerMode.Month -> {
+                val month = plannerState.currentMonth
+                PlannerSnapshot(
+                    title = "Month coverage",
+                    total = month?.totalTaskCount ?: 0,
+                    due = month?.overdueTaskCount ?: 0,
+                    highPriority = month?.quizExamCount ?: 0,
+                    supporting = "Use the broader calendar to spot assessment pressure early."
+                )
+            }
+            PlannerMode.Range -> {
+                PlannerSnapshot(
+                    title = "Range checkpoint",
+                    total = plannerState.selectedRangeDays.sumOf { it.tasks.size },
+                    due = plannerState.selectedRangeDays.sumOf { it.dueItems.size },
+                    highPriority = plannerState.selectedRangeDays.sumOf { it.highPriorityItems.size },
+                    supporting = "Custom windows help you isolate prep weeks, lab streaks, or exam runs."
+                )
+            }
         }
     }
     val rangePickerState = rememberDateRangePickerState(
@@ -159,23 +207,106 @@ fun PlannerScreen(
             }
         }
 
+        item {
+            BoxWithConstraints {
+                if (maxWidth < 420.dp) {
+                    Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
+                            ElevatedInfoCard(
+                                title = snapshot.title,
+                                value = snapshot.total.toString(),
+                                supportingText = snapshot.supporting,
+                                modifier = Modifier.weight(1f),
+                                accent = SkyBlue
+                            )
+                            ElevatedInfoCard(
+                                title = "Needs attention",
+                                value = snapshot.due.toString(),
+                                supportingText = "Due now, overdue, or inside the active planning window",
+                                modifier = Modifier.weight(1f),
+                                accent = Negative
+                            )
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
+                            ElevatedInfoCard(
+                                title = "High pressure",
+                                value = snapshot.highPriority.toString(),
+                                supportingText = "High-priority tasks, quizzes, or exams in the current view",
+                                modifier = Modifier.weight(1f),
+                                accent = MintGreen
+                            )
+                            ElevatedInfoCard(
+                                title = "Range ready",
+                                value = selectedRangeLengthDays.coerceAtLeast(1).toString(),
+                                supportingText = if (mode == PlannerMode.Range) {
+                                    "Days currently loaded in your custom planning window"
+                                } else {
+                                    "Switch to range mode when you want a tighter prep window"
+                                },
+                                modifier = Modifier.weight(1f),
+                                accent = SilverBorder
+                            )
+                        }
+                    }
+                } else {
+                    ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                        ElevatedInfoCard(
+                            title = snapshot.title,
+                            value = snapshot.total.toString(),
+                            supportingText = snapshot.supporting,
+                            modifier = Modifier.fillMaxWidth(),
+                            accent = SkyBlue
+                        )
+                        ElevatedInfoCard(
+                            title = "Needs attention",
+                            value = snapshot.due.toString(),
+                            supportingText = "Due now, overdue, or inside the active planning window",
+                            modifier = Modifier.fillMaxWidth(),
+                            accent = Negative
+                        )
+                        ElevatedInfoCard(
+                            title = "High pressure",
+                            value = snapshot.highPriority.toString(),
+                            supportingText = "High-priority tasks, quizzes, or exams in the current view",
+                            modifier = Modifier.fillMaxWidth(),
+                            accent = MintGreen
+                        )
+                        ElevatedInfoCard(
+                            title = "Range ready",
+                            value = selectedRangeLengthDays.coerceAtLeast(1).toString(),
+                            supportingText = if (mode == PlannerMode.Range) {
+                                "Days currently loaded in your custom planning window"
+                            } else {
+                                "Switch to range mode when you want a tighter prep window"
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            accent = SilverBorder
+                        )
+                    }
+                }
+            }
+        }
+
         when (mode) {
             PlannerMode.Today -> {
                 val day = plannerState.today
                 item {
-                    ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(spacing.sm)
+                    ) {
                         ElevatedInfoCard(
                             title = "Due today",
                             value = (day?.dueItems?.size ?: 0).toString(),
                             supportingText = "Items that need attention before tonight",
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.weight(1f),
                             accent = Negative
                         )
                         ElevatedInfoCard(
                             title = "Priority lane",
                             value = (day?.highPriorityItems?.size ?: 0).toString(),
                             supportingText = "Important tasks identified for today",
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.weight(1f),
                             accent = SkyBlue
                         )
                     }
@@ -247,8 +378,6 @@ fun PlannerScreen(
         item {
             PlannerFilterSheet(
                 current = plannerState.activeFilter,
-                availableCourseIds = classroomState.catalog.semesters
-                    .flatMap { semester -> semester.sections.map { section -> section.sectionId to section.sectionId } },
                 onApply = { filter ->
                     onPlannerEvent(PlannerEvent.SetFilter(filter))
                     when (mode) {
@@ -318,29 +447,62 @@ fun PlannerScreen(
         when (mode) {
             PlannerMode.Today -> {
                 val items = (plannerState.today?.tasks ?: emptyList()) + (plannerState.today?.events ?: emptyList())
-                item { TodayPlannerView(items = items) }
+                item {
+                    when {
+                        plannerState.isLoading && items.isEmpty() -> LoadingState("Loading today's planner")
+                        plannerState.errorMessage != null && items.isEmpty() -> ErrorState(plannerState.errorMessage)
+                        else -> TodayPlannerView(items = items)
+                    }
+                }
             }
             PlannerMode.Week -> {
-                item { WeekPlannerView(
-                    days = plannerState.currentWeek?.days ?: emptyList(),
-                    onSelectDay = { day ->
-                        mode = PlannerMode.Range
-                        onPlannerEvent(PlannerEvent.LoadRange(day.dateStartMillis, day.dateEndMillis))
+                item {
+                    val days = plannerState.currentWeek?.days ?: emptyList()
+                    when {
+                        plannerState.isLoading && days.isEmpty() -> LoadingState("Loading this week's planner")
+                        plannerState.errorMessage != null && days.isEmpty() -> ErrorState(plannerState.errorMessage)
+                        else -> WeekPlannerView(
+                            days = days,
+                            onSelectDay = { day ->
+                                mode = PlannerMode.Range
+                                onPlannerEvent(PlannerEvent.LoadRange(day.dateStartMillis, day.dateEndMillis))
+                            }
+                        )
                     }
-                ) }
+                }
             }
             PlannerMode.Month -> {
-                item { MonthPlannerView(
-                    month = plannerState.currentMonth,
-                    onSelectDay = { day ->
-                        mode = PlannerMode.Range
-                        onPlannerEvent(PlannerEvent.LoadRange(day.dateStartMillis, day.dateEndMillis))
+                item {
+                    when {
+                        plannerState.isLoading && plannerState.currentMonth == null -> LoadingState("Loading this month")
+                        plannerState.errorMessage != null && plannerState.currentMonth == null -> ErrorState(plannerState.errorMessage)
+                        else -> MonthPlannerView(
+                            month = plannerState.currentMonth,
+                            onSelectDay = { day ->
+                                mode = PlannerMode.Range
+                                onPlannerEvent(PlannerEvent.LoadRange(day.dateStartMillis, day.dateEndMillis))
+                            }
+                        )
                     }
-                ) }
+                }
             }
             PlannerMode.Range -> {
-                item { RangePlannerView(days = plannerState.selectedRangeDays) }
+                item {
+                    when {
+                        plannerState.isLoading && plannerState.selectedRangeDays.isEmpty() -> LoadingState("Loading selected range")
+                        plannerState.errorMessage != null && plannerState.selectedRangeDays.isEmpty() -> ErrorState(plannerState.errorMessage)
+                        else -> RangePlannerView(days = plannerState.selectedRangeDays)
+                    }
+                }
             }
         }
     }
 }
+
+private data class PlannerSnapshot(
+    val title: String,
+    val total: Int,
+    val due: Int,
+    val highPriority: Int,
+    val supporting: String
+)

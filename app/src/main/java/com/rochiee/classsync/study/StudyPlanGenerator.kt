@@ -29,7 +29,8 @@ class StudyPlanGenerator {
                 } else {
                     "Scheduled before the task deadline to reduce last-minute pressure."
                 },
-                estimatedEffortLabel = effortFor(nowMillis, task.dueDate, task.priority)
+                estimatedEffortLabel = effortFor(nowMillis, task.dueDate, task.priority),
+                notes = task.description.take(140)
             )
         }
 
@@ -45,7 +46,8 @@ class StudyPlanGenerator {
                 scheduledDateMillis = scheduledDate,
                 sourceType = event.eventType.name,
                 priorityExplanation = "Assessment prep is prioritized ahead of quizzes and exams.",
-                estimatedEffortLabel = effortFor(nowMillis, event.dueDateMillis, event.priority.score)
+                estimatedEffortLabel = effortFor(nowMillis, event.dueDateMillis, event.priority.score),
+                notes = event.description.orEmpty().take(140)
             )
         }
 
@@ -60,7 +62,8 @@ class StudyPlanGenerator {
                 scheduledDateMillis = spreadBeforeDeadline(nowMillis, event.dueDateMillis ?: (nowMillis + DAY_MILLIS)),
                 sourceType = "Reading",
                 priorityExplanation = "Material review supports upcoming work and exams.",
-                estimatedEffortLabel = effortFor(nowMillis, event.dueDateMillis, event.priority.score)
+                estimatedEffortLabel = effortFor(nowMillis, event.dueDateMillis, event.priority.score),
+                notes = event.description.orEmpty().take(140)
             )
         }
 

@@ -19,6 +19,8 @@ object UiStateJsonAdapter {
                     .put("sourceType", item.sourceType)
                     .put("priorityExplanation", item.priorityExplanation)
                     .put("estimatedEffortLabel", item.estimatedEffortLabel)
+                    .put("notes", item.notes)
+                    .put("isManual", item.isManual)
                     .put("isDone", item.isDone)
             )
         }
@@ -47,6 +49,8 @@ object UiStateJsonAdapter {
                                 sourceType = item.optString("sourceType"),
                                 priorityExplanation = item.optString("priorityExplanation"),
                                 estimatedEffortLabel = item.optString("estimatedEffortLabel"),
+                                notes = item.optString("notes"),
+                                isManual = item.optBoolean("isManual"),
                                 isDone = item.optBoolean("isDone")
                             )
                         )

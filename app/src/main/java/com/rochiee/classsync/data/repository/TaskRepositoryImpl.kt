@@ -9,6 +9,7 @@ import com.rochiee.classsync.domain.repository.TaskRepository
 import com.rochiee.classsync.reminder.ReminderScheduler
 import com.rochiee.classsync.reminder.DueSoonNotificationHelper
 import com.rochiee.classsync.taskengine.DuplicateTaskDetector
+import com.rochiee.classsync.taskengine.TaskRecencyPolicy
 import com.rochiee.classsync.widget.ClassSyncWidgetUpdater
 import android.content.Context
 import kotlinx.coroutines.flow.Flow
@@ -22,15 +23,22 @@ class TaskRepositoryImpl(
 ) : TaskRepository {
     override fun observeTasks(): Flow<List<AcademicTask>> {
         return dao.getAllTasks().map { entities ->
-            entities.map { it.toAcademicTask() }
+            entities
+                .map { it.toAcademicTask() }
+                .filter { TaskRecencyPolicy.shouldKeep(it) }
         }
     }
 
     override suspend fun getTasksSnapshot(): List<AcademicTask> {
-        return dao.getAllTasksSnapshot().map { it.toAcademicTask() }
+        return dao.getAllTasksSnapshot()
+            .map { it.toAcademicTask() }
+            .filter { TaskRecencyPolicy.shouldKeep(it) }
     }
 
     override suspend fun addTask(task: AcademicTask) {
+        if (!TaskRecencyPolicy.shouldKeep(task)) {
+            return
+        }
         if (TaskSuppressionStore.shouldCheckSuppression(task) && suppressionStore.isSuppressed(task)) {
             return
         }
@@ -47,21 +55,27 @@ class TaskRepositoryImpl(
             dao.updateTask(mergedTask.toTaskEntity())
             reminderScheduler.schedule(mergedTask)
             ClassSyncWidgetUpdater.updateAllWidgets(appContext)
-            DueSoonNotificationHelper.refresh(appContext, dao.getAllTasksSnapshot().map { it.toAcademicTask() })
+            DueSoonNotificationHelper.refresh(appContext, dao.getAllTasksSnapshot().map { it.toAcademicTask() }.filter { TaskRecencyPolicy.shouldKeep(it) })
         } else {
             val insertedId = dao.insertTask(taskWithTimestamps.toTaskEntity()).toInt()
             reminderScheduler.schedule(taskWithTimestamps.copy(id = insertedId))
             ClassSyncWidgetUpdater.updateAllWidgets(appContext)
-            DueSoonNotificationHelper.refresh(appContext, dao.getAllTasksSnapshot().map { it.toAcademicTask() })
+            DueSoonNotificationHelper.refresh(appContext, dao.getAllTasksSnapshot().map { it.toAcademicTask() }.filter { TaskRecencyPolicy.shouldKeep(it) })
         }
     }
 
     override suspend fun updateTask(task: AcademicTask) {
+        if (!TaskRecencyPolicy.shouldKeep(task)) {
+            dao.deleteTask(task.toTaskEntity())
+            ClassSyncWidgetUpdater.updateAllWidgets(appContext)
+            DueSoonNotificationHelper.refresh(appContext, dao.getAllTasksSnapshot().map { it.toAcademicTask() }.filter { TaskRecencyPolicy.shouldKeep(it) })
+            return
+        }
         val updatedTask = task.copy(updatedAtMillis = System.currentTimeMillis())
         dao.updateTask(updatedTask.toTaskEntity())
         reminderScheduler.schedule(updatedTask)
         ClassSyncWidgetUpdater.updateAllWidgets(appContext)
-        DueSoonNotificationHelper.refresh(appContext, dao.getAllTasksSnapshot().map { it.toAcademicTask() })
+        DueSoonNotificationHelper.refresh(appContext, dao.getAllTasksSnapshot().map { it.toAcademicTask() }.filter { TaskRecencyPolicy.shouldKeep(it) })
     }
 
     override suspend fun deleteTask(task: AcademicTask) {
@@ -71,10 +85,12 @@ class TaskRepositoryImpl(
         }
         dao.deleteTask(task.toTaskEntity())
         ClassSyncWidgetUpdater.updateAllWidgets(appContext)
-        DueSoonNotificationHelper.refresh(appContext, dao.getAllTasksSnapshot().map { it.toAcademicTask() })
+        DueSoonNotificationHelper.refresh(appContext, dao.getAllTasksSnapshot().map { it.toAcademicTask() }.filter { TaskRecencyPolicy.shouldKeep(it) })
     }
 
     override suspend fun getTaskById(id: Int): AcademicTask? {
-        return dao.getTaskById(id)?.toAcademicTask()
+        return dao.getTaskById(id)
+            ?.toAcademicTask()
+            ?.takeIf { TaskRecencyPolicy.shouldKeep(it) }
     }
 }

@@ -8,5 +8,7 @@ data class StudyPlanItem(
     val sourceType: String,
     val priorityExplanation: String,
     val estimatedEffortLabel: String,
+    val notes: String = "",
+    val isManual: Boolean = false,
     val isDone: Boolean = false
 )

@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rochiee.classsync.domain.repository.SettingsRepository
 import com.rochiee.classsync.domain.usecase.study.GenerateStudyPlanUseCase
+import com.rochiee.classsync.study.StudyPlan
+import com.rochiee.classsync.study.StudyPlanItem
 import com.rochiee.classsync.ui.state.UiStateJsonAdapter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,6 +40,19 @@ class StudyPlanBlocViewModel(
                 }
                 persistCurrentPlan()
             }
+            is StudyPlanEvent.AddManualBlock -> {
+                addManualBlock(event.title, event.courseName, event.scheduledDateMillis, event.notes)
+            }
+            is StudyPlanEvent.DeleteBlock -> {
+                _state.update { current ->
+                    current.copy(
+                        plan = current.plan?.copy(
+                            items = current.plan.items.filterNot { it.id == event.itemId }
+                        )
+                    )
+                }
+                persistCurrentPlan()
+            }
             StudyPlanEvent.ClearError -> _state.update { it.copy(errorMessage = null) }
         }
     }
@@ -46,12 +61,51 @@ class StudyPlanBlocViewModel(
         _state.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             runCatching { generateStudyPlanUseCase() }
-                .onSuccess { plan ->
-                    _state.update { it.copy(isLoading = false, plan = plan) }
+                .onSuccess { generatedPlan ->
+                    val preservedManualItems = _state.value.plan?.items.orEmpty()
+                        .filter { it.isManual }
+                    val mergedPlan = generatedPlan.copy(
+                        items = (generatedPlan.items + preservedManualItems)
+                            .distinctBy { it.id }
+                            .sortedBy { it.scheduledDateMillis }
+                    )
+                    _state.update { it.copy(isLoading = false, plan = mergedPlan) }
                     persistCurrentPlan()
                 }
                 .onFailure { error -> _state.update { it.copy(isLoading = false, errorMessage = error.message) } }
         }
+    }
+
+    private fun addManualBlock(
+        title: String,
+        courseName: String,
+        scheduledDateMillis: Long,
+        notes: String
+    ) {
+        val manualItem = StudyPlanItem(
+            id = "manual_${System.currentTimeMillis()}",
+            title = title,
+            courseName = courseName.ifBlank { "Self study" },
+            scheduledDateMillis = scheduledDateMillis,
+            sourceType = "Manual",
+            priorityExplanation = "Added by you for a focused study session.",
+            estimatedEffortLabel = "Custom block",
+            notes = notes.trim(),
+            isManual = true
+        )
+        _state.update { current ->
+            val currentPlan = current.plan ?: StudyPlan(
+                generatedAtMillis = System.currentTimeMillis(),
+                items = emptyList()
+            )
+            current.copy(
+                plan = currentPlan.copy(
+                    generatedAtMillis = System.currentTimeMillis(),
+                    items = (currentPlan.items + manualItem).sortedBy { it.scheduledDateMillis }
+                )
+            )
+        }
+        persistCurrentPlan()
     }
 
     private fun loadPersistedPlan() {

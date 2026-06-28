@@ -1,11 +1,9 @@
 package com.rochiee.classsync.ui.screens.planner
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -24,7 +22,6 @@ import com.rochiee.classsync.ui.theme.LocalSpacing
 @Composable
 fun PlannerFilterSheet(
     current: PlannerFilter,
-    availableCourseIds: List<Pair<String, String>>,
     onApply: (PlannerFilter) -> Unit
 ) {
     val spacing = LocalSpacing.current
@@ -35,7 +32,6 @@ fun PlannerFilterSheet(
     var showAnnouncements by remember(current) { mutableStateOf(current.showAnnouncements) }
     var showMaterials by remember(current) { mutableStateOf(current.showMaterials) }
     var showCompleted by remember(current) { mutableStateOf(current.showCompleted) }
-    var selectedCourseId by remember(current) { mutableStateOf(current.courseId) }
     TintedPanel {
         Text(text = "Planner filters", style = MaterialTheme.typography.titleMedium)
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
@@ -46,21 +42,6 @@ fun PlannerFilterSheet(
             PlannerToggleRow("Announcements", showAnnouncements) { showAnnouncements = it }
             PlannerToggleRow("Materials", showMaterials) { showMaterials = it }
             PlannerToggleRow("Show completed", showCompleted) { showCompleted = it }
-        }
-
-        Text(
-            text = "Course focus",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing.sm),
-            modifier = Modifier.horizontalScroll(rememberScrollState())
-        ) {
-            LiquidGlassTextButton(text = "All courses", onClick = { selectedCourseId = null }, selected = selectedCourseId == null)
-            availableCourseIds.forEach { (courseId, label) ->
-                LiquidGlassTextButton(text = label, onClick = { selectedCourseId = courseId }, selected = selectedCourseId == courseId)
-            }
         }
         LiquidGlassTextButton(
             text = "Apply filters",
@@ -74,7 +55,7 @@ fun PlannerFilterSheet(
                         showAnnouncements = showAnnouncements,
                         showMaterials = showMaterials,
                         showCompleted = showCompleted,
-                        courseId = selectedCourseId
+                        courseId = null
                     )
                 )
             }
