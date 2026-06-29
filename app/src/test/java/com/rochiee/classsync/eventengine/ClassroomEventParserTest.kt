@@ -122,6 +122,7 @@ class ClassroomEventParserTest {
         override suspend fun setCreateTasksFromActionableNoDateAnnouncements(enabled: Boolean) = Unit
         override suspend fun setDefaultReminderHours(hours: Int) = Unit
         override suspend fun setLastSyncTimeMillis(timeMillis: Long) = Unit
+        override suspend fun setLastAppOpenTimeMillis(timeMillis: Long) = Unit
         override suspend fun setOnboardingCompleted(completed: Boolean) = Unit
         override suspend fun setClassroomPermissionExplained(explained: Boolean) = Unit
         override suspend fun setGmailPermissionExplained(explained: Boolean) = Unit

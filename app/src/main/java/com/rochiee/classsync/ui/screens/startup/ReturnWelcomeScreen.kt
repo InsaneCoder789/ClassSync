@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -118,30 +117,6 @@ fun ReturnWelcomeScreen(
             .fillMaxSize()
             .background(backgroundBrush)
     ) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .size(260.dp)
-                .scale(orbScale.value)
-                .alpha(orbAlpha.value)
-                .clip(CircleShape)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = if (darkTheme) {
-                            listOf(
-                                SilverBorder.copy(alpha = 0.42f),
-                                Color.Transparent
-                            )
-                        } else {
-                            listOf(
-                                Color(0xFFB7C4D7).copy(alpha = 0.42f),
-                                Color.Transparent
-                            )
-                        }
-                    )
-                )
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -155,17 +130,47 @@ fun ReturnWelcomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                Image(
-                    painter = androidx.compose.ui.res.painterResource(id = R.mipmap.ic_launcher),
-                    contentDescription = "ClassSync logo",
+                Box(
                     modifier = Modifier
-                        .size(156.dp)
-                        .graphicsLayer {
-                            scaleX = 0.985f + (progress.value * 0.015f)
-                            scaleY = 0.985f + (progress.value * 0.015f)
-                            alpha = 0.92f + (progress.value * 0.08f)
-                        }
-                )
+                        .size(220.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(220.dp)
+                            .offset(y = 6.dp)
+                            .scale(orbScale.value)
+                            .alpha(orbAlpha.value)
+                            .clip(CircleShape)
+                            .background(
+                                brush = Brush.radialGradient(
+                                    colors = if (darkTheme) {
+                                        listOf(
+                                            SilverBorder.copy(alpha = 0.42f),
+                                            Color.Transparent
+                                        )
+                                    } else {
+                                        listOf(
+                                            Color(0xFFB7C4D7).copy(alpha = 0.42f),
+                                            Color.Transparent
+                                        )
+                                    }
+                                )
+                            )
+                    )
+
+                    Image(
+                        painter = androidx.compose.ui.res.painterResource(id = R.mipmap.ic_launcher),
+                        contentDescription = "ClassSync logo",
+                        modifier = Modifier
+                            .size(156.dp)
+                            .graphicsLayer {
+                                scaleX = 0.985f + (progress.value * 0.015f)
+                                scaleY = 0.985f + (progress.value * 0.015f)
+                                alpha = 0.92f + (progress.value * 0.08f)
+                            }
+                    )
+                }
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(10.dp)

@@ -19,6 +19,7 @@ object ClassroomEventClassifier {
 
     fun classify(text: String): ClassroomEventType {
         val normalized = text.lowercase()
+        val containsStandaloneTest = Regex("\\btest\\b").containsMatchIn(normalized)
         return when {
             containsAny(normalized, dueDateUpdateKeywords) -> ClassroomEventType.DUE_DATE_UPDATE
             containsAny(normalized, gradeUpdateKeywords) -> ClassroomEventType.GRADE_UPDATE
@@ -27,6 +28,9 @@ object ClassroomEventClassifier {
             containsAny(normalized, reminderKeywords) -> ClassroomEventType.REMINDER
             containsAny(normalized, examKeywords) -> ClassroomEventType.EXAM
             containsAny(normalized, quizKeywords) -> ClassroomEventType.QUIZ
+            containsStandaloneTest &&
+                !containsAny(normalized, assignmentKeywords) &&
+                !containsAny(normalized, courseworkKeywords) -> ClassroomEventType.EXAM
             containsAny(normalized, assignmentKeywords) -> ClassroomEventType.ASSIGNMENT
             containsAny(normalized, courseworkKeywords) -> ClassroomEventType.COURSEWORK
             containsAny(normalized, announcementKeywords) -> ClassroomEventType.ANNOUNCEMENT

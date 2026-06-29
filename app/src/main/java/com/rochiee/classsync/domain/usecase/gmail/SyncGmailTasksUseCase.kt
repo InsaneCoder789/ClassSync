@@ -1,5 +1,6 @@
 package com.rochiee.classsync.domain.usecase.gmail
 
+import com.rochiee.classsync.data.remote.gmail.GmailClassroomEmailParser
 import com.rochiee.classsync.domain.model.SyncLog
 import com.rochiee.classsync.domain.model.TaskSource
 import com.rochiee.classsync.domain.repository.ClassroomEventRepository
@@ -42,20 +43,20 @@ class SyncGmailTasksUseCase(
             var importedCount = 0
             var eventCount = 0
             messages.forEach { message ->
+                val metadata = GmailClassroomEmailParser.extractMetadata(
+                    subject = message.subject,
+                    body = message.body
+                )
                 val event = classroomEventParser.parse(
                     RawClassroomEventInput(
-                        title = message.subject,
+                        title = metadata.itemTitle ?: message.subject,
                         body = listOfNotNull(message.snippet, message.body).joinToString("\n"),
                         courseId = null,
-                        courseName = if (message.from?.contains("classroom.google.com") == true) {
-                            message.subject?.split(":")?.firstOrNull()?.trim()
-                        } else {
-                            null
-                        },
+                        courseName = metadata.courseName,
                         source = TaskSource.GMAIL,
-                        sourceId = message.threadId.ifBlank { message.id },
+                        sourceId = metadata.stableSourceId ?: message.threadId.ifBlank { message.id },
                         sourcePackageName = null,
-                        originalLink = message.link,
+                        originalLink = metadata.resolvedDetailLink ?: metadata.detailLink ?: message.link,
                         receivedAtMillis = message.internalDateMillis
                     )
                 )
