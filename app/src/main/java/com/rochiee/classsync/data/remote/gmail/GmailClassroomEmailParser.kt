@@ -1,5 +1,6 @@
 package com.rochiee.classsync.data.remote.gmail
 
+import com.rochiee.classsync.security.LinkSafety
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
@@ -127,6 +128,7 @@ object GmailClassroomEmailParser {
     }
 
     private fun stableSourceIdFromClassroomUrl(url: String): String? {
+        if (!LinkSafety.isTrustedClassroomUrl(url)) return null
         val uri = runCatching { URI(url) }.getOrNull() ?: return null
         val normalizedPath = uri.path?.trimEnd('/')?.takeIf { it.startsWith("/c/") } ?: return null
         return "classroom$linkSeparator$normalizedPath"
@@ -134,8 +136,8 @@ object GmailClassroomEmailParser {
 
     private fun extractClassroomContinueTarget(url: String): String? {
         val uri = runCatching { URI(url) }.getOrNull() ?: return null
-        if (isClassroomUrl(url)) return url
-        if (!uri.host.orEmpty().contains("accounts.google.com")) return null
+        if (LinkSafety.isTrustedClassroomUrl(url)) return LinkSafety.normalizeHttpsUrl(url)
+        if (!LinkSafety.isTrustedAccountsUrl(url)) return null
         val continueValue = uri.rawQuery
             ?.split("&")
             ?.mapNotNull { part ->
@@ -145,11 +147,16 @@ object GmailClassroomEmailParser {
             ?.firstOrNull()
             ?.let { URLDecoder.decode(it, Charsets.UTF_8.name()) }
             ?: return null
-        return continueValue.substringBefore("&Email=")
+        return continueValue
+            .substringBefore("&Email=")
+            .let(LinkSafety::normalizeHttpsUrl)
+            ?.takeIf(LinkSafety::isTrustedClassroomUrl)
     }
 
     private fun resolveRedirectLink(url: String): String? {
-        if (!isRedirectUrl(url)) return url.takeIf { isClassroomUrl(it) }
+        if (!LinkSafety.isTrustedNotificationsRedirect(url)) {
+            return LinkSafety.normalizeHttpsUrl(url)?.takeIf(LinkSafety::isTrustedClassroomUrl)
+        }
         return runCatching {
             val connection = URI(url).toURL().openConnection() as HttpURLConnection
             connection.instanceFollowRedirects = false
@@ -158,7 +165,7 @@ object GmailClassroomEmailParser {
             connection.readTimeout = 5_000
             connection.setRequestProperty("User-Agent", "ClassSync/1.0")
             connection.connect()
-            connection.getHeaderField("Location")
+            connection.getHeaderField("Location")?.let(LinkSafety::normalizeHttpsUrl)
         }.recover { error ->
             if (error is IOException) null else throw error
         }.getOrNull()
@@ -169,13 +176,11 @@ object GmailClassroomEmailParser {
     }
 
     private fun isClassroomUrl(url: String): Boolean {
-        val host = runCatching { URI(url).host.orEmpty() }.getOrDefault("")
-        return host.contains("classroom.google.com")
+        return LinkSafety.isTrustedClassroomUrl(url)
     }
 
     private fun isRedirectUrl(url: String): Boolean {
-        val host = runCatching { URI(url).host.orEmpty() }.getOrDefault("")
-        return host.contains("notifications.googleapis.com")
+        return LinkSafety.isTrustedNotificationsRedirect(url)
     }
 
     private const val linkSeparator = ":"

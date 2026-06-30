@@ -7,6 +7,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.rochiee.classsync.domain.model.AcademicTask
 import kotlinx.coroutines.flow.first
 import java.util.Locale
+import java.security.MessageDigest
 
 private val Context.taskSuppressionDataStore by preferencesDataStore(name = "classsync_task_suppression")
 
@@ -49,27 +50,27 @@ class TaskSuppressionStore(private val context: Context) {
             task.sourceId
                 ?.trim()
                 ?.takeIf { it.isNotBlank() }
-                ?.let { keys += "source_id:$normalizedSource:${it.lowercase(Locale.getDefault())}" }
+                ?.let { keys += "source_id:$normalizedSource:${obfuscateKeyMaterial(it.lowercase(Locale.getDefault()))}" }
 
             task.sourceLink
                 ?.trim()
                 ?.takeIf { it.isNotBlank() }
-                ?.let { keys += "source_link:$normalizedSource:${it.lowercase(Locale.getDefault())}" }
+                ?.let { keys += "source_link:$normalizedSource:${obfuscateKeyMaterial(it.lowercase(Locale.getDefault()))}" }
 
             val title = task.title.normalizeForKey()
             val course = task.courseName.normalizeForKey()
             val due = task.dueDate?.toString().orEmpty()
             if (title.isNotBlank() || course.isNotBlank()) {
-                keys += "fingerprint:$normalizedSource:$course:$title:$due"
-                keys += "fingerprint:$normalizedSource:$course:$title"
+                keys += "fingerprint:$normalizedSource:${obfuscateKeyMaterial("$course:$title:$due")}"
+                keys += "fingerprint:$normalizedSource:${obfuscateKeyMaterial("$course:$title")}"
             }
 
             if (title.isNotBlank()) {
-                keys += "title:$normalizedSource:$title"
+                keys += "title:$normalizedSource:${obfuscateKeyMaterial(title)}"
             }
 
             if (title.isNotBlank() && course.isNotBlank()) {
-                keys += "course_title:$normalizedSource:$course:$title"
+                keys += "course_title:$normalizedSource:${obfuscateKeyMaterial("$course:$title")}"
             }
 
             return keys
@@ -86,6 +87,12 @@ class TaskSuppressionStore(private val context: Context) {
                 "classroom", "google classroom", "gmail", "notification" -> true
                 else -> false
             }
+        }
+
+        private fun obfuscateKeyMaterial(raw: String): String {
+            return MessageDigest.getInstance("SHA-256")
+                .digest(raw.toByteArray())
+                .joinToString("") { "%02x".format(it) }
         }
     }
 

@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.rochiee.classsync.bloc.sync.SyncState
 import com.rochiee.classsync.bloc.task.TaskEvent
 import com.rochiee.classsync.bloc.task.TaskState
+import com.rochiee.classsync.security.LinkSafety
 import com.rochiee.classsync.ui.components.CourseChip
 import com.rochiee.classsync.ui.components.DeadlineChip
 import com.rochiee.classsync.ui.components.DeadlineText
@@ -393,6 +394,7 @@ fun TasksScreen(
                             style = MaterialTheme.typography.bodySmall,
                             color = taskMutedText
                         )
+                        val safeSourceLink = task.sourceLink?.takeIf(LinkSafety::isSafeTaskSourceLink)
                         ResponsiveFlowRow(maxItemsInEachRow = 2) {
                             LiquidGlassTextButton(
                                 text = if (task.isCompleted) "Undo completion" else "Complete task",
@@ -413,11 +415,11 @@ fun TasksScreen(
                                     if (task.isCompleted) {
                                         onTaskEvent(TaskEvent.DeleteTask(task))
                                     } else {
-                                        task.sourceLink?.takeIf { it.isNotBlank() }?.let(uriHandler::openUri)
+                                        safeSourceLink?.let(uriHandler::openUri)
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                enabled = if (task.isCompleted) true else !task.sourceLink.isNullOrBlank()
+                                enabled = if (task.isCompleted) true else safeSourceLink != null
                             )
                         }
                     }

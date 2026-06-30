@@ -3,6 +3,7 @@ package com.rochiee.classsync.eventengine
 import com.rochiee.classsync.domain.model.AcademicTask
 import com.rochiee.classsync.domain.model.ClassroomEvent
 import com.rochiee.classsync.domain.model.ClassroomEventType
+import com.rochiee.classsync.security.LinkSafety
 
 class EventToTaskConverter {
     fun convert(event: ClassroomEvent): AcademicTask? {
@@ -17,7 +18,7 @@ class EventToTaskConverter {
             priority = event.priority.score,
             source = event.source.name.lowercase().replaceFirstChar { it.uppercase() },
             sourceId = event.sourceId ?: event.id,
-            sourceLink = event.originalLink,
+            sourceLink = LinkSafety.normalizeHttpsUrl(event.originalLink),
             createdAtMillis = event.createdAtMillis,
             updatedAtMillis = event.updatedAtMillis
         )

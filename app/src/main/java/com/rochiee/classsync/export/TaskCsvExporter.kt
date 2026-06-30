@@ -28,6 +28,18 @@ class TaskCsvExporter {
     }
 
     private fun escape(value: String): String {
-        return "\"${value.replace("\"", "\"\"")}\""
+        val sanitized = sanitizeForSpreadsheetFormula(value)
+        return "\"${sanitized.replace("\"", "\"\"")}\""
+    }
+
+    private fun sanitizeForSpreadsheetFormula(value: String): String {
+        val trimmedLeading = value.trimStart()
+        val isDangerous = trimmedLeading.startsWith("=") ||
+            trimmedLeading.startsWith("+") ||
+            trimmedLeading.startsWith("-") ||
+            trimmedLeading.startsWith("@") ||
+            value.startsWith("\t") ||
+            value.startsWith("\r")
+        return if (isDangerous) "'$value" else value
     }
 }
