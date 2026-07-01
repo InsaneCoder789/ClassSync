@@ -57,6 +57,21 @@
             android:textStyle="bold" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/widgetStatusPill"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/widget_pill_surface_dark"
+        android:paddingStart="10dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="5dp"
+        android:text="Overdue 0"
+        android:textColor="#A8CCB6"
+        android:textSize="9sp"
+        android:textStyle="bold" />
+
     <LinearLayout
         android:id="@+id/widgetStatsRow"
         android:layout_width="match_parent"
@@ -69,7 +84,7 @@
             android:id="@+id/widgetTodayCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="1"
             android:background="@drawable/widget_panel_surface"
             android:orientation="vertical"
@@ -81,14 +96,14 @@
                 android:layout_height="wrap_content"
                 android:text="Today"
                 android:textColor="#667085"
-                android:textSize="10sp"
+                android:textSize="9sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widgetTodayCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 android:text="0"
                 android:textColor="#121723"
                 android:textSize="18sp"
@@ -99,8 +114,7 @@
             android:id="@+id/widgetUrgentCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
+            android:layout_marginStart="6dp"
             android:layout_weight="1"
             android:background="@drawable/widget_panel_surface"
             android:orientation="vertical"
@@ -112,44 +126,14 @@
                 android:layout_height="wrap_content"
                 android:text="Urgent"
                 android:textColor="#667085"
-                android:textSize="10sp"
+                android:textSize="9sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widgetUrgentCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="0"
-                android:textColor="#121723"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/widgetOverdueCard"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
-            android:background="@drawable/widget_panel_surface"
-            android:orientation="vertical"
-            android:padding="12dp">
-
-            <TextView
-                android:id="@+id/widgetOverdueLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Overdue"
-                android:textColor="#667085"
-                android:textSize="10sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/widgetOverdueCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 android:text="0"
                 android:textColor="#121723"
                 android:textSize="18sp"
@@ -178,7 +162,7 @@
                 android:layout_height="wrap_content"
                 android:text="Primary focus"
                 android:textColor="#6B7280"
-                android:textSize="10sp"
+                android:textSize="9sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -189,7 +173,7 @@
                 android:gravity="end"
                 android:text="No due time"
                 android:textColor="#4A5568"
-                android:textSize="10sp"
+                android:textSize="9sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -202,7 +186,7 @@
             android:maxLines="2"
             android:text="No academic tasks yet"
             android:textColor="#101828"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView

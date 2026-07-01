@@ -52,11 +52,21 @@ object ClassSyncWidgetUpdater {
             val rootSurface = if (isDark) R.drawable.widget_root_surface_dark else R.drawable.widget_root_surface
             val neutralCardSurface = if (isDark) R.drawable.widget_panel_surface_dark else R.drawable.widget_panel_surface
             val widgetOptions = appWidgetManager.getAppWidgetOptions(widgetId)
+            val widgetWidthDp = widgetOptions.getInt(
+                AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,
+                widgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 180)
+            )
             val widgetHeightDp = widgetOptions.getInt(
                 AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT,
-                widgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 180)
+                widgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 140)
             )
-            val contentCardHeightDp = ((widgetHeightDp - 104) * 0.58f).roundToInt().coerceIn(118, 164)
+            val isWideWidget = widgetWidthDp >= 250
+            val isTallWidget = widgetHeightDp >= 210
+            val contentCardHeightDp = if (isWideWidget) {
+                ((widgetHeightDp - 94) * 0.72f).roundToInt().coerceIn(120, 220)
+            } else {
+                ((widgetHeightDp - 96) * 0.68f).roundToInt().coerceIn(116, 208)
+            }
             val views = RemoteViews(context.packageName, R.layout.classsync_widget_layout).apply {
                 setInt(R.id.widgetRoot, "setBackgroundResource", rootSurface)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -66,6 +76,8 @@ object ClassSyncWidgetUpdater {
                         TypedValue.COMPLEX_UNIT_DIP
                     )
                 }
+                setInt(R.id.widgetNextTaskTitle, "setMaxLines", if (isTallWidget) 3 else 2)
+                setInt(R.id.widgetNextTaskCourse, "setMaxLines", if (isTallWidget) 2 else 1)
                 setImageViewResource(R.id.widgetLogo, R.mipmap.ic_launcher)
                 setTextViewText(R.id.widgetTitle, "ClassSync")
                 setTextViewText(
@@ -75,14 +87,12 @@ object ClassSyncWidgetUpdater {
                 setTextViewText(R.id.widgetUpdatedText, formatter.updatedText(summary.updatedAtMillis))
                 setTextViewText(R.id.widgetTodayLabel, "Today")
                 setTextViewText(R.id.widgetUrgentLabel, "Urgent")
-                setTextViewText(R.id.widgetOverdueLabel, "Overdue")
+                setTextViewText(R.id.widgetStatusPill, "Overdue ${summary.overdueTaskCount}")
                 setTextViewText(R.id.widgetNextTaskLabel, "Primary focus")
                 setInt(R.id.widgetTodayCard, "setBackgroundResource", neutralCardSurface)
                 setInt(R.id.widgetUrgentCard, "setBackgroundResource", neutralCardSurface)
-                setInt(R.id.widgetOverdueCard, "setBackgroundResource", neutralCardSurface)
                 setTextViewText(R.id.widgetTodayCount, "${summary.todayTaskCount}")
                 setTextViewText(R.id.widgetUrgentCount, "${summary.urgentTaskCount}")
-                setTextViewText(R.id.widgetOverdueCount, "${summary.overdueTaskCount}")
                 setTextViewText(
                     R.id.widgetNextTaskTitle,
                     summary.primaryTaskTitle ?: "No academic tasks yet"
@@ -131,12 +141,18 @@ object ClassSyncWidgetUpdater {
                 setTextColor(R.id.widgetTitle, primaryText)
                 setTextColor(R.id.widgetSummaryText, secondaryText)
                 setTextColor(R.id.widgetUpdatedText, secondaryText)
+                setTextColor(
+                    R.id.widgetStatusPill,
+                    if (summary.overdueTaskCount > 0) {
+                        if (isDark) 0xFFF0B9B9.toInt() else 0xFF9B5555.toInt()
+                    } else {
+                        if (isDark) 0xFF9DBAA7.toInt() else 0xFF5C7263.toInt()
+                    }
+                )
                 setTextColor(R.id.widgetTodayLabel, secondaryText)
                 setTextColor(R.id.widgetTodayCount, primaryText)
                 setTextColor(R.id.widgetUrgentLabel, secondaryText)
                 setTextColor(R.id.widgetUrgentCount, primaryText)
-                setTextColor(R.id.widgetOverdueLabel, secondaryText)
-                setTextColor(R.id.widgetOverdueCount, primaryText)
                 setTextColor(R.id.widgetNextTaskLabel, mutedAccentText)
                 setTextColor(R.id.widgetNextTaskTitle, accentText)
                 setTextColor(R.id.widgetNextTaskCourse, mutedAccentText)

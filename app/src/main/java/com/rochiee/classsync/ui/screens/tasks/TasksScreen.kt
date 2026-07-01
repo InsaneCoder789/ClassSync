@@ -183,7 +183,11 @@ fun TasksScreen(
                     )
                 }
                 Text(
-                    text = "Assignments, reminders, and your own manual reference tasks live together here.",
+                    text = "Assignments, reminders, and manual planning all live on one surface.",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                Text(
+                    text = "Keep synced coursework, self-created tasks, and safe redirect links in the same operational queue.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -222,7 +226,8 @@ fun TasksScreen(
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    selected = showComposer
+                    selected = showComposer,
+                    showArrow = !showComposer
                 )
                 if (completedTasks.isNotEmpty()) {
                     LiquidGlassTextButton(
@@ -238,8 +243,9 @@ fun TasksScreen(
             item {
                 TintedPanel {
                     Text(
-                        text = "New task details",
-                        style = MaterialTheme.typography.titleMedium
+                        text = "New task details".uppercase(),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
                     )
                     OutlinedTextField(
                         value = title,
@@ -341,10 +347,10 @@ fun TasksScreen(
             Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
                 Text(
                     text = "Your tasks",
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
-                    text = "The newest and most urgent work stays closest to the top.",
+                    text = "The newest and most urgent work stays closest to the top, with completed items drifting to the end of the stack.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -367,7 +373,7 @@ fun TasksScreen(
                     ) {
                         Text(
                             text = displayTitle,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleLarge,
                             color = taskPrimaryText
                         )
                         ResponsiveFlowRow(maxItemsInEachRow = 2) {
@@ -419,7 +425,8 @@ fun TasksScreen(
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                enabled = if (task.isCompleted) true else safeSourceLink != null
+                                enabled = if (task.isCompleted) true else safeSourceLink != null,
+                                showArrow = !task.isCompleted && safeSourceLink != null
                             )
                         }
                     }
@@ -450,7 +457,7 @@ private fun TaskStatCard(
             )
             Text(
                 text = value,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineLarge,
                 maxLines = 1
             )
             Text(

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.rochiee.classsync.ClassSyncApplication
+import com.rochiee.classsync.domain.sync.SyncRetryPolicy
 import com.rochiee.classsync.domain.model.SyncLog
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -57,7 +58,7 @@ class FullSyncWorker(
                     timestamp = System.currentTimeMillis()
                 )
             )
-            if (runAttemptCount < 3) {
+            if (SyncRetryPolicy.shouldRetryInBackground(e) || runAttemptCount < 3) {
                 Result.retry()
             } else {
                 Result.failure()

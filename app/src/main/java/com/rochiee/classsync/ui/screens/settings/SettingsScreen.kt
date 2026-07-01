@@ -89,6 +89,10 @@ fun SettingsScreen(
                     compact = true
                 )
                 Text(
+                    text = "Tune the system once, then let the app stay out of your way.",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                Text(
                     text = "Adjust what stays connected, what gets refreshed, and how ClassSync reminds you before urgent work slips.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -187,25 +191,29 @@ fun SettingsScreen(
                         text = if (syncState.isSyncing) "Syncing..." else "Refresh classroom",
                         onClick = { onSyncEvent(SyncEvent.RunClassroomSync) },
                         modifier = Modifier.widthIn(min = 148.dp),
-                        enabled = authState.isSignedIn && settingsState.classroomSyncEnabled && !syncState.isSyncing
+                        enabled = authState.isSignedIn && settingsState.classroomSyncEnabled && !syncState.isSyncing,
+                        showArrow = true
                     )
                     LiquidGlassTextButton(
                         text = if (syncState.isSyncing) "Syncing..." else "Refresh Gmail",
                         onClick = { onSyncEvent(SyncEvent.RunGmailSync) },
                         modifier = Modifier.widthIn(min = 148.dp),
-                        enabled = authState.isSignedIn && settingsState.gmailSyncEnabled && !syncState.isSyncing
+                        enabled = authState.isSignedIn && settingsState.gmailSyncEnabled && !syncState.isSyncing,
+                        showArrow = true
                     )
                     LiquidGlassTextButton(
                         text = if (syncState.isSyncing) "Syncing..." else "Run full refresh",
                         onClick = { onSyncEvent(SyncEvent.RunManualFullSync) },
                         modifier = Modifier.widthIn(min = 148.dp),
-                        enabled = authState.isSignedIn && !syncState.isSyncing
+                        enabled = authState.isSignedIn && !syncState.isSyncing,
+                        showArrow = true
                     )
                     if (!authState.isSignedIn) {
                         LiquidGlassTextButton(
                             text = "Connect Google",
                             onClick = onNavigateToAuth,
-                            modifier = Modifier.widthIn(min = 148.dp)
+                            modifier = Modifier.widthIn(min = 148.dp),
+                            showArrow = true
                         )
                     }
                 }
@@ -319,7 +327,8 @@ fun SettingsScreen(
                 LiquidGlassTextButton(
                     text = "Open debug tools",
                     onClick = onNavigateToDebug,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    showArrow = true
                 )
             }
         } }

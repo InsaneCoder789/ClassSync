@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,6 +24,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -50,25 +54,25 @@ fun progressWidgetColors(
 ): ProgressWidgetColors {
     return if (darkMode) {
         ProgressWidgetColors(
-            surfaceTop = Color(0xFF11141A),
-            surfaceBottom = Color(0xFF090B10),
+            surfaceTop = Color(0xFF050505),
+            surfaceBottom = Color(0xFF000000),
             border = SilverBorder.copy(alpha = 0.42f),
             title = Color(0xFFF7F8FC),
             body = Color(0xFFE7EBF7),
             muted = Color(0xFF99A2B5),
-            track = Color(0xFF202636),
-            progressAccent = Color(0xFF89A7FF)
+            track = Color(0xFF181818),
+            progressAccent = MaterialTheme.colorScheme.primary
         )
     } else {
         ProgressWidgetColors(
-            surfaceTop = Color(0xFFF8FAFD),
-            surfaceBottom = Color(0xFFEDEFF5),
+            surfaceTop = Color(0xFFFFFFFF),
+            surfaceBottom = Color(0xFFF7F7F3),
             border = SilverBorderSoft,
             title = Color(0xFF101828),
             body = Color(0xFF1F2937),
             muted = Color(0xFF667085),
-            track = Color(0xFFDCE3F0),
-            progressAccent = Color(0xFF527AE1)
+            track = Color(0xFFE7E7E1),
+            progressAccent = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -107,7 +111,7 @@ fun ClassSyncProgressWidget(
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
                 text = "Progress pulse",
@@ -121,6 +125,26 @@ fun ClassSyncProgressWidget(
                 colors = colors,
                 modifier = Modifier.size(176.dp)
             )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                PulseStatPill(
+                    label = "Done",
+                    value = completedTasks.toString(),
+                    colors = colors
+                )
+                PulseStatPill(
+                    label = "Active",
+                    value = tasksLeft.toString(),
+                    colors = colors
+                )
+                PulseStatPill(
+                    label = "Total",
+                    value = stableTotal.toString(),
+                    colors = colors
+                )
+            }
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -138,7 +162,7 @@ fun ClassSyncProgressWidget(
                     text = if (tasksLeft == 0) {
                         "Everything is wrapped right now."
                     } else {
-                        "$tasksLeft task${if (tasksLeft == 1) "" else "s"} still active"
+                        "$tasksLeft task${if (tasksLeft == 1) "" else "s"} still in motion"
                     },
                     color = colors.body,
                     style = MaterialTheme.typography.titleMedium,
@@ -158,21 +182,44 @@ fun ClassSyncProgressWidget(
             Column(
                 modifier = Modifier.fillMaxWidth(0.9f),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = "Completion rhythm",
-                    color = colors.body,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                ProgressSparkline(
-                    progressPercent = boundedPercent,
-                    colors = colors,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Completion rhythm",
+                        color = colors.body,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "${boundedPercent.coerceAtLeast(1)}% pace",
+                        color = colors.muted,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(30.dp)
+                        .height(42.dp)
+                        .background(
+                            color = colors.track.copy(alpha = 0.4f),
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .border(1.dp, colors.border.copy(alpha = 0.65f), RoundedCornerShape(20.dp))
+                        .padding(horizontal = 12.dp, vertical = 7.dp)
                 )
+                {
+                    ProgressSparkline(
+                        progressPercent = boundedPercent,
+                        colors = colors,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(28.dp)
+                    )
+                }
             }
         }
     }
@@ -189,7 +236,7 @@ private fun HeroPieChart(
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.matchParentSize()) {
-            val strokeWidth = 14.dp.toPx()
+            val strokeWidth = 15.dp.toPx()
             val drawSize = size.minDimension - strokeWidth
             val topLeft = Offset(strokeWidth / 2f, strokeWidth / 2f)
 
@@ -206,6 +253,12 @@ private fun HeroPieChart(
                 center = center
             )
 
+            drawCircle(
+                color = colors.surfaceTop.copy(alpha = 0.95f),
+                radius = size.minDimension * 0.30f,
+                center = center
+            )
+
             drawArc(
                 color = colors.track,
                 startAngle = 0f,
@@ -213,7 +266,10 @@ private fun HeroPieChart(
                 useCenter = false,
                 topLeft = topLeft,
                 size = Size(drawSize, drawSize),
-                style = Stroke(width = strokeWidth)
+                style = Stroke(
+                    width = strokeWidth,
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 8f), 0f)
+                )
             )
 
             drawArc(
@@ -275,5 +331,36 @@ private fun ProgressSparkline(
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(barWidth / 2f, barWidth / 2f)
             )
         }
+    }
+}
+
+@Composable
+private fun PulseStatPill(
+    label: String,
+    value: String,
+    colors: ProgressWidgetColors
+) {
+    Column(
+        modifier = Modifier
+            .background(
+                color = colors.track.copy(alpha = 0.6f),
+                shape = RoundedCornerShape(18.dp)
+            )
+            .border(1.dp, colors.border.copy(alpha = 0.7f), RoundedCornerShape(18.dp))
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(
+            text = value,
+            color = colors.title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+        Text(
+            text = label,
+            color = colors.muted,
+            style = MaterialTheme.typography.labelSmall
+        )
     }
 }

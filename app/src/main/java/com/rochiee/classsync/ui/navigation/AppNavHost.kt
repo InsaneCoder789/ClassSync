@@ -3,15 +3,18 @@ package com.rochiee.classsync.ui.navigation
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -26,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -136,11 +140,24 @@ fun AppNavHost(
         topBar = {
             if (showTopBar) {
                 TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.92f),
+                        scrolledContainerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.98f),
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                    ),
                     title = {
                         if (isHomeRoute) {
-                            AppLogoLockup(subtitle = "Everything in sync")
+                            AppLogoLockup(subtitle = "Academic control deck")
                         } else {
-                            Text(text = titleForRoute(currentRoute))
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                Text(
+                                    text = titleForRoute(currentRoute).uppercase(),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(text = titleForRoute(currentRoute), style = MaterialTheme.typography.titleLarge)
+                            }
                         }
                     },
                     navigationIcon = if (isHomeRoute) {
@@ -177,43 +194,27 @@ fun AppNavHost(
                     modifier = Modifier
                         .fillMaxWidth()
                         .navigationBarsPadding()
-                        .padding(horizontal = 18.dp, vertical = 12.dp)
+                        .padding(horizontal = 18.dp, vertical = 18.dp)
                 ) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
-                        shape = RoundedCornerShape(28.dp),
-                        shadowElevation = 18.dp,
-                        tonalElevation = 10.dp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
-                                shape = RoundedCornerShape(28.dp)
-                            )
+                    Row(
+                        modifier = Modifier.align(androidx.compose.ui.Alignment.Center),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp, vertical = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            AppDestination.bottomBarDestinations.forEach { destination ->
-                                val selected = backStackEntry?.destination?.hierarchy?.any { it.route == destination.route } == true
-                                FloatingNavItem(
-                                    label = destination.label,
-                                    icon = iconForDestination(destination),
-                                    selected = selected,
-                                    modifier = Modifier.weight(1f),
-                                    onClick = {
-                                        navController.navigate(destination.route) {
-                                            popUpTo(AppDestination.Home.route) { saveState = true }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
+                        AppDestination.bottomBarDestinations.forEach { destination ->
+                            val selected = backStackEntry?.destination?.hierarchy?.any { it.route == destination.route } == true
+                            GlassNavItem(
+                                label = destination.label,
+                                icon = iconForDestination(destination),
+                                selected = selected,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    navController.navigate(destination.route) {
+                                        popUpTo(AppDestination.Home.route) { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                )
-                            }
+                                }
+                            )
                         }
                     }
                 }
@@ -346,7 +347,7 @@ fun AppNavHost(
 }
 
 @Composable
-private fun FloatingNavItem(
+private fun GlassNavItem(
     label: String,
     icon: ImageVector,
     selected: Boolean,
@@ -356,25 +357,34 @@ private fun FloatingNavItem(
     Surface(
         onClick = onClick,
         modifier = modifier,
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(28.dp),
         color = if (selected) {
-            MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
         } else {
             Color.Transparent
-        }
+        },
+        shadowElevation = if (selected) 4.dp else 0.dp,
+        tonalElevation = 0.dp,
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            color = if (selected) {
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
+            } else {
+                Color.Transparent
+            }
+        )
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                .widthIn(min = 68.dp)
+                .padding(horizontal = 18.dp, vertical = 16.dp),
+            contentAlignment = androidx.compose.ui.Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = label,
-                tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(22.dp)
+                tint = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(28.dp)
             )
         }
     }

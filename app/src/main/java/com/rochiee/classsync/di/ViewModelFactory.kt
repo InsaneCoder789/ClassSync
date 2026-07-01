@@ -47,7 +47,8 @@ class ViewModelFactory(
                     container.clearSyncLogsUseCase,
                     container.syncGmailTasksUseCase,
                     container.syncClassroomCoursesUseCase,
-                    container.syncClassroomCourseworkUseCase
+                    container.syncClassroomCourseworkUseCase,
+                    container.runOneTimeFullSyncUseCase
                 ) as T
             }
             modelClass.isAssignableFrom(SettingsBlocViewModel::class.java) -> {

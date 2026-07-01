@@ -2,39 +2,50 @@ package com.rochiee.classsync.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 
 private val ColorWhite = Color(0xFFFFFFFF)
 
 private val LightColorScheme = lightColorScheme(
     primary = SkyBlue,
-    onPrimary = Mist,
-    secondary = NightAccent,
+    onPrimary = ColorWhite,
+    secondary = Sun,
     tertiary = Sun,
-    background = Mist,
+    background = ColorWhite,
     onBackground = Ink,
     surface = ColorWhite,
     onSurface = Ink,
-    surfaceVariant = SurfaceBlue,
-    onSurfaceVariant = Ink,
+    surfaceVariant = Color(0xFFF5F5F2),
+    onSurfaceVariant = Color(0xFF666055),
     error = Negative
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = NightAccent,
-    secondary = SilverBorder,
+    primary = MintGreen,
+    onPrimary = Ink,
+    secondary = NightAccent,
     tertiary = Sun,
-    background = Ink,
+    background = Color(0xFF000000),
     onBackground = Mist,
-    surface = NightSurface,
+    surface = Color(0xFF000000),
     onSurface = Mist,
-    surfaceVariant = NightElevated,
-    onSurfaceVariant = Mist,
+    surfaceVariant = Color(0xFF0D0D0D),
+    onSurfaceVariant = Color(0xFFB4B8B0),
     error = Coral
+)
+
+private val ClassSyncShapes = Shapes(
+    extraSmall = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+    small = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
+    medium = androidx.compose.foundation.shape.RoundedCornerShape(28.dp),
+    large = androidx.compose.foundation.shape.RoundedCornerShape(32.dp),
+    extraLarge = androidx.compose.foundation.shape.RoundedCornerShape(38.dp)
 )
 
 @Immutable
@@ -60,6 +71,7 @@ fun ClassSyncTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
+            shapes = ClassSyncShapes,
             content = content
         )
     }

@@ -111,15 +111,20 @@ fun HomeScreen(
             TintedPanel {
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
                     Text(
-                        text = "Today at a glance",
-                        style = MaterialTheme.typography.headlineSmall,
+                        text = "LIVE OVERVIEW",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "Your academic day, arranged by urgency.",
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
                         text = if (authState.isSignedIn) {
-                            "Signed in as ${authState.userEmail ?: authState.displayName ?: "student"}"
+                            "Signed in as ${authState.userEmail ?: authState.displayName ?: "student"} and ready to capture changes across Classroom, tasks, and upcoming assessments."
                         } else {
-                            "Connect Google from settings to unlock live Classroom timelines."
+                            "Connect Google from settings to unlock live Classroom timelines and richer course context."
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -158,8 +163,8 @@ fun HomeScreen(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                 Text(
-                    text = "Now in motion",
-                    style = MaterialTheme.typography.titleMedium,
+                    text = "Now in motion".uppercase(),
+                    style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 ScheduleFeatureCard(
@@ -173,8 +178,8 @@ fun HomeScreen(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                 Text(
-                    text = "Coming up next",
-                    style = MaterialTheme.typography.titleMedium,
+                    text = "Coming up next".uppercase(),
+                    style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 if (upcomingTasks.isEmpty()) {
@@ -198,8 +203,9 @@ fun HomeScreen(
             TintedPanel {
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
                     Text(
-                        text = "Daily digest preview",
-                        style = MaterialTheme.typography.titleMedium
+                        text = "Daily digest preview".uppercase(),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = "A quick local summary of what matters after your immediate queue and before the next sync cycle lands.",
@@ -253,8 +259,9 @@ fun HomeScreen(
             TintedPanel {
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                     Text(
-                        text = "Operations",
-                        style = MaterialTheme.typography.titleMedium
+                        text = "Operations".uppercase(),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = "Last sync ${syncState.lastSyncMillis.formatDateTime()} • ${eventState.recentEvents.size} recent changes captured locally",
@@ -277,15 +284,16 @@ fun HomeScreen(
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
-                    LiquidGlassTextButton(text = "Activity log", onClick = onNavigateToActivity, modifier = Modifier.weight(1f))
-                    LiquidGlassTextButton(text = "Study planner", onClick = onNavigateToStudyPlanner, modifier = Modifier.weight(1f))
+                    LiquidGlassTextButton(text = "Activity log", onClick = onNavigateToActivity, modifier = Modifier.weight(1f), showArrow = true)
+                    LiquidGlassTextButton(text = "Study planner", onClick = onNavigateToStudyPlanner, modifier = Modifier.weight(1f), showArrow = true)
                 }
-                LiquidGlassTextButton(text = "Exam focus mode", onClick = onNavigateToExamMode, modifier = Modifier.fillMaxWidth())
+                LiquidGlassTextButton(text = "Exam focus mode", onClick = onNavigateToExamMode, modifier = Modifier.fillMaxWidth(), showArrow = true)
                 if (!authState.isSignedIn) {
                     LiquidGlassTextButton(
                         text = "Connect Google account",
                         onClick = onNavigateToAuth,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        showArrow = true
                     )
                 }
             }
@@ -380,7 +388,8 @@ private fun ScheduleCompactCard(task: AcademicTask) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         text = task.courseName,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.labelLarge,
+                        color = tone.color
                     )
                     Text(
                         text = task.title,

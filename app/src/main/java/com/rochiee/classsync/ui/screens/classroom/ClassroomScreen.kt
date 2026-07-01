@@ -96,8 +96,9 @@ fun ClassroomScreen(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
                 Text(
-                    text = if (selectedSection == null) "Timetable" else selectedSection.sectionId,
-                    style = MaterialTheme.typography.headlineSmall,
+                    text = if (selectedSection == null) "TIMETABLE" else selectedSection.sectionId,
+                    style = if (selectedSection == null) MaterialTheme.typography.labelLarge else MaterialTheme.typography.headlineSmall,
+                    color = if (selectedSection == null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
@@ -152,11 +153,11 @@ private fun SemesterSelectionStep(
     catalogState: ClassroomScreenState,
     onSelectSemester: (Int) -> Unit
 ) {
-    TintedPanel {
-        Text(
-            text = "Choose your semester",
-            style = MaterialTheme.typography.titleMedium
-        )
+        TintedPanel {
+            Text(
+                text = "Choose your semester",
+                style = MaterialTheme.typography.headlineSmall
+            )
         Text(
             text = "The current XLS provides 4th semester data. Other semesters are already wired for future data drops.",
             style = MaterialTheme.typography.bodySmall,
@@ -216,7 +217,7 @@ private fun SectionSelectionStep(
             TintedPanel {
                 Text(
                     text = "Select your section",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
                     text = "Semester $semester has ${sections.size} sections available from the imported XLS.",
@@ -439,7 +440,8 @@ private fun SelectionCard(
             LiquidGlassTextButton(
                 text = "Open",
                 onClick = onClick,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                showArrow = true
             )
         }
     }

@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.rochiee.classsync.domain.usecase.classroom.SyncClassroomCoursesUseCase
 import com.rochiee.classsync.domain.usecase.classroom.SyncClassroomCourseworkUseCase
 import com.rochiee.classsync.domain.usecase.gmail.SyncGmailTasksUseCase
+import com.rochiee.classsync.domain.sync.SyncRetryPolicy
 import com.rochiee.classsync.domain.usecase.synclog.ClearSyncLogsUseCase
 import com.rochiee.classsync.domain.usecase.synclog.ObserveSyncLogsUseCase
+import com.rochiee.classsync.domain.usecase.worker.RunOneTimeFullSyncUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +23,8 @@ class SyncBlocViewModel(
     private val clearSyncLogsUseCase: ClearSyncLogsUseCase,
     private val syncGmailTasksUseCase: SyncGmailTasksUseCase,
     private val syncClassroomCoursesUseCase: SyncClassroomCoursesUseCase,
-    private val syncClassroomCourseworkUseCase: SyncClassroomCourseworkUseCase
+    private val syncClassroomCourseworkUseCase: SyncClassroomCourseworkUseCase,
+    private val runOneTimeFullSyncUseCase: RunOneTimeFullSyncUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncState())
@@ -63,24 +66,38 @@ class SyncBlocViewModel(
         _state.update { it.copy(isSyncing = true, errorMessage = null) }
         viewModelScope.launch {
             val failures = mutableListOf<String>()
+            var shouldRetryInBackground = false
 
             runCatching {
                 syncClassroomCoursesUseCase()
                 syncClassroomCourseworkUseCase()
             }.onFailure { error ->
+                shouldRetryInBackground = shouldRetryInBackground || SyncRetryPolicy.shouldRetryInBackground(error)
                 failures += error.message ?: "Classroom sync failed."
             }
 
             runCatching {
                 syncGmailTasksUseCase()
             }.onFailure { error ->
+                shouldRetryInBackground = shouldRetryInBackground || SyncRetryPolicy.shouldRetryInBackground(error)
                 failures += error.message ?: "Gmail sync failed."
             }
 
+            if (shouldRetryInBackground) {
+                runOneTimeFullSyncUseCase()
+            }
+
             _state.update {
+                val combinedMessage = failures
+                    .takeIf { messages -> messages.isNotEmpty() }
+                    ?.joinToString("\n\n")
                 it.copy(
                     isSyncing = false,
-                    errorMessage = failures.takeIf { messages -> messages.isNotEmpty() }?.joinToString("\n\n")
+                    errorMessage = if (shouldRetryInBackground && combinedMessage != null) {
+                        SyncRetryPolicy.backgroundRetryMessage(combinedMessage)
+                    } else {
+                        combinedMessage
+                    }
                 )
             }
         }
@@ -98,7 +115,12 @@ class SyncBlocViewModel(
                 syncGmailTasksUseCase()
                 _state.update { it.copy(isSyncing = false) }
             } catch (error: Exception) {
-                _state.update { it.copy(isSyncing = false, errorMessage = error.message) }
+                _state.update {
+                    it.copy(
+                        isSyncing = false,
+                        errorMessage = formatErrorMessage(error, "Gmail sync failed.")
+                    )
+                }
             }
         }
     }
@@ -111,8 +133,23 @@ class SyncBlocViewModel(
                 syncClassroomCourseworkUseCase()
                 _state.update { it.copy(isSyncing = false) }
             } catch (error: Exception) {
-                _state.update { it.copy(isSyncing = false, errorMessage = error.message) }
+                _state.update {
+                    it.copy(
+                        isSyncing = false,
+                        errorMessage = formatErrorMessage(error, "Classroom sync failed.")
+                    )
+                }
             }
+        }
+    }
+
+    private fun formatErrorMessage(error: Exception, fallbackMessage: String): String {
+        val baseMessage = error.message ?: fallbackMessage
+        return if (SyncRetryPolicy.shouldRetryInBackground(error)) {
+            runOneTimeFullSyncUseCase()
+            SyncRetryPolicy.backgroundRetryMessage(baseMessage)
+        } else {
+            baseMessage
         }
     }
 

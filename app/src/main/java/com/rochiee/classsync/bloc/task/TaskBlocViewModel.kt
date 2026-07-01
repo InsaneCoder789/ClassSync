@@ -45,6 +45,7 @@ class TaskBlocViewModel(
 
     private val _state = MutableStateFlow(TaskState())
     val state: StateFlow<TaskState> = _state.asStateFlow()
+    private var hasSeededFakeTasks = false
 
     init {
         onEvent(TaskEvent.LoadTasks)
@@ -95,12 +96,63 @@ class TaskBlocViewModel(
         _state.update { it.copy(isLoading = true) }
         observeTasksUseCase()
             .onEach { tasks ->
+                if (tasks.isEmpty() && !hasSeededFakeTasks) {
+                    hasSeededFakeTasks = true
+                    seedFakeTasks()
+                }
                 _state.update { it.copy(tasks = tasks, isLoading = false) }
             }
             .catch { e ->
                 _state.update { it.copy(error = e.message, isLoading = false) }
             }
             .launchIn(viewModelScope)
+    }
+
+    private fun seedFakeTasks() {
+        val now = System.currentTimeMillis()
+        val fakeTasks = listOf(
+            AcademicTask(
+                title = "Finish Linear Algebra Worksheet 4",
+                description = "Wrap up the last three proof questions and revise eigenvalue shortcuts before class.",
+                courseName = "Linear Algebra",
+                dueDate = now + 6L * 60L * 60L * 1000L,
+                source = "Manual"
+            ),
+            AcademicTask(
+                title = "Prepare Chemistry Lab Summary",
+                description = "Write the observations section and attach the final titration values.",
+                courseName = "Engineering Chemistry",
+                dueDate = now + 24L * 60L * 60L * 1000L,
+                source = "Manual"
+            ),
+            AcademicTask(
+                title = "Read Operating Systems Chapter 5",
+                description = "Focus on process scheduling and note down the preemptive vs non-preemptive examples.",
+                courseName = "Operating Systems",
+                dueDate = now + 2L * 24L * 60L * 60L * 1000L,
+                source = "Manual"
+            ),
+            AcademicTask(
+                title = "Build DBMS ER Diagram Draft",
+                description = "Sketch the entities, primary keys, and relationship cardinalities for the project review.",
+                courseName = "DBMS",
+                dueDate = now + 3L * 24L * 60L * 60L * 1000L,
+                source = "Manual"
+            ),
+            AcademicTask(
+                title = "Practice Aptitude Set A",
+                description = "Solve one timed practice set and mark the weak areas for revision tonight.",
+                courseName = "Placement Prep",
+                dueDate = now + 5L * 24L * 60L * 60L * 1000L,
+                source = "Manual"
+            )
+        )
+
+        viewModelScope.launch {
+            fakeTasks.forEach { task ->
+                addManualTaskUseCase(task)
+            }
+        }
     }
 
     private fun addTaskFromRawText(rawText: String, courseName: String) {

@@ -9,6 +9,7 @@ object WorkScheduler {
     const val GMAIL_SYNC_WORK = "GMAIL_SYNC_WORK"
     const val CLASSROOM_SYNC_WORK = "CLASSROOM_SYNC_WORK"
     const val FULL_SYNC_WORK = "FULL_SYNC_WORK"
+    const val IMMEDIATE_FULL_SYNC_WORK = "IMMEDIATE_FULL_SYNC_WORK"
     const val WIDGET_REFRESH_WORK = "WIDGET_REFRESH_WORK"
     const val DUE_SOON_NOTIFICATION_WORK = "DUE_SOON_NOTIFICATION_WORK"
 
@@ -110,8 +111,13 @@ object WorkScheduler {
 
         val request = OneTimeWorkRequestBuilder<FullSyncWorker>()
             .setConstraints(constraints)
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .build()
 
-        WorkManager.getInstance(context).enqueue(request)
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            IMMEDIATE_FULL_SYNC_WORK,
+            ExistingWorkPolicy.KEEP,
+            request
+        )
     }
 }

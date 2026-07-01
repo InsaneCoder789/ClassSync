@@ -46,6 +46,10 @@ fun AuthScreen(
         TintedPanel {
             AppLogoLockup(subtitle = "Academic sync with clear privacy boundaries")
             Text(
+                text = "Connect the account that already carries your classes.",
+                style = MaterialTheme.typography.headlineMedium
+            )
+            Text(
                 text = if (authState.isOAuthConfigured) {
                     "Connect your Google account to unlock Classroom sync and optional Gmail reminder sync on this device."
                 } else {
@@ -78,13 +82,15 @@ fun AuthScreen(
                     text = if (syncState.isSyncing) "Syncing..." else "Sync Classroom",
                     onClick = { onSyncEvent(SyncEvent.RunClassroomSync) },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = !syncState.isSyncing
+                    enabled = !syncState.isSyncing,
+                    showArrow = true
                 )
                 LiquidGlassTextButton(
                     text = if (syncState.isSyncing) "Syncing..." else "Sync Gmail",
                     onClick = { onSyncEvent(SyncEvent.RunGmailSync) },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = !syncState.isSyncing
+                    enabled = !syncState.isSyncing,
+                    showArrow = true
                 )
                 LiquidGlassTextButton(text = "Sign out", onClick = { onAuthEvent(AuthEvent.SignOut) })
             } else {
@@ -99,7 +105,8 @@ fun AuthScreen(
                         onBeginGoogleSignIn(context)?.let(signInLauncher::launch)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = authState.isOAuthConfigured
+                    enabled = authState.isOAuthConfigured,
+                    showArrow = true
                 )
             }
             authState.errorMessage?.let {

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
@@ -38,9 +39,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.rochiee.classsync.domain.model.AcademicTask
 import com.rochiee.classsync.domain.model.TaskPriority
@@ -68,7 +70,12 @@ fun ScreenSection(
     val spacing = LocalSpacing.current
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(spacing.md)) {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
-            Text(text = title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = title.uppercase(),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(text = title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
             subtitle?.let {
                 Text(text = it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -86,35 +93,44 @@ fun ElevatedInfoCard(
     accent: Color = MaterialTheme.colorScheme.primary
 ) {
     val spacing = LocalSpacing.current
-    Card(
+    val isDarkPalette = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    val cardBrush = if (isDarkPalette) {
+        Brush.verticalGradient(
+            listOf(
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.96f),
+                MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
+            )
+        )
+    } else {
+        Brush.verticalGradient(
+            listOf(
+                MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f)
+            )
+        )
+    }
+    Surface(
         modifier = modifier.height(184.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        shape = RoundedCornerShape(28.dp)
+        shape = RoundedCornerShape(32.dp),
+        color = Color.Transparent,
+        tonalElevation = 0.dp,
+        shadowElevation = if (isDarkPalette) 2.dp else 0.dp,
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            if (isDarkPalette) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f) else SilverBorderSoft
+        )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.88f),
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.68f)
-                        )
-                    ),
-                    shape = RoundedCornerShape(28.dp)
-                )
-                .border(
-                    width = 1.dp,
-                    color = SilverBorderSoft,
-                    shape = RoundedCornerShape(28.dp)
-                )
-                .padding(horizontal = 14.dp, vertical = 14.dp),
+                .background(cardBrush)
+                .padding(horizontal = 18.dp, vertical = 18.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .background(accent.copy(alpha = 0.14f), RoundedCornerShape(16.dp))
-                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                    .background(accent.copy(alpha = 0.14f), RoundedCornerShape(20.dp))
+                    .padding(horizontal = 12.dp, vertical = 7.dp)
             ) {
                 Text(
                     text = title,
@@ -150,13 +166,14 @@ fun StatusChip(label: String, color: Color) {
         label = {
             Text(
                 text = label,
-                color = if (isDarkPalette) Color.White else color
+                color = if (isDarkPalette) MaterialTheme.colorScheme.onSurface else color
             )
         },
         colors = AssistChipDefaults.assistChipColors(
-            disabledContainerColor = if (isDarkPalette) color.copy(alpha = 0.24f) else color.copy(alpha = 0.16f),
-            disabledLabelColor = if (isDarkPalette) Color.White else color
-        )
+            disabledContainerColor = if (isDarkPalette) color.copy(alpha = 0.2f) else color.copy(alpha = 0.14f),
+            disabledLabelColor = if (isDarkPalette) MaterialTheme.colorScheme.onSurface else color
+        ),
+        border = null
     )
 }
 
@@ -254,17 +271,36 @@ fun CourseChip(courseName: String) {
 @Composable
 fun EmptyState(title: String, description: String) {
     val spacing = LocalSpacing.current
-    Card(
-        shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.62f))
+    val isDarkPalette = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    Surface(
+        shape = RoundedCornerShape(32.dp),
+        color = Color.Transparent,
+        tonalElevation = 0.dp,
+        shadowElevation = if (isDarkPalette) 2.dp else 0.dp,
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.onSurface.copy(alpha = if (isDarkPalette) 0.1f else 0.08f)
+        )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
-                    shape = RoundedCornerShape(28.dp)
+                .background(
+                    if (isDarkPalette) {
+                        Brush.verticalGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+                            )
+                        )
+                    } else {
+                        Brush.verticalGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            )
+                        )
+                    }
                 )
                 .padding(spacing.lg),
             verticalArrangement = Arrangement.spacedBy(spacing.sm)
@@ -318,31 +354,37 @@ fun TintedPanel(
     content: @Composable () -> Unit
 ) {
     val spacing = LocalSpacing.current
-    val topColor = accentColor?.copy(alpha = 0.14f) ?: MaterialTheme.colorScheme.surface.copy(alpha = 0.86f)
-    val bottomColor = accentColor?.copy(alpha = 0.08f) ?: MaterialTheme.colorScheme.surface.copy(alpha = 0.68f)
-    val borderColor = accentColor?.copy(alpha = 0.24f) ?: SilverBorderSoft
-    Card(
+    val isDarkPalette = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    val borderColor = accentColor?.copy(alpha = if (isDarkPalette) 0.28f else 0.24f)
+        ?: if (isDarkPalette) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f) else SilverBorderSoft
+    Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+        shape = RoundedCornerShape(32.dp),
+        color = Color.Transparent,
+        tonalElevation = 0.dp,
+        shadowElevation = if (isDarkPalette) 2.dp else 0.dp,
+        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
     ) {
         Column(
             modifier = Modifier
                 .background(
-                    brush = Brush.verticalGradient(
-                        listOf(
-                            topColor,
-                            bottomColor
+                    if (isDarkPalette) {
+                        Brush.verticalGradient(
+                            listOf(
+                                (accentColor ?: MaterialTheme.colorScheme.surfaceVariant).copy(alpha = 0.14f),
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
+                            )
                         )
-                    ),
-                    shape = RoundedCornerShape(28.dp)
+                    } else {
+                        Brush.verticalGradient(
+                            listOf(
+                                (accentColor?.copy(alpha = 0.08f) ?: MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)),
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.68f)
+                            )
+                        )
+                    }
                 )
-                .border(
-                    width = 1.dp,
-                    color = borderColor,
-                    shape = RoundedCornerShape(28.dp)
-                )
-                .padding(horizontal = spacing.md, vertical = spacing.md),
+                .padding(horizontal = 18.dp, vertical = 18.dp),
             verticalArrangement = Arrangement.spacedBy(spacing.md)
         ) {
             content()
@@ -358,20 +400,23 @@ fun LiquidGlassButton(
     selected: Boolean = false,
     content: @Composable RowScope.() -> Unit
 ) {
-    val shape: Shape = RoundedCornerShape(24.dp)
-    val baseColor = if (selected) {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
-    } else {
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.78f)
-    }
+    val shape: Shape = RoundedCornerShape(22.dp)
+    val isDarkPalette = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    val baseColor = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.22f)
+    else if (isDarkPalette) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+    else MaterialTheme.colorScheme.surface.copy(alpha = 0.58f)
     val borderColor = if (selected) {
-        SilverBorder
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
     } else {
-        if (enabled) SilverBorderSoft else SilverBorderSoft.copy(alpha = 0.45f)
+        if (enabled) {
+            if (isDarkPalette) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f) else SilverBorderSoft
+        } else {
+            SilverBorderSoft.copy(alpha = 0.45f)
+        }
     }
     val contentColor = when {
         !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f)
-        selected -> Color.White
+        selected -> MaterialTheme.colorScheme.onPrimary
         else -> MaterialTheme.colorScheme.onSurface
     }
 
@@ -379,23 +424,14 @@ fun LiquidGlassButton(
         modifier = modifier
             .clip(shape)
             .clickable(enabled = enabled, onClick = onClick),
-        color = Color.Transparent,
+        color = baseColor,
         contentColor = contentColor,
         shape = shape
     ) {
         Row(
             modifier = Modifier
-                .background(
-                    brush = Brush.verticalGradient(
-                        listOf(
-                            baseColor.copy(alpha = 0.96f),
-                            baseColor.copy(alpha = 0.82f)
-                        )
-                    ),
-                    shape = shape
-                )
+                .border(1.dp, borderColor, shape)
                 .fillMaxWidth()
-                .border(1.1.dp, borderColor, shape)
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
@@ -419,15 +455,29 @@ fun LiquidGlassTextButton(
         enabled = enabled,
         selected = selected
     ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.titleMedium,
-            color = LocalContentColor.current,
-            maxLines = 1,
-            softWrap = false,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
+                color = LocalContentColor.current,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center
+            )
+            if (showArrow) {
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                    contentDescription = null,
+                    tint = LocalContentColor.current
+                )
+            }
+        }
     }
 }
 
@@ -459,31 +509,40 @@ fun AppLogoLockup(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(if (compact) 10.dp else 12.dp)
+        horizontalArrangement = Arrangement.spacedBy(if (compact) 12.dp else 14.dp)
     ) {
         Box(
             modifier = Modifier
-                .background(Color.White.copy(alpha = 0.3f), RoundedCornerShape(18.dp))
-                .padding(if (compact) 5.dp else 6.dp),
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f)
+                        )
+                    ),
+                    RoundedCornerShape(22.dp)
+                )
+                .border(1.dp, SilverBorderSoft, RoundedCornerShape(22.dp))
+                .padding(if (compact) 7.dp else 8.dp),
             contentAlignment = Alignment.Center
         ) {
             androidx.compose.foundation.Image(
                 painter = androidx.compose.ui.res.painterResource(id = com.rochiee.classsync.R.mipmap.ic_launcher),
                 contentDescription = "ClassSync logo",
-                modifier = Modifier.width(if (compact) 28.dp else 34.dp).height(if (compact) 28.dp else 34.dp)
+                modifier = Modifier.width(if (compact) 30.dp else 36.dp).height(if (compact) 30.dp else 36.dp)
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
                 text = "ClassSync",
-                style = if (compact) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleLarge,
+                style = if (compact) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineSmall,
                 color = titleColor,
                 fontWeight = FontWeight.SemiBold
             )
             subtitle?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = if (compact) 2 else 3,
                     overflow = TextOverflow.Ellipsis
