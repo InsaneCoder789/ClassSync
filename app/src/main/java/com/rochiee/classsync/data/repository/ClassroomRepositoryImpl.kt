@@ -46,4 +46,8 @@ class ClassroomRepositoryImpl(
     override suspend fun getLocalCourseById(courseId: String): CourseEntity? {
         return courseDao.getCourseById(courseId)
     }
+
+    override suspend fun clearLocalCourses() {
+        courseDao.clearCourses()
+    }
 }

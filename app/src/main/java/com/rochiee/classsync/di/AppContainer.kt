@@ -38,6 +38,7 @@ import com.rochiee.classsync.domain.usecase.planner.GetPlannerRangeUseCase
 import com.rochiee.classsync.domain.usecase.planner.GetTodayPlannerUseCase
 import com.rochiee.classsync.domain.usecase.planner.GetWeekPlannerUseCase
 import com.rochiee.classsync.domain.usecase.ai.SummaryUseCase
+import com.rochiee.classsync.domain.usecase.auth.ClearLocalAcademicDataUseCase
 import com.rochiee.classsync.domain.usecase.digest.CancelDailyDigestUseCase
 import com.rochiee.classsync.domain.usecase.digest.GenerateDigestSummaryUseCase
 import com.rochiee.classsync.domain.usecase.digest.PreviewDailyDigestUseCase
@@ -158,6 +159,7 @@ interface AppContainer {
     val addSyncLogUseCase: AddSyncLogUseCase
     val clearSyncLogsUseCase: ClearSyncLogsUseCase
     val googleAuthManager: GoogleAuthManager
+    val clearLocalAcademicDataUseCase: ClearLocalAcademicDataUseCase
     val gmailRepository: GmailRepository
     val syncGmailTasksUseCase: SyncGmailTasksUseCase
     val classroomCatalogRepository: ClassroomCatalogRepository
@@ -520,6 +522,17 @@ class AppContainerImpl(private val context: Context) : AppContainer {
             settingsRepository,
             setLastSyncTimeUseCase,
             refreshWidgetsUseCase
+        )
+    }
+
+    override val clearLocalAcademicDataUseCase: ClearLocalAcademicDataUseCase by lazy {
+        ClearLocalAcademicDataUseCase(
+            taskRepository = taskRepository,
+            classroomEventRepository = classroomEventRepository,
+            classroomRepository = classroomRepository,
+            syncLogRepository = syncLogRepository,
+            settingsRepository = settingsRepository,
+            taskSuppressionStore = taskSuppressionStore
         )
     }
 

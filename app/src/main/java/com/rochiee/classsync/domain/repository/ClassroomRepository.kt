@@ -18,4 +18,5 @@ interface ClassroomRepository {
     suspend fun saveCourses(courses: List<CourseEntity>)
     fun observeLocalCourses(): Flow<List<CourseEntity>>
     suspend fun getLocalCourseById(courseId: String): CourseEntity?
+    suspend fun clearLocalCourses()
 }

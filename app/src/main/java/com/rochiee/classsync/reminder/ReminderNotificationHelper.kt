@@ -51,6 +51,14 @@ object ReminderNotificationHelper {
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setPublicVersion(
+                NotificationCompat.Builder(context, CHANNEL_ID)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle("Task reminder")
+                    .setContentText("Unlock ClassSync to view the reminder details.")
+                    .build()
+            )
             .setAutoCancel(true)
             .build()
 

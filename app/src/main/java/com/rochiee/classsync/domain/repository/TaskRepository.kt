@@ -10,4 +10,5 @@ interface TaskRepository {
     suspend fun updateTask(task: AcademicTask)
     suspend fun deleteTask(task: AcademicTask)
     suspend fun getTaskById(id: Int): AcademicTask?
+    suspend fun clearAllTasks()
 }

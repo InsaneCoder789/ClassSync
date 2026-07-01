@@ -19,6 +19,7 @@ import com.rochiee.classsync.domain.usecase.settings.SetLastAppOpenTimeUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetClassroomPermissionExplainedUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetOnboardingCompletedUseCase
 import com.rochiee.classsync.domain.usecase.settings.SetThemeModeUseCase
+import com.rochiee.classsync.domain.usecase.widget.RefreshWidgetsUseCase
 import com.rochiee.classsync.domain.usecase.worker.CancelBackgroundSyncUseCase
 import com.rochiee.classsync.domain.usecase.worker.ScheduleBackgroundSyncUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +50,8 @@ class SettingsBlocViewModel(
     private val cancelDailyDigestUseCase: CancelDailyDigestUseCase,
     private val previewDailyDigestUseCase: PreviewDailyDigestUseCase,
     private val scheduleBackgroundSyncUseCase: ScheduleBackgroundSyncUseCase,
-    private val cancelBackgroundSyncUseCase: CancelBackgroundSyncUseCase
+    private val cancelBackgroundSyncUseCase: CancelBackgroundSyncUseCase,
+    private val refreshWidgetsUseCase: RefreshWidgetsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsState(isLoading = true))
@@ -73,7 +75,7 @@ class SettingsBlocViewModel(
             is SettingsEvent.SetDigestHourOfDay -> updateDigestHour(event.hour)
             is SettingsEvent.SetDigestIncludeAnnouncements -> updateSetting { setDigestIncludeAnnouncementsUseCase(event.enabled) }
             is SettingsEvent.SetDigestIncludeMaterials -> updateSetting { setDigestIncludeMaterialsUseCase(event.enabled) }
-            is SettingsEvent.SetThemeMode -> updateSetting { setThemeModeUseCase(event.themeMode) }
+            is SettingsEvent.SetThemeMode -> updateThemeMode(event.themeMode)
             is SettingsEvent.SetLastAppOpenTime -> updateSetting { setLastAppOpenTimeUseCase(event.timeMillis) }
             SettingsEvent.PreviewDigest -> previewDigest()
             SettingsEvent.ClearError -> _state.update { it.copy(errorMessage = null) }
@@ -174,6 +176,17 @@ class SettingsBlocViewModel(
                 if (_state.value.digestEnabled) {
                     scheduleDailyDigestUseCase(hour)
                 }
+            } catch (error: Exception) {
+                _state.update { it.copy(errorMessage = error.message) }
+            }
+        }
+    }
+
+    private fun updateThemeMode(themeMode: com.rochiee.classsync.domain.model.ThemeMode) {
+        viewModelScope.launch {
+            try {
+                setThemeModeUseCase(themeMode)
+                refreshWidgetsUseCase()
             } catch (error: Exception) {
                 _state.update { it.copy(errorMessage = error.message) }
             }

@@ -129,8 +129,14 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 Box(modifier = Modifier.fillMaxSize()) {
+                    val sanitizedStartRoute = remember(intent) {
+                        com.rochiee.classsync.ui.navigation.AppDestination.sanitizeExternalStartRoute(
+                            route = intent?.getStringExtra(EXTRA_START_DESTINATION),
+                            allowDebugTools = BuildConfig.DEBUG
+                        )
+                    }
                     AppNavHost(
-                        requestedStartRoute = intent?.getStringExtra(EXTRA_START_DESTINATION),
+                        requestedStartRoute = sanitizedStartRoute,
                         authState = authState,
                         settingsState = settingsState,
                         taskState = taskState,

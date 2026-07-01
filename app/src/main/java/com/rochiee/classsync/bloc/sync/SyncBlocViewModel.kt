@@ -94,7 +94,7 @@ class SyncBlocViewModel(
                 it.copy(
                     isSyncing = false,
                     errorMessage = if (shouldRetryInBackground && combinedMessage != null) {
-                        SyncRetryPolicy.backgroundRetryMessage(combinedMessage)
+                        SyncRetryPolicy.backgroundRetryMessage("Google")
                     } else {
                         combinedMessage
                     }
@@ -147,7 +147,12 @@ class SyncBlocViewModel(
         val baseMessage = error.message ?: fallbackMessage
         return if (SyncRetryPolicy.shouldRetryInBackground(error)) {
             runOneTimeFullSyncUseCase()
-            SyncRetryPolicy.backgroundRetryMessage(baseMessage)
+            val sourceLabel = when {
+                fallbackMessage.contains("gmail", ignoreCase = true) -> "Gmail"
+                fallbackMessage.contains("classroom", ignoreCase = true) -> "Classroom"
+                else -> "Google"
+            }
+            SyncRetryPolicy.backgroundRetryMessage(sourceLabel)
         } else {
             baseMessage
         }

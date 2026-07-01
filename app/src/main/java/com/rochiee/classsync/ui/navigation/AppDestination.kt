@@ -23,5 +23,17 @@ sealed class AppDestination(
 
     companion object {
         val bottomBarDestinations = listOf(Home, Tasks, Planner, Settings)
+
+        fun sanitizeExternalStartRoute(route: String?, allowDebugTools: Boolean): String? {
+            return when (route) {
+                Home.route,
+                Tasks.route,
+                Planner.route,
+                Settings.route,
+                Auth.route -> route
+                Debug.route -> route.takeIf { allowDebugTools }
+                else -> null
+            }
+        }
     }
 }

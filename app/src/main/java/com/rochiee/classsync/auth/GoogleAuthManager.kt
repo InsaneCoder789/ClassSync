@@ -29,7 +29,7 @@ class GoogleAuthManager(private val context: Context) {
     fun beginSignInIntent(activityContext: Context): Intent? {
         if (!isOAuthConfigured()) {
             _authState.value = AuthState.Error(
-                "Google OAuth is not configured yet. Follow /Users/rohanc/AndroidStudioProjects/classsync/docs/GOOGLE_SETUP.md before signing in."
+                "Google OAuth is not configured yet. Complete the Google setup guide for this build before signing in."
             )
             return null
         }
@@ -80,15 +80,17 @@ class GoogleAuthManager(private val context: Context) {
         }
     }
 
-    suspend fun signOut() {
+    suspend fun signOut(): Boolean {
         try {
             withContext(Dispatchers.IO) {
                 Tasks.await(googleSignInClient(context).signOut())
             }
             secureAuthStore.clearSession()
             _authState.value = AuthState.Unauthenticated
+            return true
         } catch (e: Exception) {
             _authState.value = AuthState.Error(e.message ?: "Sign-out failed")
+            return false
         }
     }
 

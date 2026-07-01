@@ -14,4 +14,7 @@ interface CourseDao {
 
     @Query("SELECT * FROM courses WHERE courseId = :courseId")
     suspend fun getCourseById(courseId: String): CourseEntity?
+
+    @Query("DELETE FROM courses")
+    suspend fun clearCourses()
 }

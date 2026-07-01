@@ -50,6 +50,14 @@ object DigestNotificationHelper {
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setPublicVersion(
+                NotificationCompat.Builder(context, CHANNEL_ID)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle("Today's ClassSync Digest")
+                    .setContentText("Unlock ClassSync to view your academic digest.")
+                    .build()
+            )
             .setAutoCancel(true)
             .build()
 

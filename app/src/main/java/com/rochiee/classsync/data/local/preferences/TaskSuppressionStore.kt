@@ -30,6 +30,12 @@ class TaskSuppressionStore(private val context: Context) {
         return keys.any(suppressed::contains)
     }
 
+    suspend fun clear() {
+        context.taskSuppressionDataStore.edit { preferences ->
+            preferences.remove(Keys.suppressedTaskKeys)
+        }
+    }
+
     companion object {
         private const val MAX_KEYS = 800
 

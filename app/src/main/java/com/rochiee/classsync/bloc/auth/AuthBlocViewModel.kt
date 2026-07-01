@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rochiee.classsync.auth.AuthState
 import com.rochiee.classsync.auth.GoogleAuthManager
+import com.rochiee.classsync.domain.usecase.auth.ClearLocalAcademicDataUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +16,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AuthBlocViewModel(
-    private val googleAuthManager: GoogleAuthManager
+    private val googleAuthManager: GoogleAuthManager,
+    private val clearLocalAcademicDataUseCase: ClearLocalAcademicDataUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthUiState())
@@ -65,7 +67,9 @@ class AuthBlocViewModel(
             AuthEvent.CheckAuthState -> googleAuthManager.checkAuthState()
             AuthEvent.SignOut -> {
                 viewModelScope.launch {
-                    googleAuthManager.signOut()
+                    if (googleAuthManager.signOut()) {
+                        clearLocalAcademicDataUseCase()
+                    }
                 }
             }
             AuthEvent.ClearAuthError -> {

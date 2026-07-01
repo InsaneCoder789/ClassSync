@@ -38,7 +38,8 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(AuthBlocViewModel::class.java) -> {
                 AuthBlocViewModel(
-                    container.googleAuthManager
+                    container.googleAuthManager,
+                    container.clearLocalAcademicDataUseCase
                 ) as T
             }
             modelClass.isAssignableFrom(SyncBlocViewModel::class.java) -> {
@@ -71,7 +72,8 @@ class ViewModelFactory(
                     container.cancelDailyDigestUseCase,
                     container.previewDailyDigestUseCase,
                     container.scheduleBackgroundSyncUseCase,
-                    container.cancelBackgroundSyncUseCase
+                    container.cancelBackgroundSyncUseCase,
+                    container.refreshWidgetsUseCase
                 ) as T
             }
             modelClass.isAssignableFrom(EventBlocViewModel::class.java) -> {

@@ -44,6 +44,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.rochiee.classsync.BuildConfig
 import com.rochiee.classsync.bloc.auth.AuthEvent
 import com.rochiee.classsync.bloc.auth.AuthUiState
 import com.rochiee.classsync.bloc.classroom.ClassroomScreenEvent
@@ -282,27 +283,28 @@ fun AppNavHost(
                         syncState = syncState,
                         onSettingsEvent = onSettingsEvent,
                         onSyncEvent = onSyncEvent,
-                        onNavigateToDebug = { navController.navigate(AppDestination.Debug.route) },
                         onNavigateToAuth = { navController.navigate(AppDestination.Auth.route) }
                     )
                 }
-                composable(AppDestination.Debug.route) {
-                    DebugScreen(
-                        authState = authState,
-                        taskState = taskState,
-                        syncState = syncState,
-                        settingsState = settingsState,
-                        eventState = eventState,
-                        plannerState = plannerState,
-                        onBeginGoogleSignIn = onBeginGoogleSignIn,
-                        onCompleteGoogleSignIn = onCompleteGoogleSignIn,
-                        onAuthEvent = onAuthEvent,
-                        onTaskEvent = onTaskEvent,
-                        onSyncEvent = onSyncEvent,
-                        onSettingsEvent = onSettingsEvent,
-                        onEventEvent = onEventEvent,
-                        onPlannerEvent = onPlannerEvent
-                    )
+                if (BuildConfig.DEBUG) {
+                    composable(AppDestination.Debug.route) {
+                        DebugScreen(
+                            authState = authState,
+                            taskState = taskState,
+                            syncState = syncState,
+                            settingsState = settingsState,
+                            eventState = eventState,
+                            plannerState = plannerState,
+                            onBeginGoogleSignIn = onBeginGoogleSignIn,
+                            onCompleteGoogleSignIn = onCompleteGoogleSignIn,
+                            onAuthEvent = onAuthEvent,
+                            onTaskEvent = onTaskEvent,
+                            onSyncEvent = onSyncEvent,
+                            onSettingsEvent = onSettingsEvent,
+                            onEventEvent = onEventEvent,
+                            onPlannerEvent = onPlannerEvent
+                        )
+                    }
                 }
                 composable(AppDestination.Auth.route) {
                     AuthScreen(

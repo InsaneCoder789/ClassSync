@@ -52,7 +52,6 @@ fun SettingsScreen(
     syncState: SyncState,
     onSettingsEvent: (SettingsEvent) -> Unit,
     onSyncEvent: (SyncEvent) -> Unit,
-    onNavigateToDebug: () -> Unit,
     onNavigateToAuth: () -> Unit
 ) {
     val spacing = LocalSpacing.current
@@ -313,25 +312,6 @@ fun SettingsScreen(
             }
         } }
 
-        item { ScreenSection(title = "Advanced", subtitle = "Developer controls live here so the main workflow stays clean.") {
-            TintedPanel {
-                Text(
-                    text = "Debug tools",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = "Use sample data, auth checks, and manual diagnostics from this section only.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                LiquidGlassTextButton(
-                    text = "Open debug tools",
-                    onClick = onNavigateToDebug,
-                    modifier = Modifier.fillMaxWidth(),
-                    showArrow = true
-                )
-            }
-        } }
     }
 }
 

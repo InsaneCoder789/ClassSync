@@ -93,4 +93,12 @@ class TaskRepositoryImpl(
             ?.toAcademicTask()
             ?.takeIf { TaskRecencyPolicy.shouldKeep(it) }
     }
+
+    override suspend fun clearAllTasks() {
+        val existingTasks = dao.getAllTasksSnapshot().map { it.toAcademicTask() }
+        existingTasks.forEach(reminderScheduler::cancel)
+        dao.clearTasks()
+        ClassSyncWidgetUpdater.updateAllWidgets(appContext)
+        DueSoonNotificationHelper.refresh(appContext, emptyList())
+    }
 }

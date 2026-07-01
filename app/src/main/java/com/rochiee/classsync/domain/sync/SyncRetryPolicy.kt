@@ -9,8 +9,9 @@ object SyncRetryPolicy {
         }
     }
 
-    fun backgroundRetryMessage(baseMessage: String): String {
-        return "$baseMessage ClassSync will keep retrying in the background until Google is reachable again."
+    fun backgroundRetryMessage(sourceLabel: String? = null): String {
+        val sourceText = sourceLabel?.takeIf { it.isNotBlank() }?.let { "$it sync" } ?: "Sync"
+        return "$sourceText could not reach Google right now. This is usually a temporary network or DNS issue. ClassSync will keep retrying automatically in the background until Google is reachable again."
     }
 
     private fun Throwable.causeChain(): Sequence<Throwable> = sequence {

@@ -53,4 +53,8 @@ class ClassroomEventRepositoryImpl(
     override suspend fun deleteEvent(eventId: String) {
         dao.deleteEventById(eventId)
     }
+
+    override suspend fun clearAllEvents() {
+        dao.clearEvents()
+    }
 }

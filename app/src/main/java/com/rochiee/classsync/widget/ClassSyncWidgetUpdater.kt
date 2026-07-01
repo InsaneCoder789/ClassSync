@@ -6,8 +6,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Build
-import android.util.TypedValue
 import android.widget.RemoteViews
 import com.rochiee.classsync.ClassSyncApplication
 import com.rochiee.classsync.MainActivity
@@ -61,23 +59,27 @@ object ClassSyncWidgetUpdater {
                 widgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 140)
             )
             val isWideWidget = widgetWidthDp >= 250
-            val isTallWidget = widgetHeightDp >= 210
-            val contentCardHeightDp = if (isWideWidget) {
-                ((widgetHeightDp - 94) * 0.72f).roundToInt().coerceIn(120, 220)
-            } else {
-                ((widgetHeightDp - 96) * 0.68f).roundToInt().coerceIn(116, 208)
-            }
+            val isTallWidget = widgetHeightDp >= 228
+            val isCompactWidget = widgetHeightDp < 220
             val views = RemoteViews(context.packageName, R.layout.classsync_widget_layout).apply {
                 setInt(R.id.widgetRoot, "setBackgroundResource", rootSurface)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    setViewLayoutHeight(
-                        R.id.widgetNextTaskContainer,
-                        contentCardHeightDp.toFloat(),
-                        TypedValue.COMPLEX_UNIT_DIP
-                    )
-                }
-                setInt(R.id.widgetNextTaskTitle, "setMaxLines", if (isTallWidget) 3 else 2)
-                setInt(R.id.widgetNextTaskCourse, "setMaxLines", if (isTallWidget) 2 else 1)
+                setViewVisibility(
+                    R.id.widgetStatsRow,
+                    if (isCompactWidget) android.view.View.GONE else android.view.View.VISIBLE
+                )
+                setViewVisibility(
+                    R.id.widgetUpdatedText,
+                    if (isCompactWidget) android.view.View.GONE else android.view.View.VISIBLE
+                )
+                setInt(R.id.widgetNextTaskTitle, "setMaxLines", when {
+                    isCompactWidget -> 1
+                    isTallWidget -> 3
+                    else -> 2
+                })
+                setInt(R.id.widgetNextTaskCourse, "setMaxLines", if (isTallWidget && !isCompactWidget) 2 else 1)
+                setFloat(R.id.widgetNextTaskTitle, "setTextSize", if (isCompactWidget) 16f else 18f)
+                setFloat(R.id.widgetNextTaskCourse, "setTextSize", if (isCompactWidget) 10f else 11f)
+                setFloat(R.id.widgetNextTaskDue, "setTextSize", if (isCompactWidget) 8f else 9f)
                 setImageViewResource(R.id.widgetLogo, R.mipmap.ic_launcher)
                 setTextViewText(R.id.widgetTitle, "ClassSync")
                 setTextViewText(

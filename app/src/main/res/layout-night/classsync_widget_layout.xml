@@ -147,6 +147,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:background="@drawable/widget_card_surface"
+        android:minHeight="118dp"
         android:orientation="vertical"
         android:padding="14dp">
 
@@ -186,7 +187,7 @@
             android:maxLines="2"
             android:text="No academic tasks yet"
             android:textColor="#101828"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView

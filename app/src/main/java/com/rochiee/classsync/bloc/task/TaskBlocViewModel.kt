@@ -303,7 +303,7 @@ class TaskBlocViewModel(
                     SyncLog(
                         source = "EXPORT",
                         status = "SUCCESS",
-                        message = "Exported CSV to ${file.absolutePath}",
+                        message = "Exported CSV as ${file.name}",
                         timestamp = System.currentTimeMillis()
                     )
                 )
@@ -321,7 +321,7 @@ class TaskBlocViewModel(
                     SyncLog(
                         source = "EXPORT",
                         status = "SUCCESS",
-                        message = "Exported JSON to ${file.absolutePath}",
+                        message = "Exported JSON as ${file.name}",
                         timestamp = System.currentTimeMillis()
                     )
                 )

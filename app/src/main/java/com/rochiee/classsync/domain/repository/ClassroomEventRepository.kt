@@ -15,4 +15,5 @@ interface ClassroomEventRepository {
     suspend fun saveEvents(events: List<ClassroomEvent>)
     suspend fun markConvertedToTask(eventId: String, converted: Boolean)
     suspend fun deleteEvent(eventId: String)
+    suspend fun clearAllEvents()
 }
