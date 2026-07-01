@@ -26,7 +26,7 @@ class WidgetTaskFormatter {
         return if (dueMillis == null) {
             "No due date"
         } else {
-            "Due ${DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(dueMillis))}"
+            DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(dueMillis))
         }
     }
 
