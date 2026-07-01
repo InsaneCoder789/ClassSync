@@ -1,4 +1,4 @@
-![ClassSync banner](docs/assets/classsync-banner.png)
+<img width="1983" height="793" alt="image" src="https://github.com/user-attachments/assets/579553ff-8476-4238-b3c6-f182ea078d0f" />
 
 # ClassSync
 
