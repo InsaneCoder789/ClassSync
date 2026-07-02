@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ClassSync privacy policy</title>
-  <meta name="description" content="Read how ClassSync handles Google sign-in, Classroom data, optional Gmail sync, local storage, and user controls.">
+  <meta name="description" content="A public privacy policy for ClassSync explaining Google sign-in, Classroom access, optional Gmail sync, local storage, and user controls.">
   <meta property="og:title" content="ClassSync privacy policy">
-  <meta property="og:description" content="A branded privacy page for the ClassSync Android app published under Donum.">
+  <meta property="og:description" content="Read how ClassSync handles academic data, Google integrations, and local-first storage.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="./assets/classsync-opening-dark-concept.png">
   <link rel="icon" type="image/png" href="./assets/classsync-logo-generated.png">
@@ -16,33 +16,36 @@
   <style>
     :root {
       color-scheme: dark light;
-      --canvas: #070b12;
-      --canvas-soft: #0f1622;
-      --panel: rgba(14, 19, 29, 0.76);
-      --panel-strong: rgba(17, 24, 35, 0.92);
-      --panel-frost: rgba(255, 255, 255, 0.04);
-      --border: rgba(170, 190, 216, 0.16);
-      --border-strong: rgba(170, 190, 216, 0.24);
-      --text: #f7f9fd;
-      --muted: #a6b0c3;
-      --signal: #8db6ff;
-      --signal-soft: rgba(141, 182, 255, 0.14);
-      --shadow: rgba(6, 10, 18, 0.42);
+      --canvas: #081018;
+      --canvas-deep: #111b28;
+      --panel: rgba(12, 18, 28, 0.82);
+      --panel-soft: rgba(255, 255, 255, 0.03);
+      --panel-strong: rgba(18, 27, 40, 0.96);
+      --line: rgba(172, 191, 218, 0.16);
+      --line-strong: rgba(172, 191, 218, 0.28);
+      --text: #f6f8fc;
+      --muted: #a5afc1;
+      --accent: #8cb4ff;
+      --accent-soft: rgba(140, 180, 255, 0.16);
+      --accent-ghost: rgba(140, 180, 255, 0.08);
+      --shadow: rgba(4, 8, 16, 0.42);
       --sans: "Outfit", "Segoe UI", sans-serif;
       --mono: "JetBrains Mono", "SFMono-Regular", monospace;
-      --light-canvas: #f2f5fb;
-      --light-panel: rgba(255, 255, 255, 0.84);
-      --light-panel-strong: rgba(255, 255, 255, 0.96);
-      --light-border: rgba(18, 24, 36, 0.08);
-      --light-text: #0d1422;
-      --light-muted: #5d6778;
+      --shell-width: min(1380px, calc(100% - 2rem));
       --radius-shell: 2rem;
       --radius-panel: 1.5rem;
-      --radius-chip: 999px;
-      --shell-width: min(1320px, calc(100% - 2rem));
-      --section-gap: clamp(1rem, 2vw, 1.4rem);
-      --hero-gap: clamp(1rem, 2vw, 1.4rem);
+      --radius-pill: 999px;
+      --gap-xl: clamp(1.25rem, 2vw, 1.75rem);
+      --gap-lg: clamp(1rem, 1.7vw, 1.35rem);
+      --gap-md: 0.9rem;
+      --gap-sm: 0.65rem;
       --motion: 240ms cubic-bezier(0.22, 1, 0.36, 1);
+      --light-canvas: #f2f5fb;
+      --light-panel: rgba(255, 255, 255, 0.86);
+      --light-panel-strong: rgba(255, 255, 255, 0.97);
+      --light-line: rgba(16, 24, 38, 0.08);
+      --light-text: #0e1523;
+      --light-muted: #5e6779;
     }
 
     * {
@@ -59,12 +62,12 @@
       font-family: var(--sans);
       color: var(--text);
       background:
-        radial-gradient(circle at 12% 0%, rgba(141, 182, 255, 0.26), transparent 22%),
-        radial-gradient(circle at 88% 18%, rgba(103, 139, 224, 0.18), transparent 18%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 16%),
-        linear-gradient(180deg, #06090f 0%, #0a1019 100%);
-      position: relative;
+        radial-gradient(circle at 12% 2%, rgba(140, 180, 255, 0.26), transparent 21%),
+        radial-gradient(circle at 82% 16%, rgba(104, 136, 216, 0.2), transparent 16%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 16%),
+        linear-gradient(180deg, #060b12 0%, #0d1521 100%);
       overflow-x: hidden;
+      position: relative;
     }
 
     body::before {
@@ -72,15 +75,15 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: 0.12;
+      opacity: 0.1;
       background-image:
-        radial-gradient(rgba(255, 255, 255, 0.08) 0.55px, transparent 0.55px);
+        radial-gradient(rgba(255, 255, 255, 0.1) 0.55px, transparent 0.55px);
       background-size: 12px 12px;
-      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.6), transparent 88%);
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.8), transparent 86%);
     }
 
     a {
-      color: var(--signal);
+      color: var(--accent);
       text-decoration: none;
     }
 
@@ -97,13 +100,13 @@
       position: absolute;
       left: 1rem;
       top: -3rem;
-      background: var(--signal);
-      color: #09111c;
+      z-index: 20;
       padding: 0.8rem 1rem;
-      border-radius: 0.9rem;
+      border-radius: 1rem;
+      background: var(--accent);
+      color: #09111b;
       font-weight: 700;
       transition: top var(--motion);
-      z-index: 10;
     }
 
     .skip-link:focus {
@@ -112,15 +115,15 @@
 
     .page-shell {
       width: var(--shell-width);
-      margin: 1rem auto 1.5rem;
+      margin: 1rem auto;
       padding: 1rem;
       border-radius: var(--radius-shell);
-      border: 1px solid var(--border);
+      border: 1px solid var(--line);
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
         var(--panel);
+      box-shadow: 0 28px 100px var(--shadow);
       backdrop-filter: blur(28px);
-      box-shadow: 0 24px 90px var(--shadow);
     }
 
     .topbar {
@@ -128,7 +131,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      padding: 0.5rem 0.4rem 1rem;
+      padding: 0.35rem 0.3rem 1rem;
     }
 
     .brand {
@@ -139,15 +142,15 @@
     }
 
     .brand-mark {
+      width: 3.6rem;
+      height: 3.6rem;
+      flex: 0 0 auto;
       display: grid;
       place-items: center;
-      width: 3.5rem;
-      height: 3.5rem;
-      flex: 0 0 auto;
-      border-radius: 1.15rem;
-      border: 1px solid var(--border);
+      border-radius: 1.2rem;
+      border: 1px solid var(--line);
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)),
         rgba(255, 255, 255, 0.02);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
@@ -164,7 +167,7 @@
 
     .brand-copy strong {
       display: block;
-      font-size: 1.15rem;
+      font-size: 1.16rem;
       font-weight: 700;
       letter-spacing: -0.03em;
     }
@@ -175,7 +178,7 @@
       font-size: 0.95rem;
     }
 
-    .top-links {
+    .top-actions {
       display: flex;
       align-items: center;
       gap: 0.65rem;
@@ -183,110 +186,234 @@
       justify-content: flex-end;
     }
 
-    .top-link {
+    .ghost-link,
+    .pill-link {
       display: inline-flex;
       align-items: center;
-      min-height: 2.8rem;
-      padding: 0.7rem 1rem;
-      border-radius: var(--radius-chip);
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.025);
+      justify-content: center;
+      min-height: 2.85rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
       color: var(--text);
-      transition: transform var(--motion), background var(--motion), border-color var(--motion);
+      transition:
+        transform var(--motion),
+        background var(--motion),
+        border-color var(--motion);
     }
 
-    .top-link:hover,
-    .top-link:focus-visible {
+    .ghost-link:hover,
+    .ghost-link:focus-visible,
+    .pill-link:hover,
+    .pill-link:focus-visible {
       transform: translateY(-1px);
-      background: rgba(255, 255, 255, 0.05);
-      border-color: var(--border-strong);
+      border-color: var(--line-strong);
+      background: rgba(255, 255, 255, 0.06);
       text-decoration: none;
     }
 
-    .hero-grid {
+    .masthead {
       display: grid;
-      grid-template-columns: minmax(0, 1.18fr) minmax(300px, 0.82fr);
-      gap: var(--hero-gap);
-      align-items: start;
+      grid-template-columns: minmax(290px, 0.78fr) minmax(0, 1.22fr);
+      gap: var(--gap-xl);
+      align-items: stretch;
     }
 
-    .hero-main,
-    .hero-side,
-    .policy-section,
-    .quick-card,
+    .rail,
+    .hero-panel,
+    .summary-card,
+    .policy-card,
     .footer-panel {
-      border: 1px solid var(--border);
       border-radius: var(--radius-panel);
+      border: 1px solid var(--line);
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)),
-        rgba(255, 255, 255, 0.015);
+        rgba(255, 255, 255, 0.018);
     }
 
-    .hero-main {
-      padding: 1.15rem;
+    .rail {
+      padding: 1rem;
       display: grid;
       gap: 1rem;
+      align-content: start;
+      position: sticky;
+      top: 1rem;
+      min-height: min-content;
+    }
+
+    .rail-group {
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .rail-label,
+    .section-index,
+    .summary-label {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .rail-title,
+    .summary-card h2,
+    .policy-card h2,
+    .footer-heading {
+      margin: 0;
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+      text-wrap: balance;
+    }
+
+    .rail-title {
+      font-size: 1.45rem;
+    }
+
+    .rail-copy,
+    .summary-copy,
+    .policy-card p,
+    .policy-card li,
+    .policy-card dd,
+    .footer-panel p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .policy-nav {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .policy-nav a {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: baseline;
+      gap: 0.8rem;
+      min-height: 3rem;
+      padding: 0.85rem 0.95rem;
+      border-radius: 1rem;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.025);
+      color: var(--text);
+      transition:
+        transform var(--motion),
+        border-color var(--motion),
+        background var(--motion);
+    }
+
+    .policy-nav a:hover,
+    .policy-nav a:focus-visible {
+      transform: translateY(-1px);
+      border-color: var(--line-strong);
+      background: rgba(255, 255, 255, 0.05);
+      text-decoration: none;
+    }
+
+    .policy-nav strong {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    .policy-nav span {
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .hero-panel {
+      padding: 1rem;
+      display: grid;
+      gap: 1rem;
+      overflow: hidden;
     }
 
     .hero-banner {
       position: relative;
       aspect-ratio: 16 / 9;
-      border-radius: calc(var(--radius-panel) - 0.3rem);
       overflow: hidden;
+      border-radius: 1.3rem;
       border: 1px solid rgba(255, 255, 255, 0.06);
       background:
-        radial-gradient(circle at 20% 24%, rgba(141, 182, 255, 0.3), transparent 20%),
-        radial-gradient(circle at 76% 30%, rgba(141, 182, 255, 0.18), transparent 18%),
-        linear-gradient(135deg, rgba(17, 27, 44, 0.96), rgba(8, 12, 20, 0.96));
+        radial-gradient(circle at 18% 22%, rgba(140, 180, 255, 0.34), transparent 20%),
+        radial-gradient(circle at 84% 28%, rgba(140, 180, 255, 0.18), transparent 16%),
+        linear-gradient(145deg, rgba(19, 31, 47, 0.96), rgba(8, 13, 20, 0.98));
+      isolation: isolate;
     }
 
     .hero-banner::before {
       content: "";
       position: absolute;
-      inset: 8% 12%;
-      border-radius: 1.75rem;
+      inset: 7% 14%;
+      border-radius: 1.9rem;
       border: 1px solid rgba(255, 255, 255, 0.08);
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)),
-        rgba(7, 11, 18, 0.42);
+        linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.02)),
+        rgba(10, 15, 23, 0.34);
       box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.06),
-        0 24px 44px rgba(5, 8, 12, 0.24);
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 24px 44px rgba(5, 9, 16, 0.22);
     }
 
     .hero-banner::after {
-      content: "ClassSync";
+      content: "";
       position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      font-size: clamp(2rem, 4vw, 4rem);
-      font-weight: 800;
-      letter-spacing: -0.06em;
-      color: rgba(247, 249, 253, 0.92);
-      text-shadow: 0 12px 32px rgba(5, 8, 12, 0.26);
+      inset: auto 10% 13%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
     }
 
-    .hero-banner-brand {
+    .hero-logo {
       position: absolute;
       left: 50%;
       top: 50%;
-      transform: translate(-50%, calc(-50% - 3.4rem));
-      width: clamp(4.6rem, 8vw, 6.8rem);
-      height: clamp(4.6rem, 8vw, 6.8rem);
+      transform: translate(-50%, calc(-50% - 4.1rem));
+      width: clamp(4.8rem, 7vw, 6.8rem);
+      height: clamp(4.8rem, 7vw, 6.8rem);
       padding: 0.9rem;
       border-radius: 1.6rem;
       border: 1px solid rgba(255, 255, 255, 0.1);
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
-        rgba(9, 13, 20, 0.6);
-      box-shadow: 0 20px 38px rgba(5, 8, 12, 0.28);
+        rgba(10, 15, 23, 0.62);
+      box-shadow: 0 24px 40px rgba(4, 8, 16, 0.28);
     }
 
-    .hero-banner-brand img {
+    .hero-logo img {
       width: 100%;
       height: 100%;
       object-fit: contain;
+    }
+
+    .hero-mark {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, 16%);
+      text-align: center;
+    }
+
+    .hero-mark strong {
+      display: block;
+      font-size: clamp(2rem, 4vw, 4rem);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      color: rgba(247, 249, 253, 0.92);
+      text-shadow: 0 12px 28px rgba(4, 8, 16, 0.22);
+    }
+
+    .hero-mark span {
+      display: block;
+      margin-top: 0.45rem;
+      color: rgba(247, 249, 253, 0.62);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .hero-copy {
@@ -295,255 +422,208 @@
       align-content: start;
     }
 
-    .policy-chip {
+    .hero-chip {
       display: inline-flex;
       align-items: center;
       gap: 0.7rem;
       width: fit-content;
-      min-height: 2.5rem;
+      min-height: 2.45rem;
       padding: 0.55rem 0.95rem;
-      border-radius: var(--radius-chip);
-      background: var(--signal-soft);
-      color: var(--signal);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      border-radius: var(--radius-pill);
+      background: var(--accent-soft);
+      color: var(--accent);
       font-size: 0.78rem;
       font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
-    .policy-chip::before {
+    .hero-chip::before {
       content: "";
       width: 0.52rem;
       height: 0.52rem;
       border-radius: 999px;
       background: currentColor;
-      box-shadow: 0 0 0 0.35rem rgba(141, 182, 255, 0.12);
-    }
-
-    h1,
-    h2,
-    h3 {
-      margin: 0;
-      line-height: 0.98;
-      letter-spacing: -0.05em;
-      text-wrap: balance;
+      box-shadow: 0 0 0 0.35rem rgba(140, 180, 255, 0.11);
     }
 
     h1 {
-      font-size: clamp(2.55rem, 5.2vw, 5.4rem);
-      max-width: 10.6ch;
-    }
-
-    .hero-lede,
-    .section-copy,
-    .quick-copy,
-    .footer-panel p,
-    li,
-    dd {
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.7;
+      margin: 0;
+      max-width: 9.6ch;
+      font-size: clamp(2.9rem, 5.5vw, 5.7rem);
+      line-height: 0.94;
+      letter-spacing: -0.065em;
+      text-wrap: balance;
     }
 
     .hero-lede {
-      max-width: 60ch;
       margin: 0;
+      max-width: 58ch;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.72;
     }
 
-    .hero-note {
+    .hero-inline {
+      display: inline;
+      color: var(--accent);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .primary-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.9rem;
+      padding: 0.8rem 1.05rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(140, 180, 255, 0.22);
+      background: var(--accent-soft);
+      color: var(--text);
+      transition:
+        transform var(--motion),
+        background var(--motion),
+        border-color var(--motion);
+    }
+
+    .primary-link:hover,
+    .primary-link:focus-visible {
+      transform: translateY(-1px);
+      background: rgba(140, 180, 255, 0.24);
+      border-color: rgba(140, 180, 255, 0.32);
+      text-decoration: none;
+    }
+
+    .summary-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.75rem;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: var(--gap-lg);
+      margin-top: var(--gap-xl);
     }
 
-    .hero-note .quick-card {
+    .summary-card {
+      padding: 1.15rem;
+      display: grid;
+      gap: 0.75rem;
+      align-content: start;
       min-height: 100%;
     }
 
-    .hero-side {
-      padding: 1rem;
-      display: grid;
-      gap: 1rem;
-      position: sticky;
-      top: 1rem;
-    }
-
-    .side-title {
-      font-size: 1.55rem;
-      letter-spacing: -0.04em;
-    }
-
-    .section-nav {
-      display: grid;
-      gap: 0.55rem;
-    }
-
-    .section-nav a {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 1rem;
-      min-height: 3rem;
-      padding: 0.8rem 0.95rem;
-      border-radius: 1rem;
-      border: 1px solid transparent;
-      background: rgba(255, 255, 255, 0.02);
-      color: var(--text);
-      transition: transform var(--motion), border-color var(--motion), background var(--motion);
-    }
-
-    .section-nav a:hover,
-    .section-nav a:focus-visible {
-      transform: translateY(-1px);
-      border-color: var(--border-strong);
-      background: rgba(255, 255, 255, 0.04);
-      text-decoration: none;
-    }
-
-    .section-nav strong {
-      font-size: 0.82rem;
-      font-family: var(--mono);
-      font-weight: 700;
-      color: var(--signal);
-      letter-spacing: 0.04em;
-    }
-
-    .section-nav span {
-      text-align: right;
-      font-size: 0.96rem;
-      color: var(--muted);
-    }
-
-    .contact-tile {
-      display: grid;
-      gap: 0.65rem;
-      padding: 1rem;
-      border-radius: 1.15rem;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.025);
-    }
-
-    .contact-tile strong {
-      font-size: 0.9rem;
-      color: var(--signal);
-      font-family: var(--mono);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .contact-tile a {
-      display: inline-flex;
-      align-items: center;
-      min-height: 2.8rem;
-      width: fit-content;
-      padding: 0.7rem 1rem;
-      border-radius: var(--radius-chip);
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--text);
-      transition: transform var(--motion), border-color var(--motion);
-    }
-
-    .contact-tile a:hover,
-    .contact-tile a:focus-visible {
-      transform: translateY(-1px);
-      border-color: var(--border-strong);
-      text-decoration: none;
+    .summary-card h2 {
+      font-size: 1.4rem;
     }
 
     .content-stack {
       display: grid;
-      gap: calc(var(--section-gap) * 1.15);
-      margin-top: calc(var(--section-gap) * 1.15);
+      gap: calc(var(--gap-xl) * 1.05);
+      margin-top: calc(var(--gap-xl) * 1.05);
     }
 
-    .quick-grid {
+    .split-intro {
       display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr;
-      gap: var(--section-gap);
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      gap: var(--gap-xl);
+      align-items: start;
     }
 
-    .quick-card {
-      padding: 1.15rem;
+    .intro-block,
+    .intro-aside {
       display: grid;
-      gap: 0.7rem;
-      aspect-ratio: 16 / 9;
-      align-content: start;
+      gap: var(--gap-md);
     }
 
-    .quick-label,
-    .section-index {
-      font-family: var(--mono);
-      font-size: 0.8rem;
-      color: var(--signal);
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
+    .intro-title {
+      margin: 0;
+      font-size: clamp(1.65rem, 2.3vw, 2.3rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      text-wrap: balance;
     }
 
-    .quick-card h2,
-    .quick-card h3 {
-      font-size: 1.35rem;
-      letter-spacing: -0.04em;
+    .intro-aside .summary-card {
+      height: 100%;
     }
 
     .policy-grid {
       display: grid;
       grid-template-columns: repeat(12, minmax(0, 1fr));
-      column-gap: var(--section-gap);
-      row-gap: calc(var(--section-gap) * 1.2);
+      column-gap: var(--gap-lg);
+      row-gap: calc(var(--gap-lg) * 1.2);
     }
 
-    .policy-section {
-      padding: 1.35rem;
+    .policy-card {
+      padding: 1.25rem;
       display: grid;
       gap: 0.95rem;
       align-content: start;
+      min-height: 100%;
     }
 
-    .policy-section h2 {
-      font-size: clamp(1.45rem, 2vw, 1.9rem);
+    .policy-card h2 {
+      font-size: clamp(1.45rem, 2vw, 1.92rem);
     }
 
-    .policy-section ul,
-    .policy-section dl {
+    .policy-card ul,
+    .policy-card dl {
       margin: 0;
       padding: 0;
     }
 
-    .policy-section ul {
+    .policy-card ul {
       padding-left: 1.1rem;
       display: grid;
       gap: 0.6rem;
     }
 
-    .policy-section dl {
+    .policy-card dl {
       display: grid;
       gap: 0.9rem;
     }
 
-    .policy-section dt {
+    .policy-card dt {
       font-weight: 700;
       color: var(--text);
       margin-bottom: 0.2rem;
     }
 
-    .policy-section dd {
+    .policy-card dd {
       margin: 0;
     }
 
+    .span-8 { grid-column: span 8; }
     .span-7 { grid-column: span 7; }
-    .span-5 { grid-column: span 5; }
     .span-6 { grid-column: span 6; }
+    .span-5 { grid-column: span 5; }
+    .span-4 { grid-column: span 4; }
+
+    .section-index {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .section-index::before {
+      content: "";
+      width: 1rem;
+      height: 1px;
+      background: currentColor;
+      opacity: 0.72;
+    }
 
     .footer-panel {
-      margin-top: calc(var(--section-gap) * 1.7);
-      padding: 1.35rem 1.4rem;
+      margin-top: calc(var(--gap-xl) * 1.35);
+      padding: 1.3rem 1.4rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1.1rem;
+      gap: 1rem;
       flex-wrap: wrap;
-      border-radius: calc(var(--radius-panel) + 0.2rem);
       position: relative;
     }
 
@@ -552,27 +632,31 @@
       position: absolute;
       left: 1.4rem;
       right: 1.4rem;
-      top: -0.95rem;
+      top: -1rem;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(170, 190, 216, 0.22), transparent);
+      background: linear-gradient(90deg, transparent, rgba(172, 191, 218, 0.22), transparent);
     }
 
-    .footer-links {
+    .footer-heading {
+      font-size: 1.25rem;
+    }
+
+    .footer-copy {
+      display: grid;
+      gap: 0.45rem;
+      max-width: 54ch;
+    }
+
+    .footer-actions {
       display: flex;
-      align-items: center;
-      gap: 0.8rem;
+      gap: 0.7rem;
       flex-wrap: wrap;
+      align-items: center;
     }
 
-    .footer-link {
-      display: inline-flex;
-      align-items: center;
-      min-height: 2.5rem;
-      padding: 0.55rem 0.9rem;
-      border-radius: var(--radius-chip);
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.025);
-      color: var(--text);
+    .grain-rule {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
     }
 
     code {
@@ -583,112 +667,113 @@
       background: rgba(255, 255, 255, 0.075);
     }
 
-    .grain-divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
-    }
-
     @media (prefers-color-scheme: light) {
       body {
         color: var(--light-text);
         background:
-          radial-gradient(circle at 12% 0%, rgba(114, 149, 221, 0.16), transparent 22%),
-          radial-gradient(circle at 88% 18%, rgba(103, 139, 224, 0.11), transparent 18%),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.7), transparent 18%),
+          radial-gradient(circle at 12% 2%, rgba(113, 148, 221, 0.16), transparent 21%),
+          radial-gradient(circle at 82% 16%, rgba(103, 139, 224, 0.12), transparent 16%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent 16%),
           var(--light-canvas);
       }
 
       .page-shell {
+        border-color: var(--light-line);
         background:
           linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.92)),
           var(--light-panel);
-        border-color: var(--light-border);
-        box-shadow: 0 24px 84px rgba(42, 57, 92, 0.12);
+        box-shadow: 0 28px 88px rgba(44, 60, 92, 0.12);
       }
 
-      .hero-main,
-      .hero-side,
-      .policy-section,
-      .quick-card,
+      .rail,
+      .hero-panel,
+      .summary-card,
+      .policy-card,
       .footer-panel,
-      .top-link,
-      .contact-tile,
-      .section-nav a {
+      .ghost-link,
+      .pill-link,
+      .policy-nav a {
+        border-color: var(--light-line);
         background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.96)),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.96)),
           var(--light-panel-strong);
-        border-color: var(--light-border);
       }
 
       .brand-mark,
       .hero-banner {
-        border-color: var(--light-border);
+        border-color: var(--light-line);
       }
 
       .hero-banner {
         background:
-          radial-gradient(circle at 20% 24%, rgba(114, 149, 221, 0.24), transparent 20%),
-          radial-gradient(circle at 76% 30%, rgba(114, 149, 221, 0.14), transparent 18%),
-          linear-gradient(135deg, rgba(228, 235, 247, 0.96), rgba(211, 221, 239, 0.96));
-      }
-
-      .brand-copy span,
-      .hero-lede,
-      .section-copy,
-      .quick-copy,
-      .footer-panel p,
-      li,
-      dd,
-      .section-nav span {
-        color: var(--light-muted);
-      }
-
-      .top-link,
-      .contact-tile a,
-      .footer-link,
-      .section-nav a {
-        color: var(--light-text);
+          radial-gradient(circle at 18% 22%, rgba(113, 148, 221, 0.22), transparent 20%),
+          radial-gradient(circle at 84% 28%, rgba(113, 148, 221, 0.12), transparent 16%),
+          linear-gradient(145deg, rgba(228, 235, 247, 0.96), rgba(210, 221, 239, 0.96));
       }
 
       .hero-banner::before,
-      .hero-banner-brand {
-        border-color: rgba(18, 24, 36, 0.08);
+      .hero-logo {
+        border-color: rgba(16, 24, 38, 0.08);
       }
 
-      .hero-banner::after {
-        color: rgba(13, 20, 34, 0.88);
+      .hero-mark strong {
+        color: rgba(14, 21, 35, 0.9);
         text-shadow: none;
       }
 
+      .hero-mark span,
+      .brand-copy span,
+      .rail-copy,
+      .summary-copy,
+      .policy-card p,
+      .policy-card li,
+      .policy-card dd,
+      .footer-panel p,
+      .policy-nav span,
+      .hero-lede {
+        color: var(--light-muted);
+      }
+
+      .ghost-link,
+      .pill-link,
+      .policy-nav a {
+        color: var(--light-text);
+      }
+
+      .footer-panel::before {
+        background: linear-gradient(90deg, transparent, rgba(16, 24, 38, 0.14), transparent);
+      }
+
       code {
-        background: rgba(18, 24, 36, 0.06);
+        background: rgba(16, 24, 38, 0.06);
       }
     }
 
-    @media (max-width: 1024px) {
-      .hero-grid,
-      .quick-grid {
+    @media (max-width: 1100px) {
+      .masthead,
+      .split-intro,
+      .summary-grid {
         grid-template-columns: 1fr;
       }
 
-      .hero-side {
+      .rail {
         position: static;
       }
 
+      .span-8,
       .span-7,
-      .span-5,
       .span-6,
-      .span-4,
-      .span-8 {
+      .span-5,
+      .span-4 {
         grid-column: span 12;
       }
     }
 
     @media (max-width: 767px) {
       .page-shell {
-        width: min(100% - 1rem, 1320px);
+        width: min(100% - 1rem, 1380px);
         padding: 0.75rem;
-        border-radius: 1.5rem;
+        border-radius: 1.45rem;
       }
 
       .topbar {
@@ -696,24 +781,17 @@
         flex-direction: column;
       }
 
-      .hero-note,
-      .policy-grid {
-        grid-template-columns: 1fr;
-      }
-
       h1 {
         max-width: none;
       }
 
-      .hero-main,
-      .hero-side,
-      .policy-section,
-      .quick-card {
-        padding: 1rem;
-      }
-
-      .quick-card {
-        aspect-ratio: auto;
+      .rail,
+      .hero-panel,
+      .summary-card,
+      .policy-card,
+      .footer-panel {
+        padding-left: 1rem;
+        padding-right: 1rem;
       }
     }
   </style>
@@ -733,57 +811,24 @@
         </div>
       </div>
 
-      <nav class="top-links" aria-label="Privacy page links">
-        <a class="top-link" href="#policy-content">Policy sections</a>
-        <a class="top-link" href="mailto:tech@donum.in">Contact privacy support</a>
-        <a class="top-link" href="https://github.com/InsaneCoder789/ClassSync">Source repository</a>
+      <nav class="top-actions" aria-label="Privacy page actions">
+        <a class="ghost-link" href="#policy-content">Policy sections</a>
+        <a class="ghost-link" href="mailto:tech@donum.in">Contact privacy support</a>
+        <a class="ghost-link" href="https://github.com/InsaneCoder789/ClassSync">Source repository</a>
       </nav>
     </header>
 
-    <section class="hero-grid" aria-labelledby="privacy-title">
-      <article class="hero-main">
-        <div class="hero-banner">
-          <div class="hero-banner-brand">
-            <img src="./assets/classsync-logo-generated.png" alt="ClassSync logo">
-          </div>
+    <section class="masthead" aria-labelledby="privacy-title">
+      <aside class="rail">
+        <div class="rail-group">
+          <span class="rail-label">Policy map</span>
+          <h2 class="rail-title">A readable contract for how ClassSync handles study data.</h2>
+          <p class="rail-copy">This page is designed for students, reviewers, and store approval teams who need the actual data flow in clear language without reading a wall of legal boilerplate.</p>
         </div>
 
-        <div class="hero-copy">
-          <span class="policy-chip">Privacy policy</span>
-          <h1 id="privacy-title">See how ClassSync handles your academic data.</h1>
-          <p class="hero-lede">
-            This page explains what the app reads from Google, what stays on your device, when Gmail is optional, how reminders and widgets work, and what control users keep over their own study workspace.
-          </p>
-
-          <div class="hero-note">
-            <div class="quick-card">
-              <span class="quick-label">Published by</span>
-              <h2>Donum</h2>
-              <p class="quick-copy">The app is currently being prepared for release under the Donum launch identity.</p>
-            </div>
-            <div class="quick-card">
-              <span class="quick-label">Privacy contact</span>
-              <h2>tech@donum.in</h2>
-              <p class="quick-copy">Questions, deletion guidance, and privacy support route through the monitored Donum mailbox.</p>
-            </div>
-            <div class="quick-card">
-              <span class="quick-label">Updated</span>
-              <h2>July 3, 2026</h2>
-              <p class="quick-copy">This document matches the current ClassSync codebase and Google integrations used for launch prep.</p>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <aside class="hero-side" aria-labelledby="navigator-title">
-        <div>
-          <span class="quick-label">Navigator</span>
-          <h2 class="side-title" id="navigator-title">Policy map</h2>
-        </div>
-
-        <nav class="section-nav" aria-label="Policy sections">
-          <a href="#section-01"><strong>01</strong><span>What ClassSync does</span></a>
-          <a href="#section-02"><strong>02</strong><span>Information we access</span></a>
+        <nav class="policy-nav" aria-label="Policy section navigation">
+          <a href="#section-01"><strong>01</strong><span>What the app does</span></a>
+          <a href="#section-02"><strong>02</strong><span>What information is accessed</span></a>
           <a href="#section-03"><strong>03</strong><span>How data is used</span></a>
           <a href="#section-04"><strong>04</strong><span>Optional and required access</span></a>
           <a href="#section-05"><strong>05</strong><span>Sharing and third parties</span></a>
@@ -791,53 +836,90 @@
           <a href="#section-07"><strong>07</strong><span>Permissions</span></a>
           <a href="#section-08"><strong>08</strong><span>On-device machine learning</span></a>
           <a href="#section-09"><strong>09</strong><span>Retention and user controls</span></a>
-          <a href="#section-10"><strong>10</strong><span>Children and policy changes</span></a>
+          <a href="#section-10"><strong>10</strong><span>Children and updates</span></a>
         </nav>
 
-        <div class="contact-tile">
-          <strong>Need help?</strong>
-          <p class="section-copy">If someone needs privacy support, sign-out guidance, or a data handling explanation for the published app, they should be able to reach a real person quickly.</p>
-          <a href="mailto:tech@donum.in">Email tech@donum.in</a>
-        </div>
+        <a class="pill-link" href="mailto:tech@donum.in">Email tech@donum.in</a>
       </aside>
+
+      <article class="hero-panel">
+        <div class="hero-banner">
+          <div class="hero-logo">
+            <img src="./assets/classsync-logo-generated.png" alt="ClassSync logo">
+          </div>
+          <div class="hero-mark">
+            <strong>ClassSync</strong>
+            <span>Privacy policy</span>
+          </div>
+        </div>
+
+        <div class="hero-copy">
+          <span class="hero-chip">Public privacy policy</span>
+          <h1 id="privacy-title">Understand how <span class="hero-inline">ClassSync</span> treats academic data.</h1>
+          <p class="hero-lede">
+            This policy explains Google sign-in, Classroom sync, optional Gmail reminder discovery, local storage, reminders, widgets, and what users can disable or delete. It is written to match the current Android app published under Donum.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-link" href="#section-02">Start with collected data</a>
+            <a class="ghost-link" href="#section-09">Jump to user controls</a>
+          </div>
+        </div>
+      </article>
     </section>
 
     <div class="content-stack" id="policy-content">
-      <section class="quick-grid" aria-label="Privacy summary">
-        <article class="quick-card">
-          <span class="quick-label">Privacy posture</span>
-          <h3>Local-first by default</h3>
-          <p class="quick-copy">ClassSync is built to keep synced academic state on-device rather than routing it through a custom app backend.</p>
+      <section class="summary-grid" aria-label="Privacy summary">
+        <article class="summary-card">
+          <span class="summary-label">Publisher</span>
+          <h2>Donum</h2>
+          <p class="summary-copy">ClassSync is currently being prepared for public distribution under the Donum launch identity.</p>
         </article>
-        <article class="quick-card">
-          <span class="quick-label">Primary sources</span>
-          <h3>Classroom, Gmail, manual tasks</h3>
-          <p class="quick-copy">Google Classroom is the main sync surface, Gmail is optional, and user-created tasks remain part of the same local workspace.</p>
+        <article class="summary-card">
+          <span class="summary-label">Privacy contact</span>
+          <h2>tech@donum.in</h2>
+          <p class="summary-copy">Privacy questions, deletion guidance, and support requests route through a monitored mailbox.</p>
         </article>
-        <article class="quick-card">
-          <span class="quick-label">User controls</span>
-          <h3>Disable, sign out, clear local data</h3>
-          <p class="quick-copy">Users can turn off Gmail sync, turn off Classroom sync, disable notifications, sign out, or remove local app data.</p>
+        <article class="summary-card">
+          <span class="summary-label">Last updated</span>
+          <h2>July 3, 2026</h2>
+          <p class="summary-copy">This version reflects the current Google sign-in, Classroom, optional Gmail, reminders, widget, and ML classification flows.</p>
         </article>
       </section>
 
-      <div class="grain-divider"></div>
+      <div class="grain-rule"></div>
+
+      <section class="split-intro" aria-label="Policy introduction">
+        <div class="intro-block">
+          <span class="summary-label">Reading guide</span>
+          <h2 class="intro-title">This page is structured by product behavior, not by generic legal boilerplate.</h2>
+          <p class="rail-copy">
+            That means the most important questions are answered in the order people actually ask them: what the app does, what it reads, whether Gmail is optional, where data lives, and how someone can turn features off or wipe local state.
+          </p>
+        </div>
+        <div class="intro-aside">
+          <article class="summary-card">
+            <span class="summary-label">Product posture</span>
+            <h2>Local-first by default</h2>
+            <p class="summary-copy">ClassSync does not currently run a custom app backend that stores synced academic content for users.</p>
+          </article>
+        </div>
+      </section>
 
       <section class="policy-grid" aria-label="Detailed privacy policy">
-        <article class="policy-section span-7" id="section-01">
+        <article class="policy-card span-7" id="section-01">
           <span class="section-index">01</span>
-          <h2>What ClassSync does</h2>
-          <p class="section-copy">
-            ClassSync is a local-first academic organization app for Android. It brings together Google Classroom coursework, announcements, materials, optional Gmail-based academic reminder discovery, manual tasks, planner views, widgets, exam planning, and study planning inside a single student workspace.
+          <h2>What the app does</h2>
+          <p>
+            ClassSync is a local-first academic organization app for Android. It brings together Google Classroom coursework, announcements, materials, optional Gmail-based reminder discovery, manual tasks, planner views, widgets, exam planning, and study planning inside a single student workspace.
           </p>
-          <p class="section-copy">
-            The app does not currently run a custom backend that centrally stores synced academic content for users.
+          <p>
+            The app does not currently operate a custom backend that centrally stores synced academic content for users.
           </p>
         </article>
 
-        <article class="policy-section span-5" id="section-02">
+        <article class="policy-card span-5" id="section-02">
           <span class="section-index">02</span>
-          <h2>Information we access</h2>
+          <h2>What information is accessed</h2>
           <ul>
             <li>Google account email address and basic sign-in session details</li>
             <li>Google Classroom read-only academic data such as courses, coursework, announcements, and materials</li>
@@ -848,7 +930,7 @@
           </ul>
         </article>
 
-        <article class="policy-section span-6" id="section-03">
+        <article class="policy-card span-6" id="section-03">
           <span class="section-index">03</span>
           <h2>How data is used</h2>
           <dl>
@@ -861,13 +943,13 @@
               <dd>Used to convert Google Classroom activity and optional Gmail reminders into local events, tasks, planner views, widgets, and reminders.</dd>
             </div>
             <div>
-              <dt>On-device intelligence</dt>
-              <dd>Used to support rule-based and local ML-assisted classification of academic updates into clearer categories.</dd>
+              <dt>On-device classification</dt>
+              <dd>Used to support rule-based and local ML-assisted categorization of academic updates into clearer task and event types.</dd>
             </div>
           </dl>
         </article>
 
-        <article class="policy-section span-6" id="section-04">
+        <article class="policy-card span-6" id="section-04">
           <span class="section-index">04</span>
           <h2>Optional and required access</h2>
           <ul>
@@ -878,24 +960,22 @@
           </ul>
         </article>
 
-        <article class="policy-section span-5" id="section-05">
+        <article class="policy-card span-5" id="section-05">
           <span class="section-index">05</span>
           <h2>Sharing and third parties</h2>
-          <p class="section-copy">
-            ClassSync does not sell personal data and does not operate a separate app backend that stores synced academic content.
-          </p>
+          <p>ClassSync does not sell personal data and does not run a separate backend that stores synced academic content for users.</p>
           <ul>
             <li>Google sign-in services are used for authentication</li>
             <li>Google Classroom API is used for read-only academic sync</li>
             <li>Gmail API is used for optional read-only academic reminder discovery</li>
-            <li>Task exports are written to the user's device when the user explicitly triggers them</li>
+            <li>Task exports are written to the user's device only when the user explicitly triggers them</li>
           </ul>
         </article>
 
-        <article class="policy-section span-7" id="section-06">
+        <article class="policy-card span-7" id="section-06">
           <span class="section-index">06</span>
           <h2>Local storage and security</h2>
-          <p class="section-copy">
+          <p>
             ClassSync stores synced tasks, academic events, planner state, exam-related state, reminder settings, digest preferences, and onboarding settings locally on the device.
           </p>
           <ul>
@@ -906,7 +986,7 @@
           </ul>
         </article>
 
-        <article class="policy-section span-6" id="section-07">
+        <article class="policy-card span-6" id="section-07">
           <span class="section-index">07</span>
           <h2>Permissions</h2>
           <ul>
@@ -914,26 +994,22 @@
             <li><code>ACCESS_NETWORK_STATE</code> to manage sync behavior based on connectivity</li>
             <li><code>POST_NOTIFICATIONS</code> for reminders, digests, and due-soon alerts</li>
           </ul>
-          <p class="section-copy">
-            The app does not currently request contacts, location, microphone, camera, SMS, call log, or background location permissions.
-          </p>
+          <p>The app does not currently request contacts, location, microphone, camera, SMS, call log, photo library, or background location permissions.</p>
         </article>
 
-        <article class="policy-section span-6" id="section-08">
+        <article class="policy-card span-6" id="section-08">
           <span class="section-index">08</span>
           <h2>On-device machine learning</h2>
-          <p class="section-copy">
+          <p>
             ClassSync may use an on-device TensorFlow Lite model to help classify academic events into categories such as due date task, announcement only, material only, exam or test information, submission instruction, and grade or feedback.
           </p>
-          <p class="section-copy">
-            This logic runs locally inside the app runtime and works alongside deterministic rule-based classification and fallback policies.
-          </p>
+          <p>This logic runs locally inside the app runtime and works alongside deterministic rule-based classification and fallback policies.</p>
         </article>
 
-        <article class="policy-section span-6" id="section-09">
+        <article class="policy-card span-6" id="section-09">
           <span class="section-index">09</span>
           <h2>Retention and user controls</h2>
-          <p class="section-copy">
+          <p>
             ClassSync retains locally stored data on the device until the user deletes specific tasks or academic data, signs out and clears local state, clears app data, or uninstalls the app.
           </p>
           <ul>
@@ -946,26 +1022,30 @@
           </ul>
         </article>
 
-        <article class="policy-section span-6" id="section-10">
+        <article class="policy-card span-6" id="section-10">
           <span class="section-index">10</span>
-          <h2>Children and policy changes</h2>
-          <p class="section-copy">
+          <h2>Children and policy updates</h2>
+          <p>
             ClassSync is intended as a general student productivity app and is not designed as a child-directed service under Google Play Families policies unless explicitly declared otherwise in the Play Console.
           </p>
-          <p class="section-copy">
-            This policy will be updated before release whenever new permissions, data flows, backend storage, or sharing behavior are introduced.
+          <p>
+            This policy will be updated before release whenever new permissions, backend storage, or sharing behavior are introduced.
           </p>
         </article>
       </section>
-    </div>
 
-    <footer class="footer-panel">
-      <p>For privacy questions, deletion guidance, or support, contact <a href="mailto:tech@donum.in">tech@donum.in</a>.</p>
-      <div class="footer-links">
-        <a class="footer-link" href="#privacy-title">Back to top</a>
-        <a class="footer-link" href="https://github.com/InsaneCoder789/ClassSync">Project source</a>
-      </div>
-    </footer>
+      <footer class="footer-panel">
+        <div class="footer-copy">
+          <span class="summary-label">Need help?</span>
+          <h2 class="footer-heading">Reach a real person for privacy questions.</h2>
+          <p>For privacy questions, deletion guidance, or support, contact <a href="mailto:tech@donum.in">tech@donum.in</a>.</p>
+        </div>
+        <div class="footer-actions">
+          <a class="pill-link" href="#privacy-title">Back to top</a>
+          <a class="ghost-link" href="https://github.com/InsaneCoder789/ClassSync">Project source</a>
+        </div>
+      </footer>
+    </div>
   </main>
 </body>
 </html>
