@@ -4,14 +4,14 @@ Last updated: July 2, 2026
 
 This Privacy Policy explains how ClassSync accesses, stores, uses, and handles information when you use the ClassSync Android application.
 
-Before publishing, replace the publisher contact details and public policy URL placeholders below with your real production values.
+This policy is intended to be published publicly for the Play Store release and in-app privacy link.
 
 ## 1. Publisher
 
 - App name: `ClassSync`
-- Publisher: `[Replace with your legal developer or company name]`
-- Privacy contact: `privacy@classsync.app`
-- Public policy URL: `https://classsync.app/privacy`
+- Publisher: `Donum`
+- Privacy contact: `tech@donum.in`
+- Public policy URL: `https://insanecoder789.github.io/ClassSync/privacy/`
 
 ## 2. What ClassSync Does
 
@@ -159,6 +159,4 @@ We may update this Privacy Policy as the app changes. If publishing changes intr
 
 For privacy questions, requests, or support:
 
-- Email: `privacy@classsync.app`
-
-Before release, replace this contact with your real monitored support or privacy address.
+- Email: `tech@donum.in`

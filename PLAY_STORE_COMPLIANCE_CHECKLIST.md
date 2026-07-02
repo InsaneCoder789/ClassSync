@@ -148,9 +148,9 @@ Google Play wording can change, so treat this as a draft mapping for the current
 
 ## 7. Code/Policy Gaps Still To Finish
 
-- Replace placeholder public privacy policy URL in the app resources.
-- Replace placeholder privacy email with a real monitored address.
-- Host the privacy policy on a public URL before submission.
+- Confirm `tech@donum.in` remains the monitored privacy/support mailbox used in the Play listing and privacy policy.
+- Verify the GitHub Pages policy URL is live before submission:
+  - `https://insanecoder789.github.io/ClassSync/privacy/`
 - Reconfirm Data safety answers after any code changes to sync, exports, or ML logging.
 - Review release build configuration, minification, and final manifest before upload.
 
