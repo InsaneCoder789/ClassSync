@@ -31,10 +31,30 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
+      - name: Prepare privacy site
+        run: |
+          mkdir -p public/privacy
+          cp privacy/index.html public/privacy/index.html
+          cat <<'EOF' > public/index.html
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta http-equiv="refresh" content="0; url=./privacy/">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>ClassSync Privacy Policy</title>
+            <link rel="canonical" href="./privacy/">
+          </head>
+          <body>
+            <p>Redirecting to <a href="./privacy/">ClassSync Privacy Policy</a>...</p>
+          </body>
+          </html>
+          EOF
+
       - name: Upload privacy policy artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: privacy
+          path: public
 
       - name: Deploy to GitHub Pages
         id: deployment
