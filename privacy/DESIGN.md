@@ -1,50 +1,52 @@
-# Design System: ClassSync Privacy Surface
+# Design System: ClassSync Privacy Command Deck
 
 ## 1. Visual Theme & Atmosphere
-A restrained, premium control-deck interface with dark glass surfaces, cool academic blue signal color, and offset composition. Density is balanced rather than sparse, variance is intentionally asymmetric, and motion should feel fluid but never noisy. The page should read like a polished product brief rather than a generic legal document.
+A premium privacy page that feels like a product briefing room instead of a legal template. Density sits in the "Daily App Balanced" range, variance is clearly asymmetric, and motion should stay restrained but tactile. The atmosphere should combine dark glass surfaces, cool academic lighting, and clear editorial structure so the page reads as trustworthy, branded, and deliberate.
 
 ## 2. Color Palette & Roles
-- **Night Canvas** (`#06080D`) — Primary dark background
-- **Control Deck Slate** (`#11151F`) — Secondary background tone and soft depth zones
-- **Glass Surface** (`rgba(10,14,22,0.82)`) — Main card and panel fill
-- **Whisper Border** (`rgba(169,188,212,0.16)`) — Structural borders and glass edges
-- **Signal Blue** (`#8BB8FF`) — Single accent for active states, privacy links, section markers
+- **Midnight Ledger** (`#070B12`) — Primary canvas background
+- **Slate Engine** (`#0F1622`) — Supporting background tone and ambient depth
+- **Frosted Deck** (`rgba(14,19,29,0.76)`) — Main shell fill with glass effect
+- **Steel Whisper** (`rgba(170,190,216,0.16)`) — Structural borders and separators
+- **Signal Blue** (`#8DB6FF`) — Single accent for navigation anchors, focus states, and active policy markers
 - **Cold Paper** (`#F2F5FB`) — Light mode canvas
-- **Ink Text** (`#0D1422`) — Light mode primary text
+- **Archive Ink** (`#0D1422`) — Light mode primary text
 
-Only one accent color is allowed. No purple, neon cyan, or glowing gradients.
+Only one accent color is permitted. No purple gradients, no neon blues, and no pure black surfaces.
 
 ## 3. Typography Rules
-- **Display:** `Outfit` — tight tracking, bold but calm, used for the hero headline and section titles
-- **Body:** `Outfit` — relaxed leading, maximum readable line length, neutral tone
-- **Mono:** `JetBrains Mono` — metadata, section indices, short technical labels
-- **Banned:** `Inter`, generic serif fonts, pure system-default typography stacks for hero surfaces
+- **Display:** `Outfit` — track-tight, low line-height, balanced multi-line wrapping, built for strong hero statements
+- **Body:** `Outfit` — readable line length capped near `65ch`, medium and semibold weights used for hierarchy
+- **Mono:** `JetBrains Mono` — labels, indices, timestamps, and technical metadata
+- **Banned:** `Inter`, browser default serif fonts, generic legal-template typography
 
 ## 4. Component Stylings
-- **Hero Banner:** Wide branded visual with an overlay veil, never used as a background behind text without separation
-- **Logo Tile:** Rounded glass capsule that frames the ClassSync mark with subtle inner highlight
-- **Meta Cards:** Rounded glass blocks with mono labels and short factual answers
-- **Policy Sections:** Two-column staggered panels on desktop, single column on mobile, never three equal columns
-- **Links:** Accent blue, no underglow, no novelty hover tricks
+- **Top Bar:** Floating glass utility row with brand lockup and compact legal/support links
+- **Hero Banner:** Full-width branded image with a dark veil overlay; text never sits directly on raw artwork
+- **Policy Navigator:** Sticky aside made of stacked navigation rows rather than default pills or tabs
+- **Quick Summary Cards:** Compact briefing cards that surface key facts such as publisher, contact, and launch posture
+- **Policy Sections:** Mixed-width editorial panels arranged on a 12-column grid; avoid equal towers
+- **Footer Actions:** Tertiary capsule links for back-to-top and source navigation
 
 ## 5. Layout Principles
-- Split hero with main narrative panel on the left and summary/meta aside on the right
-- Text never overlaps imagery; every element gets its own zone
-- Maintain max width containment around `1180px`
-- Collapse to single column below `768px`
-- Policy content should feel editorial and modular, not one continuous wall of text
+- Use a split hero: main narrative panel on the left, policy map on the right
+- Break the legal content into a staggered 12-column grid, not a uniform list of same-size cards
+- Keep strong max-width containment around `1320px`
+- Preserve clear spatial separation between media, headline, summary, and legal text
+- Collapse to a clean single-column stack below `1024px`, with no horizontal overflow at any breakpoint
 
 ## 6. Motion & Interaction
-- Any future motion should use spring-like `transform` and `opacity` transitions only
-- Hover states may lift by `1px` with subtle timing
-- No pulsing legal panels, no spinning loaders, no animated glows
+- Hover and focus states should use `transform` and `opacity` only
+- Links and cards may lift by `1px` for tactile feedback
+- Navigation rows should feel interactive through border and background shifts, not glow
+- Preserve smooth anchor scrolling and obvious keyboard focus visibility
 
 ## 7. Anti-Patterns (Banned)
 - No emojis
 - No `Inter`
 - No pure black `#000000`
-- No neon outer glows
-- No centered generic hero
-- No equal three-card feature rows
-- No legal-template blandness with only plain text on white
-- No overlapping logo and headline content
+- No neon outer glows or purple AI gradients
+- No centered, generic privacy hero
+- No three-equal-card legal rows
+- No plain white legal document styling with a single heading and wall of text
+- No overlapping image/text gimmicks or inaccessible decorative clutter
