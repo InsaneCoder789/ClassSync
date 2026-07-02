@@ -35,6 +35,9 @@ jobs:
         run: |
           mkdir -p public/privacy
           cp privacy/index.html public/privacy/index.html
+          mkdir -p public/privacy/assets
+          cp app/src/main/res/drawable-nodpi/classsync_logo_generated.png public/privacy/assets/classsync-logo-generated.png
+          cp design/opening/classsync-opening-dark-concept.png public/privacy/assets/classsync-opening-dark-concept.png
           cat <<'EOF' > public/index.html
           <!DOCTYPE html>
           <html lang="en">
