@@ -22,7 +22,7 @@ Only one accent color is permitted. No purple gradients, no neon blues, and no p
 
 ## 4. Component Stylings
 - **Top Bar:** Floating glass utility row with brand lockup and compact legal/support links
-- **Hero Banner:** Full-width branded image with a dark veil overlay; text never sits directly on raw artwork
+- **Hero Banner:** 16:9 branded surface with abstract lighting and centered logo lockup; no phone mockups or app screenshots
 - **Policy Navigator:** Sticky aside made of stacked navigation rows rather than default pills or tabs
 - **Quick Summary Cards:** Compact briefing cards that surface key facts such as publisher, contact, and launch posture
 - **Policy Sections:** Mixed-width editorial panels arranged on a 12-column grid; avoid equal towers
@@ -30,6 +30,7 @@ Only one accent color is permitted. No purple gradients, no neon blues, and no p
 
 ## 5. Layout Principles
 - Use a split hero: main narrative panel on the left, policy map on the right
+- Major promotional containers should respect a 16:9 rhythm where content length allows it
 - Break the legal content into a staggered 12-column grid, not a uniform list of same-size cards
 - Keep strong max-width containment around `1320px`
 - Preserve clear spatial separation between media, headline, summary, and legal text
@@ -46,6 +47,7 @@ Only one accent color is permitted. No purple gradients, no neon blues, and no p
 - No `Inter`
 - No pure black `#000000`
 - No neon outer glows or purple AI gradients
+- No mobile-device mockup imagery inside the privacy page
 - No centered, generic privacy hero
 - No three-equal-card legal rows
 - No plain white legal document styling with a single heading and wall of text

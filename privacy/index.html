@@ -230,27 +230,63 @@
 
     .hero-banner {
       position: relative;
-      min-height: 18rem;
+      aspect-ratio: 16 / 9;
       border-radius: calc(var(--radius-panel) - 0.3rem);
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.06);
-      background: #0b1119;
+      background:
+        radial-gradient(circle at 20% 24%, rgba(141, 182, 255, 0.3), transparent 20%),
+        radial-gradient(circle at 76% 30%, rgba(141, 182, 255, 0.18), transparent 18%),
+        linear-gradient(135deg, rgba(17, 27, 44, 0.96), rgba(8, 12, 20, 0.96));
     }
 
-    .hero-banner img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scale(1.02);
+    .hero-banner::before {
+      content: "";
+      position: absolute;
+      inset: 8% 12%;
+      border-radius: 1.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)),
+        rgba(7, 11, 18, 0.42);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 24px 44px rgba(5, 8, 12, 0.24);
     }
 
     .hero-banner::after {
-      content: "";
+      content: "ClassSync";
       position: absolute;
-      inset: 0;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: clamp(2rem, 4vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      color: rgba(247, 249, 253, 0.92);
+      text-shadow: 0 12px 32px rgba(5, 8, 12, 0.26);
+    }
+
+    .hero-banner-brand {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, calc(-50% - 3.4rem));
+      width: clamp(4.6rem, 8vw, 6.8rem);
+      height: clamp(4.6rem, 8vw, 6.8rem);
+      padding: 0.9rem;
+      border-radius: 1.6rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       background:
-        linear-gradient(110deg, rgba(6, 9, 14, 0.08), rgba(6, 9, 14, 0.66) 58%, rgba(6, 9, 14, 0.92)),
-        linear-gradient(180deg, transparent 0%, rgba(5, 8, 12, 0.54) 100%);
+        linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
+        rgba(9, 13, 20, 0.6);
+      box-shadow: 0 20px 38px rgba(5, 8, 12, 0.28);
+    }
+
+    .hero-banner-brand img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .hero-copy {
@@ -296,24 +332,6 @@
     h1 {
       font-size: clamp(2.55rem, 5.2vw, 5.4rem);
       max-width: 10.6ch;
-    }
-
-    .headline-inline {
-      display: inline-flex;
-      width: clamp(4.8rem, 10vw, 7rem);
-      height: clamp(3rem, 6.4vw, 4.2rem);
-      vertical-align: middle;
-      margin: 0 0.14em;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      overflow: hidden;
-      box-shadow: 0 14px 40px rgba(5, 8, 12, 0.3);
-    }
-
-    .headline-inline img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
 
     .hero-lede,
@@ -449,6 +467,8 @@
       padding: 1.15rem;
       display: grid;
       gap: 0.7rem;
+      aspect-ratio: 16 / 9;
+      align-content: start;
     }
 
     .quick-label,
@@ -594,6 +614,13 @@
         border-color: var(--light-border);
       }
 
+      .hero-banner {
+        background:
+          radial-gradient(circle at 20% 24%, rgba(114, 149, 221, 0.24), transparent 20%),
+          radial-gradient(circle at 76% 30%, rgba(114, 149, 221, 0.14), transparent 18%),
+          linear-gradient(135deg, rgba(228, 235, 247, 0.96), rgba(211, 221, 239, 0.96));
+      }
+
       .brand-copy span,
       .hero-lede,
       .section-copy,
@@ -612,10 +639,14 @@
         color: var(--light-text);
       }
 
+      .hero-banner::before,
+      .hero-banner-brand {
+        border-color: rgba(18, 24, 36, 0.08);
+      }
+
       .hero-banner::after {
-        background:
-          linear-gradient(110deg, rgba(255, 255, 255, 0), rgba(16, 21, 32, 0.1) 55%, rgba(16, 21, 32, 0.55)),
-          linear-gradient(180deg, transparent 0%, rgba(16, 21, 32, 0.22) 100%);
+        color: rgba(13, 20, 34, 0.88);
+        text-shadow: none;
       }
 
       code {
@@ -663,17 +694,15 @@
         max-width: none;
       }
 
-      .headline-inline {
-        display: block;
-        margin: 0.7rem 0 0;
-        width: min(14rem, 60vw);
-      }
-
       .hero-main,
       .hero-side,
       .policy-section,
       .quick-card {
         padding: 1rem;
+      }
+
+      .quick-card {
+        aspect-ratio: auto;
       }
     }
   </style>
@@ -703,12 +732,14 @@
     <section class="hero-grid" aria-labelledby="privacy-title">
       <article class="hero-main">
         <div class="hero-banner">
-          <img src="./assets/classsync-opening-dark-concept.png" alt="ClassSync branded privacy banner showing the app's academic control deck visual identity">
+          <div class="hero-banner-brand">
+            <img src="./assets/classsync-logo-generated.png" alt="ClassSync logo">
+          </div>
         </div>
 
         <div class="hero-copy">
           <span class="policy-chip">Privacy policy</span>
-          <h1 id="privacy-title">See how <span class="headline-inline"><img src="./assets/classsync-opening-dark-concept.png" alt="ClassSync privacy banner preview"></span> ClassSync handles your academic data.</h1>
+          <h1 id="privacy-title">See how ClassSync handles your academic data.</h1>
           <p class="hero-lede">
             This page explains what the app reads from Google, what stays on your device, when Gmail is optional, how reminders and widgets work, and what control users keep over their own study workspace.
           </p>
