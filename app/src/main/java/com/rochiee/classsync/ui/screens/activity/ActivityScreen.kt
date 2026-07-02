@@ -27,7 +27,7 @@ fun ActivityScreen(
     Column(modifier = Modifier.padding(spacing.md), verticalArrangement = Arrangement.spacedBy(spacing.md)) {
         ScreenSection(title = "Recent activity", subtitle = "Latest classroom events stored locally.") {
             if (eventState.recentEvents.isEmpty()) {
-                EmptyState("No activity yet", "Run a sync or add sample events from Debug to populate this timeline.")
+                EmptyState("No activity yet", "Run a sync or connect Google to start building your academic timeline.")
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                     items(eventState.recentEvents) { event ->

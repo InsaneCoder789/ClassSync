@@ -34,13 +34,18 @@ def main() -> None:
     parser.add_argument("--model_dir", required=True, type=Path)
     parser.add_argument("--output_dir", required=True, type=Path)
     parser.add_argument("--batch_size", type=int, default=32)
+    parser.add_argument(
+        "--split_strategy",
+        choices=("auto", "group_by_text", "split_hint", "random_rows"),
+        default="group_by_text",
+    )
     args = parser.parse_args()
 
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
     frame = load_dataset(args.csv.resolve())
-    splits = split_dataset(frame)
+    splits = split_dataset(frame, split_strategy=args.split_strategy)
     model = load_saved_model_for_inference(args.model_dir.resolve())
     vectorizer = build_vectorizer(splits.train_texts)
     test_tokens = vectorize_texts(vectorizer, splits.test_texts)
@@ -54,6 +59,7 @@ def main() -> None:
     predicted_labels = np.array([LABELS[idx] for idx in predicted_indices])
     metrics = write_reports(output_dir, splits.test_frame.reset_index(drop=True), truth_labels, predicted_labels)
     copy_reports_to_project_root(output_dir, Path(__file__).resolve().parents[1])
+    metrics["split_summary"] = splits.split_summary
     (output_dir / "evaluation_metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
     print(json.dumps(metrics, indent=2))
 

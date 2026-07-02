@@ -8,9 +8,5 @@ sealed class EventEvent {
     object LoadRecentEvents : EventEvent()
     data class DeleteEvent(val eventId: String) : EventEvent()
     data class ConvertEventToTask(val eventId: String) : EventEvent()
-    object AddSampleAnnouncementEvent : EventEvent()
-    object AddSampleMaterialEvent : EventEvent()
-    object AddSampleQuizEvent : EventEvent()
-    object AddSampleCommentEvent : EventEvent()
     object ClearError : EventEvent()
 }

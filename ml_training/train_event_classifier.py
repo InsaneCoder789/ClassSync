@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 from dataclasses import dataclass
@@ -11,6 +12,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split
 
 
 LABELS = [
@@ -44,6 +46,7 @@ class DatasetSplits:
     test_texts: np.ndarray
     test_labels: np.ndarray
     test_frame: pd.DataFrame
+    split_summary: dict[str, object]
 
 
 def normalize_text(value: object) -> str:
@@ -76,6 +79,7 @@ def load_dataset(csv_path: Path) -> pd.DataFrame:
     ensure_required_columns(frame)
     frame = frame.copy()
     frame["input_text"] = build_input_text(frame)
+    frame["input_text_normalized"] = frame["input_text"].map(normalize_text).str.lower()
     frame["classification_label"] = frame["classification_label"].fillna("UNKNOWN").astype(str).str.strip()
     frame = frame[frame["classification_label"].isin(LABELS)]
     if frame.empty:
@@ -84,14 +88,114 @@ def load_dataset(csv_path: Path) -> pd.DataFrame:
     return frame
 
 
-def split_dataset(frame: pd.DataFrame, random_seed: int = 42) -> DatasetSplits:
+def text_group_key(text: str) -> str:
+    normalized = normalize_text(text).lower()
+    return hashlib.sha1(normalized.encode("utf-8")).hexdigest()
+
+
+def count_cross_split_overlap(frame: pd.DataFrame, split_column: str) -> dict[str, int]:
+    grouped = frame.groupby("text_group")[split_column].agg(lambda values: tuple(sorted(set(values))))
+    overlapping_groups = grouped[grouped.map(len) > 1]
+    overlapping_rows = int(frame["text_group"].isin(overlapping_groups.index).sum())
+    return {
+        "overlapping_groups": int(len(overlapping_groups)),
+        "overlapping_rows": overlapping_rows,
+    }
+
+
+def split_with_group_holdout(frame: pd.DataFrame, random_seed: int) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, dict[str, object]]:
+    group_frame = frame.groupby("text_group", as_index=False).agg(
+        classification_label=("classification_label", "first")
+    )
+
+    train_groups, temp_groups = train_test_split(
+        group_frame,
+        test_size=0.2,
+        random_state=random_seed,
+        stratify=group_frame["classification_label"],
+    )
+    val_groups, test_groups = train_test_split(
+        temp_groups,
+        test_size=0.5,
+        random_state=random_seed,
+        stratify=temp_groups["classification_label"],
+    )
+
+    train_frame = frame[frame["text_group"].isin(train_groups["text_group"])].copy()
+    val_frame = frame[frame["text_group"].isin(val_groups["text_group"])].copy()
+    test_frame = frame[frame["text_group"].isin(test_groups["text_group"])].copy()
+
+    summary = {
+        "strategy": "group_by_text",
+        "unique_text_groups": int(len(group_frame)),
+        "cross_split_overlap": count_cross_split_overlap(
+            pd.concat(
+                [
+                    train_frame.assign(effective_split="train"),
+                    val_frame.assign(effective_split="validation"),
+                    test_frame.assign(effective_split="test"),
+                ],
+                ignore_index=True,
+            ),
+            "effective_split",
+        ),
+    }
+    return train_frame, val_frame, test_frame, summary
+
+
+def split_from_explicit_hints(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, dict[str, object]]:
     valid_splits = {"train", "validation", "val", "test"}
-    if frame["split_hint_normalized"].isin(valid_splits).any():
-        train_frame = frame[frame["split_hint_normalized"] == "train"].copy()
-        val_frame = frame[frame["split_hint_normalized"].isin({"validation", "val"})].copy()
-        test_frame = frame[frame["split_hint_normalized"] == "test"].copy()
-        if train_frame.empty or val_frame.empty or test_frame.empty:
-            raise ValueError("split_hint exists but does not produce non-empty train/validation/test sets.")
+    train_frame = frame[frame["split_hint_normalized"] == "train"].copy()
+    val_frame = frame[frame["split_hint_normalized"].isin({"validation", "val"})].copy()
+    test_frame = frame[frame["split_hint_normalized"] == "test"].copy()
+    if train_frame.empty or val_frame.empty or test_frame.empty:
+        raise ValueError("split_hint exists but does not produce non-empty train/validation/test sets.")
+    combined = pd.concat(
+        [
+            train_frame.assign(effective_split="train"),
+            val_frame.assign(effective_split="validation"),
+            test_frame.assign(effective_split="test"),
+        ],
+        ignore_index=True,
+    )
+    return train_frame, val_frame, test_frame, {
+        "strategy": "split_hint",
+        "cross_split_overlap": count_cross_split_overlap(combined, "effective_split"),
+    }
+
+
+def split_dataset(
+    frame: pd.DataFrame,
+    random_seed: int = 42,
+    split_strategy: str = "group_by_text",
+) -> DatasetSplits:
+    frame = frame.copy()
+    frame["text_group"] = frame["input_text_normalized"].map(text_group_key)
+
+    valid_splits = {"train", "validation", "val", "test"}
+    if split_strategy == "split_hint":
+        train_frame, val_frame, test_frame, split_summary = split_from_explicit_hints(frame)
+    elif split_strategy == "auto":
+        if frame["split_hint_normalized"].isin(valid_splits).any():
+            hinted_train, hinted_val, hinted_test, hinted_summary = split_from_explicit_hints(frame)
+            overlap = hinted_summary["cross_split_overlap"]["overlapping_groups"]
+            if overlap == 0:
+                train_frame, val_frame, test_frame, split_summary = (
+                    hinted_train,
+                    hinted_val,
+                    hinted_test,
+                    hinted_summary,
+                )
+            else:
+                train_frame, val_frame, test_frame, split_summary = split_with_group_holdout(frame, random_seed)
+                split_summary["fallback_reason"] = (
+                    f"Detected {overlap} normalized text groups spanning multiple split_hint buckets."
+                )
+                split_summary["hint_overlap"] = hinted_summary["cross_split_overlap"]
+        else:
+            train_frame, val_frame, test_frame, split_summary = split_with_group_holdout(frame, random_seed)
+    elif split_strategy == "group_by_text":
+        train_frame, val_frame, test_frame, split_summary = split_with_group_holdout(frame, random_seed)
     else:
         shuffled = frame.sample(frac=1.0, random_state=random_seed).reset_index(drop=True)
         total = len(shuffled)
@@ -100,6 +204,18 @@ def split_dataset(frame: pd.DataFrame, random_seed: int = 42) -> DatasetSplits:
         train_frame = shuffled.iloc[:train_end].copy()
         val_frame = shuffled.iloc[train_end:val_end].copy()
         test_frame = shuffled.iloc[val_end:].copy()
+        combined = pd.concat(
+            [
+                train_frame.assign(effective_split="train"),
+                val_frame.assign(effective_split="validation"),
+                test_frame.assign(effective_split="test"),
+            ],
+            ignore_index=True,
+        )
+        split_summary = {
+            "strategy": "random_rows",
+            "cross_split_overlap": count_cross_split_overlap(combined, "effective_split"),
+        }
 
     label_to_index = {label: idx for idx, label in enumerate(LABELS)}
 
@@ -114,6 +230,7 @@ def split_dataset(frame: pd.DataFrame, random_seed: int = 42) -> DatasetSplits:
         test_texts=test_frame["input_text"].to_numpy(dtype=str),
         test_labels=encode_labels(test_frame["classification_label"]),
         test_frame=test_frame,
+        split_summary=split_summary,
     )
 
 
@@ -255,6 +372,16 @@ def main() -> None:
     parser.add_argument("--output_dir", required=True, type=Path)
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch_size", type=int, default=32)
+    parser.add_argument(
+        "--split_strategy",
+        choices=("auto", "group_by_text", "split_hint", "random_rows"),
+        default="group_by_text",
+        help=(
+            "How to build train/validation/test splits. "
+            "'group_by_text' keeps normalized duplicate texts in exactly one split. "
+            "'auto' uses split_hint only when it is overlap-free."
+        ),
+    )
     args = parser.parse_args()
 
     output_dir = args.output_dir.resolve()
@@ -262,7 +389,7 @@ def main() -> None:
     project_root = Path(__file__).resolve().parents[1]
 
     frame = load_dataset(args.csv.resolve())
-    splits = split_dataset(frame)
+    splits = split_dataset(frame, split_strategy=args.split_strategy)
 
     vectorizer = build_vectorizer(splits.train_texts)
     train_tokens = vectorize_texts(vectorizer, splits.train_texts)
@@ -311,6 +438,7 @@ def main() -> None:
             "validation": int(len(splits.val_texts)),
             "test": int(len(splits.test_texts)),
         },
+        "split_summary": splits.split_summary,
         "labels": LABELS,
         "history": {k: [float(v) for v in values] for k, values in history.history.items()},
         **report_metrics,

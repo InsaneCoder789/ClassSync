@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ClassSync</string>
+    <string name="privacy_policy_public_url">https://classsync.app/privacy</string>
+    <string name="privacy_policy_contact_email">privacy@classsync.app</string>
 </resources>

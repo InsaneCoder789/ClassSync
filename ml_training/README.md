@@ -35,7 +35,7 @@ The model trains on:
 - fallback input: `title + body + course_name`
 - target label: `classification_label`
 
-If `split_hint` is present, it is used for train / validation / test. Otherwise the script uses an 80 / 10 / 10 random split.
+If `split_hint` is present, the scripts can use it, but the safer default is a group-aware split by normalized message text so duplicate templates do not leak across train / validation / test.
 
 ## Install dependencies
 
@@ -51,6 +51,7 @@ pip install -r ml_training/requirements.txt
 python ml_training/train_event_classifier.py \
   --csv /Users/rohanc/Downloads/classsync_synthetic_event_training_50000.csv \
   --output_dir ml_training/output \
+  --split_strategy group_by_text \
   --epochs 10 \
   --batch_size 32
 ```
@@ -61,7 +62,8 @@ python ml_training/train_event_classifier.py \
 python ml_training/evaluate_event_classifier.py \
   --csv /Users/rohanc/Downloads/classsync_synthetic_event_training_50000.csv \
   --model_dir ml_training/output/saved_model \
-  --output_dir ml_training/output
+  --output_dir ml_training/output \
+  --split_strategy group_by_text
 ```
 
 ## Export TFLite only
@@ -93,6 +95,13 @@ The training script also copies:
 
 - `app/src/main/assets/classsync_event_classifier.tflite`
 - `app/src/main/assets/classsync_event_labels.txt`
+
+## Split strategy
+
+- `group_by_text`: recommended default. Keeps normalized duplicate texts in only one split.
+- `auto`: uses `split_hint` only when there is no cross-split duplicate-text overlap.
+- `split_hint`: trusts the dataset-provided split assignments as-is.
+- `random_rows`: plain random 80 / 10 / 10 row split. Fastest, but most leakage-prone on synthetic/template-heavy data.
 
 ## Android fallback behavior
 

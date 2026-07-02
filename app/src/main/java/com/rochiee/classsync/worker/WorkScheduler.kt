@@ -62,8 +62,7 @@ object WorkScheduler {
     }
 
     fun scheduleAll(context: Context) {
-        scheduleGmailSync(context)
-        scheduleClassroomSync(context)
+        cancelSyncWork(context)
         scheduleFullSync(context)
         scheduleWidgetRefresh(context)
     }
@@ -96,12 +95,17 @@ object WorkScheduler {
     }
 
     fun cancelAll(context: Context) {
+        cancelSyncWork(context)
+        val workManager = WorkManager.getInstance(context)
+        workManager.cancelUniqueWork(WIDGET_REFRESH_WORK)
+        workManager.cancelUniqueWork(DUE_SOON_NOTIFICATION_WORK)
+    }
+
+    fun cancelSyncWork(context: Context) {
         val workManager = WorkManager.getInstance(context)
         workManager.cancelUniqueWork(GMAIL_SYNC_WORK)
         workManager.cancelUniqueWork(CLASSROOM_SYNC_WORK)
         workManager.cancelUniqueWork(FULL_SYNC_WORK)
-        workManager.cancelUniqueWork(WIDGET_REFRESH_WORK)
-        workManager.cancelUniqueWork(DUE_SOON_NOTIFICATION_WORK)
     }
 
     fun runOneTimeFullSync(context: Context) {

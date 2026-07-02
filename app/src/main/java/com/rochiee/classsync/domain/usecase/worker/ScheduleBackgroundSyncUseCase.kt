@@ -11,19 +11,22 @@ class ScheduleBackgroundSyncUseCase(
 ) {
     suspend operator fun invoke() {
         val settings = settingsRepository.observeSettings().first()
+        WorkScheduler.cancelSyncWork(context)
+
         if (!settings.backgroundSyncEnabled) {
-            WorkScheduler.cancelAll(context)
             return
         }
 
-        if (settings.gmailSyncEnabled) {
-            WorkScheduler.scheduleGmailSync(context)
-        }
-        if (settings.classroomSyncEnabled) {
-            WorkScheduler.scheduleClassroomSync(context)
-        }
-        if (settings.gmailSyncEnabled || settings.classroomSyncEnabled) {
-            WorkScheduler.scheduleFullSync(context)
+        when {
+            settings.gmailSyncEnabled && settings.classroomSyncEnabled -> {
+                WorkScheduler.scheduleFullSync(context)
+            }
+            settings.gmailSyncEnabled -> {
+                WorkScheduler.scheduleGmailSync(context)
+            }
+            settings.classroomSyncEnabled -> {
+                WorkScheduler.scheduleClassroomSync(context)
+            }
         }
     }
 }

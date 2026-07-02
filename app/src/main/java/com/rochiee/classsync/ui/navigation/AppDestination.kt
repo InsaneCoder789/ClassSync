@@ -20,9 +20,11 @@ sealed class AppDestination(
     data object EventDetail : AppDestination("eventDetail", "Event Detail")
     data object StudyPlanner : AppDestination("studyPlanner", "Study Planner")
     data object ExamMode : AppDestination("examMode", "Exam Mode")
+    data object PrivacyPolicy : AppDestination("privacyPolicy", "Privacy Policy")
 
     companion object {
-        val bottomBarDestinations = listOf(Home, Tasks, Planner, Settings)
+        val bottomBarDestinations: List<AppDestination>
+            get() = listOf(Home, Tasks, Planner, Settings)
 
         fun sanitizeExternalStartRoute(route: String?, allowDebugTools: Boolean): String? {
             return when (route) {

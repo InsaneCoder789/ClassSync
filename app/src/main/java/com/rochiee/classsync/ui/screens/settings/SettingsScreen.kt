@@ -52,7 +52,8 @@ fun SettingsScreen(
     syncState: SyncState,
     onSettingsEvent: (SettingsEvent) -> Unit,
     onSyncEvent: (SyncEvent) -> Unit,
-    onNavigateToAuth: () -> Unit
+    onNavigateToAuth: () -> Unit,
+    onNavigateToPrivacyPolicy: () -> Unit
 ) {
     val spacing = LocalSpacing.current
     LazyColumn(
@@ -309,6 +310,31 @@ fun SettingsScreen(
                     LiquidGlassTextButton(text = "8 PM", onClick = { onSettingsEvent(SettingsEvent.SetDigestHourOfDay(20)) }, modifier = Modifier.widthIn(min = 92.dp), selected = settingsState.digestHourOfDay == 20)
                 }
                 LiquidGlassTextButton(text = "Preview today’s digest", onClick = { onSettingsEvent(SettingsEvent.PreviewDigest) }, modifier = Modifier.fillMaxWidth())
+            }
+        } }
+
+        item { ScreenSection(title = "Privacy and policy", subtitle = "Review exactly what ClassSync accesses, what stays local, and what you control.") {
+            TintedPanel {
+                Text(
+                    text = "ClassSync stores your task workspace locally on this device. If you sign in with Google, the app may read your Google account email, Google Classroom coursework, announcements, materials, and optional Gmail academic messages only for the sync features you enable.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = "Classroom sync is read-only. Gmail sync is optional. Exported CSV or JSON files are created only when you trigger an export. Reminder and digest notifications use local app data. ClassSync does not sell your personal data and does not use a custom backend to store your academic content.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "You can disable Gmail sync, disable Classroom sync, sign out of Google, or clear local academic data at any time.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                LiquidGlassTextButton(
+                    text = "Read privacy policy",
+                    onClick = onNavigateToPrivacyPolicy,
+                    modifier = Modifier.fillMaxWidth(),
+                    showArrow = true
+                )
             }
         } }
 

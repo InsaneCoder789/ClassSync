@@ -74,6 +74,7 @@ import com.rochiee.classsync.ui.screens.exam.ExamModeScreen
 import com.rochiee.classsync.ui.screens.home.HomeScreen
 import com.rochiee.classsync.ui.screens.onboarding.OnboardingScreen
 import com.rochiee.classsync.ui.screens.planner.PlannerScreen
+import com.rochiee.classsync.ui.screens.settings.PrivacyPolicyScreen
 import com.rochiee.classsync.ui.screens.settings.SettingsScreen
 import com.rochiee.classsync.ui.screens.study.StudyPlannerScreen
 import com.rochiee.classsync.ui.screens.tasks.TasksScreen
@@ -283,8 +284,12 @@ fun AppNavHost(
                         syncState = syncState,
                         onSettingsEvent = onSettingsEvent,
                         onSyncEvent = onSyncEvent,
-                        onNavigateToAuth = { navController.navigate(AppDestination.Auth.route) }
+                        onNavigateToAuth = { navController.navigate(AppDestination.Auth.route) },
+                        onNavigateToPrivacyPolicy = { navController.navigate(AppDestination.PrivacyPolicy.route) }
                     )
+                }
+                composable(AppDestination.PrivacyPolicy.route) {
+                    PrivacyPolicyScreen()
                 }
                 if (BuildConfig.DEBUG) {
                     composable(AppDestination.Debug.route) {
@@ -415,6 +420,7 @@ private fun titleForRoute(route: String?): String {
         route.startsWith(AppDestination.EventDetail.route) -> AppDestination.EventDetail
         route == AppDestination.StudyPlanner.route -> AppDestination.StudyPlanner
         route == AppDestination.ExamMode.route -> AppDestination.ExamMode
+        route == AppDestination.PrivacyPolicy.route -> AppDestination.PrivacyPolicy
         else -> AppDestination.Home
     }
     return destination.label

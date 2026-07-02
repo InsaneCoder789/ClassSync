@@ -79,10 +79,6 @@ fun DebugScreen(
                 LiquidGlassTextButton(text = "Export CSV", onClick = { onTaskEvent(TaskEvent.ExportTasksCsv) }, modifier = Modifier.weight(1f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
-                LiquidGlassTextButton(text = "Sample Announcement", onClick = { onEventEvent(EventEvent.AddSampleAnnouncementEvent) }, modifier = Modifier.weight(1f))
-                LiquidGlassTextButton(text = "Sample Quiz", onClick = { onEventEvent(EventEvent.AddSampleQuizEvent) }, modifier = Modifier.weight(1f))
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm), modifier = Modifier.fillMaxWidth()) {
                 LiquidGlassTextButton(text = "Load Today", onClick = { onPlannerEvent(PlannerEvent.LoadToday) }, modifier = Modifier.weight(1f))
                 LiquidGlassTextButton(text = "Load Week", onClick = { onPlannerEvent(PlannerEvent.LoadCurrentWeek) }, modifier = Modifier.weight(1f))
             }

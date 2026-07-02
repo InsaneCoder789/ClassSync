@@ -19,6 +19,8 @@ venv/
 ml_training/.venv/
 ml_training/output/
 ml_training/reports/
+ml_training/output_50k_grouped/
+.kotlin/
 
 # Local-only documentation and agent notes
 AGENT.md

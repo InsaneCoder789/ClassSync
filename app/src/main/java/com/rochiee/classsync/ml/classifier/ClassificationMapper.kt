@@ -53,7 +53,10 @@ object ClassificationMapper {
             EventClassificationLabel.INFORMATION_ONLY,
             EventClassificationLabel.ANNOUNCEMENT_ONLY -> ClassroomEventActionType.INFORMATION_ONLY
             EventClassificationLabel.MATERIAL_ONLY -> {
-                if (inputText.containsAny("read", "complete", "prepare", "revise", "before next class")) {
+                if (
+                    !inputText.containsNegativeTaskSignal() &&
+                    inputText.containsAny("read", "complete", "prepare", "revise", "before next class")
+                ) {
                     ClassroomEventActionType.TASK_REQUIRED
                 } else {
                     ClassroomEventActionType.OPTIONAL_READING
@@ -106,5 +109,23 @@ object ClassificationMapper {
     private fun String.containsAny(vararg keywords: String): Boolean {
         val normalized = lowercase()
         return keywords.any { normalized.contains(it) }
+    }
+
+    private fun String.containsNegativeTaskSignal(): Boolean {
+        val normalized = lowercase()
+        return listOf(
+            "no action needed",
+            "no action is needed",
+            "no submission required",
+            "no submission is required",
+            "no preparation needed",
+            "for discussion only",
+            "discussion only",
+            "for your reference",
+            "optional reference",
+            "optional reading",
+            "nothing to submit",
+            "no task required"
+        ).any { normalized.contains(it) }
     }
 }

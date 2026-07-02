@@ -80,7 +80,6 @@ class ViewModelFactory(
                 EventBlocViewModel(
                     container.observeAllEventsUseCase,
                     container.observeRecentEventsUseCase,
-                    container.saveClassroomEventUseCase,
                     container.convertEventToTaskUseCase,
                     container.deleteClassroomEventUseCase
                 ) as T

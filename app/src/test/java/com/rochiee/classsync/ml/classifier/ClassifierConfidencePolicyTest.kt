@@ -50,6 +50,84 @@ class ClassifierConfidencePolicyTest {
         assertTrue(chosen.reason.contains("medium-confidence band"))
     }
 
+    @Test
+    fun keepsTrustedRuleLabelEvenWhenTfliteDisagrees() {
+        val ruleResult = result(
+            label = EventClassificationLabel.TEST_OR_EXAM_INFO,
+            eventType = ClassroomEventType.EXAM,
+            actionType = ClassroomEventActionType.TASK_REQUIRED,
+            shouldCreateTask = true,
+            confidence = 0.92f,
+            source = ClassificationSource.RULE_BASED
+        )
+        val tfliteResult = result(
+            label = EventClassificationLabel.INFORMATION_ONLY,
+            eventType = ClassroomEventType.ANNOUNCEMENT,
+            actionType = ClassroomEventActionType.INFORMATION_ONLY,
+            shouldCreateTask = false,
+            confidence = 0.97f,
+            source = ClassificationSource.TFLITE
+        )
+
+        val chosen = ClassifierConfidencePolicy.choose(ruleResult, tfliteResult)
+
+        assertEquals(EventClassificationLabel.TEST_OR_EXAM_INFO, chosen.label)
+        assertEquals(ClassificationSource.HYBRID_FALLBACK, chosen.source)
+        assertTrue(chosen.reason.contains("Trusted rule label kept"))
+    }
+
+    @Test
+    fun fallsBackWhenTfliteConfidenceIsLow() {
+        val ruleResult = result(
+            label = EventClassificationLabel.ANNOUNCEMENT_ONLY,
+            eventType = ClassroomEventType.ANNOUNCEMENT,
+            actionType = ClassroomEventActionType.INFORMATION_ONLY,
+            shouldCreateTask = false,
+            confidence = 0.62f,
+            source = ClassificationSource.RULE_BASED
+        )
+        val tfliteResult = result(
+            label = EventClassificationLabel.TASK_REQUIRED,
+            eventType = ClassroomEventType.COURSEWORK,
+            actionType = ClassroomEventActionType.TASK_REQUIRED,
+            shouldCreateTask = true,
+            confidence = 0.41f,
+            source = ClassificationSource.TFLITE
+        )
+
+        val chosen = ClassifierConfidencePolicy.choose(ruleResult, tfliteResult)
+
+        assertEquals(EventClassificationLabel.ANNOUNCEMENT_ONLY, chosen.label)
+        assertEquals(ClassificationSource.HYBRID_FALLBACK, chosen.source)
+        assertTrue(chosen.reason.contains("below threshold"))
+    }
+
+    @Test
+    fun prefersStrongTfliteOverWeakRuleLabel() {
+        val ruleResult = result(
+            label = EventClassificationLabel.INFORMATION_ONLY,
+            eventType = ClassroomEventType.ANNOUNCEMENT,
+            actionType = ClassroomEventActionType.INFORMATION_ONLY,
+            shouldCreateTask = false,
+            confidence = 0.35f,
+            source = ClassificationSource.RULE_BASED
+        )
+        val tfliteResult = result(
+            label = EventClassificationLabel.SUBMISSION_INSTRUCTION,
+            eventType = ClassroomEventType.ASSIGNMENT,
+            actionType = ClassroomEventActionType.TASK_REQUIRED,
+            shouldCreateTask = true,
+            confidence = 0.88f,
+            source = ClassificationSource.TFLITE
+        )
+
+        val chosen = ClassifierConfidencePolicy.choose(ruleResult, tfliteResult)
+
+        assertEquals(EventClassificationLabel.SUBMISSION_INSTRUCTION, chosen.label)
+        assertEquals(ClassificationSource.TFLITE, chosen.source)
+        assertTrue(chosen.reason.contains("Strong TFLite confidence"))
+    }
+
     private fun result(
         label: EventClassificationLabel,
         eventType: ClassroomEventType = ClassroomEventType.ASSIGNMENT,

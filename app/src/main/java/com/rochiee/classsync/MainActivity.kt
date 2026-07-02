@@ -34,13 +34,11 @@ import com.rochiee.classsync.ui.navigation.AppNavHost
 import com.rochiee.classsync.ui.screens.startup.ReturnWelcomeScreen
 import com.rochiee.classsync.ui.theme.ClassSyncTheme
 import kotlinx.coroutines.delay
-import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     companion object {
         const val EXTRA_START_DESTINATION = "classsync.extra.START_DESTINATION"
-        private const val APP_SPLASH_MIN_DURATION_MILLIS = 2600L
-        private const val APP_SPLASH_MAX_DURATION_MILLIS = 3900L
+        private const val APP_SPLASH_DURATION_MILLIS = 650L
     }
 
     private val taskViewModel: TaskBlocViewModel by viewModels {
@@ -102,19 +100,13 @@ class MainActivity : ComponentActivity() {
             }
 
             ClassSyncTheme(darkTheme = useDarkTheme) {
-                val launchDurationMillis = remember {
-                    Random.nextLong(
-                        from = APP_SPLASH_MIN_DURATION_MILLIS,
-                        until = APP_SPLASH_MAX_DURATION_MILLIS + 1L
-                    )
-                }
                 var showLaunchSplash by remember {
                     mutableStateOf(true)
                 }
 
                 LaunchedEffect(settingsState.isLoading) {
                     if (settingsState.isLoading) return@LaunchedEffect
-                    delay(launchDurationMillis)
+                    delay(APP_SPLASH_DURATION_MILLIS)
                     showLaunchSplash = false
                     settingsViewModel.onEvent(
                         com.rochiee.classsync.bloc.settings.SettingsEvent.SetLastAppOpenTime(
@@ -163,7 +155,7 @@ class MainActivity : ComponentActivity() {
                     if (showLaunchSplash) {
                         ReturnWelcomeScreen(
                             darkTheme = useDarkTheme,
-                            durationMillis = launchDurationMillis.toInt(),
+                            durationMillis = APP_SPLASH_DURATION_MILLIS.toInt(),
                             modifier = Modifier.fillMaxSize()
                         )
                     }
