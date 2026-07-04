@@ -19,6 +19,8 @@ import kotlinx.coroutines.withContext
 
 class GoogleAuthManager(private val context: Context) {
     private val secureAuthStore = SecureAuthStore(context.applicationContext)
+    private val requiredScopes: Array<Scope>
+        get() = GoogleScopes.ALL_SCOPES.map(::Scope).toTypedArray()
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
@@ -81,17 +83,18 @@ class GoogleAuthManager(private val context: Context) {
     }
 
     suspend fun signOut(): Boolean {
+        var completedRemoteSignOut = true
         try {
             withContext(Dispatchers.IO) {
                 Tasks.await(googleSignInClient(context).signOut())
             }
+        } catch (e: Exception) {
+            completedRemoteSignOut = false
+        } finally {
             secureAuthStore.clearSession()
             _authState.value = AuthState.Unauthenticated
-            return true
-        } catch (e: Exception) {
-            _authState.value = AuthState.Error(e.message ?: "Sign-out failed")
-            return false
         }
+        return completedRemoteSignOut
     }
 
     fun checkAuthState() {
@@ -99,15 +102,21 @@ class GoogleAuthManager(private val context: Context) {
             val account = GoogleSignIn.getLastSignedInAccount(context)
             val session = secureAuthStore.restoreSession()
             _authState.value = when {
-                isOAuthConfigured() && account?.email?.isNotBlank() == true -> {
+                isOAuthConfigured() &&
+                    account?.email?.isNotBlank() == true &&
+                    hasRequiredPermissions(account) -> {
                     persistAccount(account)
                     _authState.value
                 }
-                isOAuthConfigured() && session != null -> {
-                    AuthState.Authenticated(
-                        email = session.email,
-                        displayName = session.displayName
+                isOAuthConfigured() && account?.email?.isNotBlank() == true -> {
+                    secureAuthStore.clearSession()
+                    AuthState.Error(
+                        "Google sign-in is missing the Gmail or Classroom permissions ClassSync needs. Sign out, sign in again, and accept every requested Google permission."
                     )
+                }
+                isOAuthConfigured() && session != null -> {
+                    secureAuthStore.clearSession()
+                    AuthState.Unauthenticated
                 }
                 else -> AuthState.Unauthenticated
             }
@@ -131,12 +140,15 @@ class GoogleAuthManager(private val context: Context) {
         GoogleSignIn.getClient(activityContext, googleSignInOptions())
 
     private fun googleSignInOptions(): GoogleSignInOptions {
-        val scopes = GoogleScopes.ALL_SCOPES.map(::Scope)
         return GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .requestIdToken(webClientId)
-            .requestScopes(scopes.first(), *scopes.drop(1).toTypedArray())
+            .requestScopes(requiredScopes.first(), *requiredScopes.drop(1).toTypedArray())
             .build()
+    }
+
+    private fun hasRequiredPermissions(account: GoogleSignInAccount): Boolean {
+        return GoogleSignIn.hasPermissions(account, *requiredScopes)
     }
 
     private fun persistAccount(account: GoogleSignInAccount) {

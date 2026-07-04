@@ -349,27 +349,30 @@ private fun OnboardingWhiteButton(
     val isLightMode = MaterialTheme.colorScheme.background.luminance() > 0.5f
     val shellGradient = if (isPrimary) {
         listOf(
-            Color.White.copy(alpha = if (enabled) 0.34f else 0.18f),
-            Color(0xFFDCE8FA).copy(alpha = if (enabled) 0.24f else 0.12f)
+            Color(0xFF080B12).copy(alpha = if (enabled) 0.96f else 0.44f),
+            Color(0xFF101722).copy(alpha = if (enabled) 0.94f else 0.40f)
         )
     } else {
         listOf(
-            Color.White.copy(alpha = if (enabled) 0.22f else 0.12f),
-            Color(0xFFC7D7F0).copy(alpha = if (enabled) 0.14f else 0.08f)
+            Color(0xFF11151D).copy(alpha = if (enabled) 0.82f else 0.32f),
+            Color(0xFF171D28).copy(alpha = if (enabled) 0.78f else 0.28f)
         )
     }
     val borderColor = if (isPrimary) {
-        Color.White.copy(alpha = if (enabled) 0.42f else 0.20f)
+        Color.White.copy(alpha = if (enabled) 0.22f else 0.10f)
     } else {
-        Color.White.copy(alpha = if (enabled) 0.28f else 0.14f)
+        Color.White.copy(alpha = if (enabled) 0.16f else 0.08f)
     }
-    val textColor = if (enabled) Color.White.copy(alpha = if (isPrimary) 0.98f else 0.92f) else Color.White.copy(alpha = 0.52f)
+    val textColor = when {
+        !enabled -> Color.White.copy(alpha = 0.54f)
+        else -> Color.White.copy(alpha = if (isPrimary) 0.99f else 0.92f)
+    }
     val arrowContainerColor = if (isLightMode) {
-        if (isPrimary) Color.White.copy(alpha = 0.82f) else Color.White.copy(alpha = 0.68f)
+        if (isPrimary) Color.White.copy(alpha = 0.14f) else Color.White.copy(alpha = 0.10f)
     } else {
-        if (isPrimary) Color.White.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.16f)
+        if (isPrimary) Color.White.copy(alpha = 0.14f) else Color.White.copy(alpha = 0.10f)
     }
-    val arrowTint = if (isLightMode) Color(0xFF173055) else Color.White
+    val arrowTint = Color.White
     Surface(
         onClick = onClick,
         enabled = enabled,
@@ -403,7 +406,7 @@ private fun OnboardingWhiteButton(
                 text = label,
                 style = MaterialTheme.typography.titleLarge,
                 color = textColor,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.ExtraBold
             )
             Surface(
                 modifier = Modifier.size(42.dp),

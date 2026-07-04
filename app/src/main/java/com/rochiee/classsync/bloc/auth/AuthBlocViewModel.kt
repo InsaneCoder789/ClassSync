@@ -67,8 +67,14 @@ class AuthBlocViewModel(
             AuthEvent.CheckAuthState -> googleAuthManager.checkAuthState()
             AuthEvent.SignOut -> {
                 viewModelScope.launch {
-                    if (googleAuthManager.signOut()) {
-                        clearLocalAcademicDataUseCase()
+                    val signOutSucceeded = googleAuthManager.signOut()
+                    clearLocalAcademicDataUseCase()
+                    if (!signOutSucceeded) {
+                        _state.update {
+                            it.copy(
+                                errorMessage = "Google sign-out did not finish cleanly, but your local ClassSync session and academic data were cleared on this device."
+                            )
+                        }
                     }
                 }
             }
