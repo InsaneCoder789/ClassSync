@@ -1,5 +1,6 @@
 package com.rochiee.classsync.ui.screens.settings
 
+import com.rochiee.classsync.BuildConfig
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.rochiee.classsync.bloc.auth.AuthUiState
+import com.rochiee.classsync.bloc.auth.AuthEvent
 import com.rochiee.classsync.bloc.settings.SettingsEvent
 import com.rochiee.classsync.bloc.settings.SettingsState
 import com.rochiee.classsync.bloc.sync.SyncEvent
@@ -50,6 +52,7 @@ fun SettingsScreen(
     settingsState: SettingsState,
     authState: AuthUiState,
     syncState: SyncState,
+    onAuthEvent: (AuthEvent) -> Unit,
     onSettingsEvent: (SettingsEvent) -> Unit,
     onSyncEvent: (SyncEvent) -> Unit,
     onNavigateToAuth: () -> Unit,
@@ -334,6 +337,41 @@ fun SettingsScreen(
                     onClick = onNavigateToPrivacyPolicy,
                     modifier = Modifier.fillMaxWidth(),
                     showArrow = true
+                )
+            }
+        } }
+
+        item { ScreenSection(title = "Account and build", subtitle = "Switch the Google account used by ClassSync and verify the active app build.") {
+            TintedPanel {
+                Text(
+                    text = if (authState.isSignedIn) {
+                        "Signed in as ${authState.userEmail ?: authState.displayName ?: "Google account"}."
+                    } else {
+                        "No Google account is connected right now."
+                    },
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = "Use the action below to sign out of the current Google account and continue with a different one.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                LiquidGlassTextButton(
+                    text = if (authState.isSignedIn) "Logout and sign in to another account" else "Sign in to a Google account",
+                    onClick = {
+                        if (authState.isSignedIn) {
+                            onAuthEvent(AuthEvent.SignOut)
+                            onSyncEvent(SyncEvent.ClearError)
+                        }
+                        onNavigateToAuth()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    showArrow = true
+                )
+                Text(
+                    text = "Build version v${BuildConfig.VERSION_NAME}",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         } }

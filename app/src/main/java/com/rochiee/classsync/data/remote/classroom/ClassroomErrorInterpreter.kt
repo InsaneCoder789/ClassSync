@@ -1,6 +1,8 @@
 package com.rochiee.classsync.data.remote.classroom
 
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
+import com.rochiee.classsync.data.remote.google.GoogleApiDiagnosticFormatter
 
 object ClassroomErrorInterpreter {
     fun toUserMessage(
@@ -8,6 +10,15 @@ object ClassroomErrorInterpreter {
         action: String,
         accountEmail: String? = null
     ): String {
+        if (error is UserRecoverableAuthIOException) {
+            return buildString {
+                append("Classroom access still needs your approval on this device. Sign out of ClassSync, sign in again, and accept the Classroom permission prompt before retrying ")
+                append(action)
+                append(".\n\n")
+                append(GoogleApiDiagnosticFormatter.build("Google Classroom", action, error))
+            }
+        }
+
         val googleError = error as? GoogleJsonResponseException
         val statusCode = googleError?.statusCode
         val rawMessage = googleError?.details?.message
@@ -21,7 +32,7 @@ object ClassroomErrorInterpreter {
             ?.equals("gmail.com", ignoreCase = true) == true
         val signedInLabel = accountEmail?.takeIf { it.isNotBlank() } ?: "this Google account"
 
-        return when {
+        val summary = when {
             statusCode == 401 -> {
                 "Your Google Classroom session expired. Sign in again, then retry $action."
             }
@@ -67,5 +78,6 @@ object ClassroomErrorInterpreter {
                 "We couldn't $action in Classroom right now. Please try again in a moment."
             }
         }
+        return "$summary\n\n${GoogleApiDiagnosticFormatter.build("Google Classroom", action, error)}"
     }
 }

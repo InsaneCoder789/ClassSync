@@ -282,6 +282,7 @@ fun AppNavHost(
                         settingsState = settingsState,
                         authState = authState,
                         syncState = syncState,
+                        onAuthEvent = onAuthEvent,
                         onSettingsEvent = onSettingsEvent,
                         onSyncEvent = onSyncEvent,
                         onNavigateToAuth = { navController.navigate(AppDestination.Auth.route) },

@@ -23,19 +23,41 @@ class GmailApiClient(private val authTokenProvider: AuthTokenProvider) {
     suspend fun searchMessages(query: String): List<Message> = withContext(Dispatchers.IO) {
         val service = getGmailService()
             ?: throw IllegalStateException("Gmail access is unavailable. Connect a Google account and approve Gmail access on this device.")
-        val response = service.users().messages().list("me")
-            .setQ(query)
-            .setMaxResults(20L)
-            .execute()
-        
-        response.messages ?: emptyList()
+        try {
+            val response = service.users().messages().list("me")
+                .setQ(query)
+                .setMaxResults(20L)
+                .execute()
+
+            response.messages ?: emptyList()
+        } catch (e: Exception) {
+            throw IllegalStateException(
+                GmailErrorInterpreter.toUserMessage(
+                    error = e,
+                    action = "read your Gmail reminders",
+                    accountEmail = authTokenProvider.selectedAccountEmail()
+                ),
+                e
+            )
+        }
     }
 
     suspend fun getMessageDetails(messageId: String): Message? = withContext(Dispatchers.IO) {
         val service = getGmailService()
             ?: throw IllegalStateException("Gmail access is unavailable. Connect a Google account and approve Gmail access on this device.")
-        service.users().messages().get("me", messageId)
-            .setFormat("full")
-            .execute()
+        try {
+            service.users().messages().get("me", messageId)
+                .setFormat("full")
+                .execute()
+        } catch (e: Exception) {
+            throw IllegalStateException(
+                GmailErrorInterpreter.toUserMessage(
+                    error = e,
+                    action = "read that Gmail message",
+                    accountEmail = authTokenProvider.selectedAccountEmail()
+                ),
+                e
+            )
+        }
     }
 }
