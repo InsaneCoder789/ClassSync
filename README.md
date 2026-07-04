@@ -4,6 +4,13 @@
 
 ClassSync is a local-first Android productivity app for students who want their academic work in one place. It combines Google Classroom sync, optional Gmail-based academic discovery, manual task capture, planner views, exam preparation, study planning, reminders, and a homescreen widget into a single Compose-based experience.
 
+## Try The App
+
+ClassSync is currently available as an Android-only application. Cross-platform support is planned for a later release.
+
+- Closed testing: [Join the Android test](https://play.google.com/apps/testing/com.rochiee.classsync)
+- Download: [Get ClassSync on Google Play](https://play.google.com/store/apps/details?id=com.rochiee.classsync)
+
 The current app direction is centered around a hybrid event intelligence pipeline:
 
 - hard rules stay in place for trusted academic signals
