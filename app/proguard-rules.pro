@@ -19,3 +19,27 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep Google API client JSON models and field metadata intact in release builds.
+# Gmail/Classroom responses are populated reflectively via @Key fields and GenericJson.
+-keepattributes Signature,*Annotation*,EnclosingMethod,InnerClasses
+
+-keep class com.google.api.client.util.Key { *; }
+-keep class com.google.api.client.util.GenericData { *; }
+-keep class com.google.api.client.json.GenericJson { *; }
+-keep class com.google.api.client.googleapis.json.GoogleJsonError { *; }
+-keep class com.google.api.client.googleapis.json.GoogleJsonError$ErrorInfo { *; }
+-keep class com.google.api.client.json.gson.GsonFactory { *; }
+
+-keep class com.google.api.services.gmail.model.** { *; }
+-keep class com.google.api.services.classroom.model.** { *; }
+-keep class com.google.api.client.googleapis.extensions.android.gms.auth.** { *; }
+
+-keepclassmembers class * extends com.google.api.client.json.GenericJson {
+    <fields>;
+    <methods>;
+}
+
+-keepclassmembers class * {
+    @com.google.api.client.util.Key <fields>;
+}
