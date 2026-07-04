@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClassSync terms of service</title>
+  <meta name="description" content="Public terms of service for the Android-first ClassSync app.">
+  <meta property="og:title" content="ClassSync terms of service">
+  <meta property="og:description" content="Read the current terms that govern access to the Android-first ClassSync application and testing builds.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="../assets/classsync-opening-dark-concept.png">
+  <link rel="icon" type="image/png" href="../assets/classsync-logo-generated.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #060b12;
+      --bg-2: #0d1521;
+      --panel: rgba(12, 18, 28, 0.82);
+      --line: rgba(172, 191, 218, 0.16);
+      --line-strong: rgba(172, 191, 218, 0.28);
+      --text: #f6f8fc;
+      --muted: #a5afc1;
+      --accent: #8cb4ff;
+      --accent-soft: rgba(140, 180, 255, 0.12);
+      --radius-shell: 2rem;
+      --radius-panel: 1.45rem;
+      --radius-pill: 999px;
+      --shadow: 0 28px 100px rgba(4, 8, 16, 0.42);
+      --shell-width: min(1240px, calc(100% - 2rem));
+      --sans: "Outfit", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 14% 2%, rgba(140, 180, 255, 0.24), transparent 19%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell {
+      width: var(--shell-width);
+      margin: 1rem auto;
+      padding: 1rem;
+      border-radius: var(--radius-shell);
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.012)),
+        var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(26px);
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding-bottom: 1rem;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .mark {
+      width: 3.4rem;
+      height: 3.4rem;
+      border-radius: 1.1rem;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02));
+    }
+    .mark img { width: 2rem; height: 2rem; object-fit: contain; }
+    .brand strong { display: block; font-size: 1.12rem; letter-spacing: -0.03em; }
+    .brand span { display: block; color: var(--muted); font-size: 0.94rem; }
+    .actions { display: flex; gap: 0.65rem; flex-wrap: wrap; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.8rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      transition: 220ms ease;
+    }
+    .pill:hover { transform: translateY(-1px); border-color: var(--line-strong); }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .hero-panel,
+    .section {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-panel);
+      background: rgba(255,255,255,0.03);
+    }
+    .hero-panel {
+      padding: clamp(1.35rem, 2.8vw, 2.1rem);
+      display: grid;
+      gap: 0.95rem;
+    }
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      padding: 0.45rem 0.8rem;
+      border-radius: var(--radius-pill);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+    }
+    .lede, .section p, .section li {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.72;
+      font-size: 0.98rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .section {
+      padding: 1.2rem;
+      display: grid;
+      gap: 0.7rem;
+    }
+    .section.full { grid-column: 1 / -1; }
+    .label {
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    h2 {
+      margin: 0;
+      font-size: clamp(1.28rem, 2.4vw, 1.75rem);
+      letter-spacing: -0.04em;
+    }
+    ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.55rem; }
+    .footer {
+      margin-top: 1rem;
+      padding-top: 0.4rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark"><img src="../assets/classsync-logo-generated.png" alt="ClassSync logo"></div>
+        <div>
+          <strong>ClassSync</strong>
+          <span>Terms of service</span>
+        </div>
+      </div>
+      <nav class="actions" aria-label="Public links">
+        <a class="pill" href="../">Home</a>
+        <a class="pill" href="../privacy/">Privacy policy</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <article class="hero-panel">
+        <span class="eyebrow">Android-first beta terms</span>
+        <h1>Use the app carefully while the platform is still evolving.</h1>
+        <p class="lede">
+          These terms govern access to the current Android release and testing builds of ClassSync. The app is still being refined, cross-platform support may come later, and Google-connected academic features depend on external Google services.
+        </p>
+      </article>
+    </section>
+
+    <section class="grid" aria-label="Terms sections">
+      <article class="section">
+        <span class="label">01</span>
+        <h2>Acceptance</h2>
+        <p>By installing, accessing, or using ClassSync, you agree to these terms. If you do not agree, do not use the app.</p>
+      </article>
+
+      <article class="section">
+        <span class="label">02</span>
+        <h2>Platform scope</h2>
+        <p>ClassSync is currently an Android application. Any references to future cross-platform support describe product direction only and are not a promise of availability or release timing.</p>
+      </article>
+
+      <article class="section full">
+        <span class="label">03</span>
+        <h2>What ClassSync provides</h2>
+        <p>ClassSync helps users organize academic workflows by combining Google Classroom read-only sync, optional Gmail-based reminder discovery, manual tasks, local reminders, planners, widgets, study planning, and exam preparation features.</p>
+      </article>
+
+      <article class="section">
+        <span class="label">04</span>
+        <h2>Google-connected features</h2>
+        <ul>
+          <li>Google sign-in is required for Classroom and optional Gmail integrations.</li>
+          <li>Google Classroom access is read-only for supported app features.</li>
+          <li>Gmail sync is optional and should only be used for academic reminder discovery when enabled by the user.</li>
+          <li>Google availability, account permissions, Workspace policies, or API limits may affect app behavior.</li>
+        </ul>
+      </article>
+
+      <article class="section">
+        <span class="label">05</span>
+        <h2>User responsibilities</h2>
+        <ul>
+          <li>Use the app only with accounts and academic data you are permitted to access.</li>
+          <li>Review synced tasks, reminders, and planning suggestions before relying on them for deadlines or submissions.</li>
+          <li>Delete local exports from your device when they are no longer needed.</li>
+        </ul>
+      </article>
+
+      <article class="section">
+        <span class="label">06</span>
+        <h2>No guarantee of perfect accuracy</h2>
+        <p>ClassSync may use local rules and on-device machine learning to classify academic updates. These outputs are assistance features only and may occasionally be incomplete, delayed, or incorrect.</p>
+      </article>
+
+      <article class="section">
+        <span class="label">07</span>
+        <h2>Beta and availability disclaimer</h2>
+        <p>Testing builds, preview releases, or newly published versions may contain bugs, sync delays, UI issues, or compatibility problems. Features may change, pause, or be removed while the product is being improved.</p>
+      </article>
+
+      <article class="section">
+        <span class="label">08</span>
+        <h2>Privacy</h2>
+        <p>Your use of ClassSync is also governed by the public privacy policy. Read it here: <a href="../privacy/">ClassSync privacy policy</a>.</p>
+      </article>
+
+      <article class="section">
+        <span class="label">09</span>
+        <h2>Limitation of liability</h2>
+        <p>To the maximum extent permitted by applicable law, ClassSync is provided on an “as is” and “as available” basis without guarantees that academic sync, reminders, exports, or planning outputs will always be uninterrupted, complete, or error-free.</p>
+      </article>
+
+      <article class="section">
+        <span class="label">10</span>
+        <h2>Contact</h2>
+        <p>For support, privacy questions, or terms-related communication, contact <a href="mailto:tech@donum.in">tech@donum.in</a>.</p>
+      </article>
+    </section>
+
+    <footer class="footer">
+      <span>Last updated: July 4, 2026</span>
+      <span>ClassSync by Donum</span>
+    </footer>
+  </main>
+</body>
+</html>

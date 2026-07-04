@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "privacy/**"
+      - "site/**"
       - ".github/workflows/deploy-privacy-policy.yml"
   workflow_dispatch:
 
@@ -31,32 +32,23 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Prepare privacy site
+      - name: Prepare public site
         run: |
           mkdir -p public/privacy
           cp privacy/index.html public/privacy/index.html
+          mkdir -p public/terms
+          cp site/terms.html public/terms/index.html
           mkdir -p public/privacy/assets
+          mkdir -p public/assets
           cp app/src/main/res/drawable-nodpi/classsync_logo_generated.png public/privacy/assets/classsync-logo-generated.png
+          cp app/src/main/res/drawable-nodpi/classsync_logo_generated.png public/assets/classsync-logo-generated.png
           cp design/opening/classsync-opening-dark-concept.png public/privacy/assets/classsync-opening-dark-concept.png
+          cp design/opening/classsync-opening-dark-concept.png public/assets/classsync-opening-dark-concept.png
           build_sha="${GITHUB_SHA}"
           perl -0pi -e "s#</body>#  <!-- build-sha: ${build_sha} -->\n</body>#i" public/privacy/index.html
-          cat <<'EOF' > public/index.html
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8">
-            <meta http-equiv="refresh" content="0; url=./privacy/">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>ClassSync Privacy Policy</title>
-            <link rel="canonical" href="./privacy/">
-          </head>
-          <body>
-            <p>Redirecting to <a href="./privacy/">ClassSync Privacy Policy</a>...</p>
-            <!-- build-sha: __BUILD_SHA__ -->
-          </body>
-          </html>
-          EOF
-          perl -0pi -e "s#__BUILD_SHA__#${build_sha}#g" public/index.html
+          cp site/index.html public/index.html
+          perl -0pi -e "s#</body>#  <!-- build-sha: ${build_sha} -->\n</body>#i" public/index.html
+          perl -0pi -e "s#</body>#  <!-- build-sha: ${build_sha} -->\n</body>#i" public/terms/index.html
 
       - name: Upload privacy policy artifact
         uses: actions/upload-pages-artifact@v3
