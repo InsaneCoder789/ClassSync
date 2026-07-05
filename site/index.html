@@ -112,9 +112,10 @@
     }
 
     .brand-mark img {
-      width: 2.2rem;
-      height: 2.2rem;
+      width: 2.85rem;
+      height: 2.85rem;
       object-fit: contain;
+      filter: drop-shadow(0 10px 18px rgba(88, 128, 214, 0.18));
     }
 
     .brand-copy strong {
@@ -187,14 +188,24 @@
 
     .hero-banner-panel {
       overflow: hidden;
-      padding: 0;
+      padding: 1rem;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(140, 180, 255, 0.1), transparent 24%),
+        rgba(255,255,255,0.02);
     }
 
     .hero-banner-panel img {
       width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
+      max-width: 100%;
+      height: auto;
+      aspect-ratio: auto;
+      object-fit: contain;
       object-position: center;
+      border-radius: 1rem;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(6, 11, 18, 0.38);
     }
 
     .hero-copy {
@@ -335,29 +346,58 @@
     }
 
     .carousel-card {
-      padding: 1.2rem;
+      padding: 1.35rem;
       display: grid;
-      gap: 1rem;
+      gap: 1.15rem;
       overflow: hidden;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(140, 180, 255, 0.1), transparent 24%),
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
     }
 
     .carousel-stage {
       display: grid;
       grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
-      gap: 1.2rem;
+      gap: 1.35rem;
       align-items: stretch;
+      min-height: 42rem;
     }
 
     .phone-frame {
       position: relative;
-      padding: 1rem;
+      padding: 1.2rem;
       border-radius: 2rem;
       border: 1px solid var(--line);
       background:
         radial-gradient(circle at 30% 10%, rgba(140, 180, 255, 0.12), transparent 30%),
-        rgba(255,255,255,0.02);
+        linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
       display: grid;
       place-items: center;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 22px 48px rgba(4, 8, 16, 0.28);
+      isolation: isolate;
+    }
+
+    .phone-frame::before,
+    .phone-frame::after {
+      content: "";
+      position: absolute;
+      inset: 2.1rem;
+      border-radius: 1.7rem;
+      border: 1px solid rgba(255,255,255,0.04);
+      z-index: 0;
+      transform-origin: center;
+    }
+
+    .phone-frame::before {
+      transform: translate(1rem, 1rem) scale(0.96);
+      background: rgba(255,255,255,0.015);
+    }
+
+    .phone-frame::after {
+      transform: translate(1.9rem, 1.9rem) scale(0.92);
+      background: rgba(255,255,255,0.01);
     }
 
     .phone-screen {
@@ -368,48 +408,117 @@
       border: 1px solid rgba(255,255,255,0.08);
       background: #05090f;
       box-shadow: 0 18px 44px rgba(2, 6, 12, 0.45);
+      position: relative;
+      z-index: 1;
+      transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 320ms cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .phone-screen img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 260ms ease;
+    }
+
+    .carousel-stage.is-transitioning .phone-screen {
+      transform: translateY(0.5rem) scale(0.985);
+      box-shadow: 0 12px 28px rgba(2, 6, 12, 0.35);
+    }
+
+    .carousel-stage.is-transitioning .phone-screen img {
+      transform: scale(1.03);
+      opacity: 0.72;
     }
 
     .slide-copy {
       display: grid;
-      gap: 0.9rem;
+      gap: 1rem;
       align-content: start;
-      padding: 0.35rem 0;
+      padding: 1.2rem 1.25rem;
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255,255,255,0.06);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
+        rgba(255,255,255,0.018);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease;
+    }
+
+    .carousel-stage.is-transitioning .slide-copy {
+      transform: translateY(0.5rem);
+      opacity: 0.68;
     }
 
     .slide-index {
       color: var(--accent);
       font-family: var(--mono);
-      font-size: 0.8rem;
-      letter-spacing: 0.08em;
+      font-size: 0.86rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
+    }
+
+    .slide-kicker {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 2.15rem;
+      padding: 0.48rem 0.82rem;
+      border-radius: var(--radius-pill);
+      background: rgba(140, 180, 255, 0.1);
+      border: 1px solid rgba(140, 180, 255, 0.18);
+      color: #d7e6ff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
     }
 
     .slide-title {
       margin: 0;
-      font-size: clamp(1.65rem, 3vw, 2.45rem);
-      letter-spacing: -0.05em;
+      max-width: 12ch;
+      font-size: clamp(2.3rem, 4vw, 4rem);
+      line-height: 0.94;
+      letter-spacing: -0.07em;
+      text-wrap: balance;
     }
 
     .slide-description {
       margin: 0;
       color: var(--muted);
-      line-height: 1.75;
-      max-width: 60ch;
+      line-height: 1.84;
+      font-size: clamp(1.04rem, 1.4vw, 1.18rem);
+      max-width: 58ch;
     }
 
     .slide-bullets {
       margin: 0;
-      padding-left: 1.1rem;
+      padding: 0;
       display: grid;
-      gap: 0.55rem;
+      gap: 0.75rem;
+      list-style: none;
       color: var(--muted);
+    }
+
+    .slide-bullets li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.8rem;
+      align-items: start;
+      padding: 0.9rem 0.95rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.022);
+      line-height: 1.68;
+      font-size: 1rem;
+    }
+
+    .slide-bullets li::before {
+      content: "";
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 999px;
+      margin-top: 0.42rem;
+      background: linear-gradient(135deg, #d9e9ff, #8cb4ff);
+      box-shadow: 0 0 0 0.32rem rgba(140, 180, 255, 0.1);
     }
 
     .carousel-controls,
@@ -422,6 +531,27 @@
 
     .carousel-controls {
       justify-content: space-between;
+    }
+
+    .carousel-meta {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .carousel-progress {
+      width: min(22rem, 100%);
+      height: 0.35rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+
+    .carousel-progress-bar {
+      height: 100%;
+      width: 16.666%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #a8c9ff, #8cb4ff);
+      transition: width 320ms cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .carousel-buttons {
@@ -439,18 +569,25 @@
     }
 
     .carousel-button {
-      min-height: 2.75rem;
-      padding: 0.75rem 1rem;
+      min-height: 2.9rem;
+      padding: 0.8rem 1.05rem;
       border-radius: var(--radius-pill);
       font: inherit;
+      font-weight: 600;
+      letter-spacing: -0.01em;
       cursor: pointer;
     }
 
     .carousel-button:hover,
+    .carousel-button:active,
     .dot:hover,
     .dot.is-active {
       border-color: var(--line-strong);
       background: rgba(140, 180, 255, 0.14);
+    }
+
+    .carousel-button:active {
+      transform: translateY(1px) scale(0.985);
     }
 
     .carousel-button:focus-visible,
@@ -460,11 +597,18 @@
     }
 
     .dot {
-      width: 0.9rem;
-      height: 0.9rem;
+      width: 0.95rem;
+      height: 0.95rem;
       border-radius: 999px;
       padding: 0;
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dot.is-active {
+      width: 2.8rem;
+      border-radius: 999px;
     }
 
     .diagram-card {
@@ -479,10 +623,15 @@
       padding: 1rem;
       background: rgba(255,255,255,0.02);
       overflow: auto;
+      display: grid;
+      place-items: center;
     }
 
-    .diagram-shell .mermaid {
+    .diagram-shell img {
+      width: 100%;
       min-width: 620px;
+      height: auto;
+      object-fit: contain;
     }
 
     .link-card {
@@ -531,6 +680,7 @@
 
       .carousel-stage {
         grid-template-columns: 1fr;
+        min-height: auto;
       }
     }
 
@@ -556,7 +706,15 @@
         align-items: flex-start;
       }
 
-      .diagram-shell .mermaid {
+      .slide-copy {
+        padding: 1rem;
+      }
+
+      .slide-title {
+        max-width: none;
+      }
+
+      .diagram-shell img {
         min-width: 520px;
       }
     }
@@ -675,7 +833,13 @@
           </div>
 
           <div class="slide-copy">
-            <span class="slide-index" id="carousel-index">Screen 1 of 6</span>
+            <div class="carousel-meta">
+              <span class="slide-index" id="carousel-index">Screen 1 of 6</span>
+              <div class="carousel-progress" aria-hidden="true">
+                <div class="carousel-progress-bar" id="carousel-progress-bar"></div>
+              </div>
+            </div>
+            <span class="slide-kicker" id="carousel-kicker">Daily command view</span>
             <h3 class="slide-title" id="carousel-title">Home dashboard</h3>
             <p class="slide-description" id="carousel-description">
               The home surface gives the student a high-level academic readout with synced coursework signals, activity pressure, operations shortcuts, and the first layer of daily decision-making.
@@ -712,21 +876,7 @@
           <strong>How ClassSync turns academic inputs into usable student surfaces</strong>
           <p>Classroom and optional Gmail feed the local event engine, which then powers tasks, planners, widgets, and reminders.</p>
           <div class="diagram-shell">
-            <div class="mermaid">
-flowchart TD
-    A["Onboarding"] --> B["Google Sign-In"]
-    B --> C["Google Classroom Sync"]
-    B --> D["Optional Gmail Reminder Sync"]
-    C --> E["Hybrid Event Intelligence"]
-    D --> E
-    E --> F["Local Events and Tasks"]
-    F --> G["Home Dashboard"]
-    F --> H["Tasks Queue"]
-    F --> I["Planner Views"]
-    F --> J["Study Planner"]
-    F --> K["Exam Mode"]
-    F --> L["Widget and Reminders"]
-            </div>
+            <img src="./assets/mermaid-system-blueprint.png" alt="ClassSync flow diagram showing onboarding, Google sign-in, Classroom sync, optional Gmail reminder sync, hybrid event intelligence, local events and tasks, and downstream app surfaces including dashboard, tasks, planner, study planner, exam mode, and widget reminders.">
           </div>
         </article>
 
@@ -734,16 +884,7 @@ flowchart TD
           <strong>What the app handles locally versus what it does not do</strong>
           <p>This clarifies the trust boundary: ClassSync reads academic inputs, organizes them locally, and does not present itself as a custom cloud backend.</p>
           <div class="diagram-shell">
-            <div class="mermaid">
-flowchart LR
-    A["Google account sign-in"] --> B["Read-only Google APIs"]
-    B --> C["ClassSync local parser and classifier"]
-    C --> D["On-device Room and DataStore state"]
-    D --> E["Tasks, planner, widget, reminders"]
-    X["No custom academic backend"] -.-> D
-    Y["No email sending or mailbox edits"] -.-> B
-    Z["No server-side reselling of academic data"] -.-> D
-            </div>
+            <img src="./assets/mermaid-trust-boundary.png" alt="ClassSync trust-boundary diagram showing Google account sign-in flowing to read-only Google APIs, then to the local parser and classifier, then to on-device Room and DataStore state, with explicit exclusions for custom academic backend, email sending or mailbox edits, and server-side reselling of academic data.">
           </div>
         </article>
       </div>
@@ -789,23 +930,12 @@ flowchart LR
     </footer>
   </main>
 
-  <script type="module">
-    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
-
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: "dark",
-      securityLevel: "loose",
-      flowchart: {
-        curve: "basis",
-        padding: 18
-      }
-    });
-
+  <script>
     const slides = [
       {
         image: "./screenshots/01_home_dashboard.png",
         alt: "ClassSync home dashboard screenshot",
+        kicker: "Daily command view",
         title: "Home dashboard",
         description: "The home surface gives the student a high-level academic readout with synced coursework signals, activity pressure, operations shortcuts, and the first layer of daily decision-making.",
         bullets: [
@@ -817,6 +947,7 @@ flowchart LR
       {
         image: "./screenshots/02_progress_pulse.png",
         alt: "ClassSync progress pulse screenshot",
+        kicker: "Momentum surface",
         title: "Progress pulse",
         description: "Progress Pulse visualizes completion rhythm, active work, and total workload so the student can understand momentum without digging through multiple lists.",
         bullets: [
@@ -828,6 +959,7 @@ flowchart LR
       {
         image: "./screenshots/03_tasks_queue.png",
         alt: "ClassSync tasks queue screenshot",
+        kicker: "Unified queue",
         title: "Tasks queue",
         description: "The task surface is where synced academic items and self-created tasks live together, making coursework and manual planning part of the same queue.",
         bullets: [
@@ -839,6 +971,7 @@ flowchart LR
       {
         image: "./screenshots/04_planner_ranges.png",
         alt: "ClassSync planner range screenshot",
+        kicker: "Range planning",
         title: "Planner range views",
         description: "Planner mode lets the user switch between today, week, month, and custom range views to control short-term and medium-term academic load.",
         bullets: [
@@ -850,6 +983,7 @@ flowchart LR
       {
         image: "./screenshots/05_priority_lanes.png",
         alt: "ClassSync priority lanes screenshot",
+        kicker: "Pressure sorting",
         title: "Priority lanes",
         description: "Priority lanes break work into urgency bands so students can identify what needs immediate attention, what is high pressure, and what can be scheduled later.",
         bullets: [
@@ -861,6 +995,7 @@ flowchart LR
       {
         image: "./screenshots/06_home_widget.png",
         alt: "ClassSync home widget screenshot",
+        kicker: "Outside-the-app view",
         title: "Home screen widget",
         description: "The widget extends ClassSync beyond the app by placing current academic focus, overdue counts, and a primary task snapshot directly on the home screen.",
         bullets: [
@@ -873,14 +1008,18 @@ flowchart LR
 
     const image = document.getElementById("carousel-image");
     const indexLabel = document.getElementById("carousel-index");
+    const kicker = document.getElementById("carousel-kicker");
     const title = document.getElementById("carousel-title");
     const description = document.getElementById("carousel-description");
     const bullets = document.getElementById("carousel-bullets");
     const dots = document.getElementById("carousel-dots");
+    const progressBar = document.getElementById("carousel-progress-bar");
     const prev = document.getElementById("carousel-prev");
     const next = document.getElementById("carousel-next");
+    const stage = document.querySelector(".carousel-stage");
 
     let currentSlide = 0;
+    let transitionTimer = null;
 
     function renderDots() {
       dots.innerHTML = "";
@@ -899,11 +1038,18 @@ flowchart LR
 
     function renderSlide() {
       const slide = slides[currentSlide];
+      stage.classList.add("is-transitioning");
+      clearTimeout(transitionTimer);
+      transitionTimer = setTimeout(() => {
+        stage.classList.remove("is-transitioning");
+      }, 260);
       image.src = slide.image;
       image.alt = slide.alt;
       indexLabel.textContent = `Screen ${currentSlide + 1} of ${slides.length}`;
+      kicker.textContent = slide.kicker;
       title.textContent = slide.title;
       description.textContent = slide.description;
+      progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
       bullets.innerHTML = "";
       slide.bullets.forEach((point) => {
         const item = document.createElement("li");

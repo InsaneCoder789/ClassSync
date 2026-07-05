@@ -46,6 +46,8 @@ jobs:
           cp design/opening/classsync-opening-dark-concept.png public/privacy/assets/classsync-opening-dark-concept.png
           cp design/opening/classsync-opening-dark-concept.png public/assets/classsync-opening-dark-concept.png
           cp docs/assets/classsync-banner.png public/assets/classsync-banner.png
+          cp playstore_assets/diagrams/mermaid-system-blueprint.png public/assets/mermaid-system-blueprint.png
+          cp playstore_assets/diagrams/mermaid-trust-boundary.png public/assets/mermaid-trust-boundary.png
           cp playstore_assets/screenshots/*.png public/screenshots/
           build_sha="${GITHUB_SHA}"
           perl -0pi -e "s#</body>#  <!-- build-sha: ${build_sha} -->\n</body>#i" public/privacy/index.html
