@@ -60,13 +60,48 @@ jobs:
         with:
           path: public
 
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - name: Deploy to GitHub Pages (attempt 1)
+        id: deployment_attempt_1
+        continue-on-error: true
         uses: actions/deploy-pages@v5
         with:
-          timeout: 1200000
+          timeout: 600000
           error_count: 30
           reporting_interval: 10000
+
+      - name: Pause before retry 2
+        if: steps.deployment_attempt_1.outcome == 'failure'
+        run: sleep 15
+
+      - name: Deploy to GitHub Pages (attempt 2)
+        id: deployment_attempt_2
+        if: steps.deployment_attempt_1.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+        with:
+          timeout: 600000
+          error_count: 30
+          reporting_interval: 10000
+
+      - name: Pause before retry 3
+        if: steps.deployment_attempt_1.outcome == 'failure' && steps.deployment_attempt_2.outcome == 'failure'
+        run: sleep 20
+
+      - name: Deploy to GitHub Pages (attempt 3)
+        id: deployment_attempt_3
+        if: steps.deployment_attempt_1.outcome == 'failure' && steps.deployment_attempt_2.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+        with:
+          timeout: 600000
+          error_count: 30
+          reporting_interval: 10000
+
+      - name: Fail if all GitHub Pages deployment attempts failed
+        if: steps.deployment_attempt_1.outcome == 'failure' && steps.deployment_attempt_2.outcome == 'failure' && steps.deployment_attempt_3.outcome == 'failure'
+        run: |
+          echo "GitHub Pages deployment failed after three attempts."
+          exit 1
 
       - name: Check deployed privacy policy availability
         run: |
