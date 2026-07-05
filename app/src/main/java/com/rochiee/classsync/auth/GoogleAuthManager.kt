@@ -97,29 +97,34 @@ class GoogleAuthManager(private val context: Context) {
         return completedRemoteSignOut
     }
 
-    fun checkAuthState() {
-        if (_authState.value == AuthState.Idle) {
-            val account = GoogleSignIn.getLastSignedInAccount(context)
-            val session = secureAuthStore.restoreSession()
-            _authState.value = when {
-                isOAuthConfigured() &&
-                    account?.email?.isNotBlank() == true &&
-                    hasRequiredPermissions(account) -> {
-                    persistAccount(account)
-                    _authState.value
-                }
-                isOAuthConfigured() && account?.email?.isNotBlank() == true -> {
-                    secureAuthStore.clearSession()
-                    AuthState.Error(
-                        "Google sign-in is missing the Gmail or Classroom permissions ClassSync needs. Sign out, sign in again, and accept every requested Google permission."
-                    )
-                }
-                isOAuthConfigured() && session != null -> {
-                    secureAuthStore.clearSession()
-                    AuthState.Unauthenticated
-                }
-                else -> AuthState.Unauthenticated
+    suspend fun checkAuthState() {
+        if (_authState.value != AuthState.Idle) return
+        if (!isOAuthConfigured()) {
+            _authState.value = AuthState.Unauthenticated
+            return
+        }
+
+        val account = GoogleSignIn.getLastSignedInAccount(context)
+        val session = secureAuthStore.restoreSession()
+        _authState.value = when {
+            account?.email?.isNotBlank() == true && hasRequiredPermissions(account) -> {
+                persistAccount(account)
+                _authState.value
             }
+            account?.email?.isNotBlank() == true -> {
+                secureAuthStore.clearSession()
+                AuthState.Error(
+                    "Google sign-in is missing the Gmail or Classroom permissions ClassSync needs. Sign out, sign in again, and accept every requested Google permission."
+                )
+            }
+            session != null -> {
+                recoverPersistedSession(session)
+                AuthState.Authenticated(
+                    email = session.email,
+                    displayName = session.displayName
+                )
+            }
+            else -> AuthState.Unauthenticated
         }
     }
 
@@ -138,6 +143,29 @@ class GoogleAuthManager(private val context: Context) {
 
     private fun googleSignInClient(activityContext: Context) =
         GoogleSignIn.getClient(activityContext, googleSignInOptions())
+
+    private suspend fun recoverPersistedSession(session: SecureAuthStore.PersistedAuthSession) {
+        runCatching {
+            withContext(Dispatchers.IO) {
+                Tasks.await(googleSignInClient(context).silentSignIn())
+            }
+        }.onSuccess { account ->
+            if (account.email?.isNotBlank() == true && hasRequiredPermissions(account)) {
+                persistAccount(account)
+            } else {
+                // Keep the remembered identity until the user explicitly signs out.
+                _authState.value = AuthState.Authenticated(
+                    email = session.email,
+                    displayName = session.displayName
+                )
+            }
+        }.onFailure {
+            _authState.value = AuthState.Authenticated(
+                email = session.email,
+                displayName = session.displayName
+            )
+        }
+    }
 
     private fun googleSignInOptions(): GoogleSignInOptions {
         return GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

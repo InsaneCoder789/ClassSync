@@ -416,6 +416,7 @@ fun LiquidGlassButton(
     }
     val contentColor = when {
         !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f)
+        selected && isDarkPalette -> Color.White
         selected -> MaterialTheme.colorScheme.onPrimary
         else -> MaterialTheme.colorScheme.onSurface
     }

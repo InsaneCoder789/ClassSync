@@ -356,18 +356,34 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                LiquidGlassTextButton(
-                    text = if (authState.isSignedIn) "Logout and sign in to another account" else "Sign in to a Google account",
-                    onClick = {
-                        if (authState.isSignedIn) {
+                if (authState.isSignedIn) {
+                    LiquidGlassTextButton(
+                        text = "Logout",
+                        onClick = {
                             onAuthEvent(AuthEvent.SignOut)
                             onSyncEvent(SyncEvent.ClearError)
-                        }
-                        onNavigateToAuth()
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    showArrow = true
-                )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        showArrow = true
+                    )
+                    LiquidGlassTextButton(
+                        text = "Logout and sign in to another account",
+                        onClick = {
+                            onAuthEvent(AuthEvent.SignOut)
+                            onSyncEvent(SyncEvent.ClearError)
+                            onNavigateToAuth()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        showArrow = true
+                    )
+                } else {
+                    LiquidGlassTextButton(
+                        text = "Sign in to a Google account",
+                        onClick = onNavigateToAuth,
+                        modifier = Modifier.fillMaxWidth(),
+                        showArrow = true
+                    )
+                }
                 Text(
                     text = "Build version v${BuildConfig.VERSION_NAME}",
                     style = MaterialTheme.typography.labelLarge,

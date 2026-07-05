@@ -101,6 +101,7 @@ class ViewModelFactory(
             modelClass.isAssignableFrom(StudyPlanBlocViewModel::class.java) -> {
                 StudyPlanBlocViewModel(
                     container.generateStudyPlanUseCase,
+                    container.observeClassroomCoursesUseCase,
                     container.settingsRepository
                 ) as T
             }

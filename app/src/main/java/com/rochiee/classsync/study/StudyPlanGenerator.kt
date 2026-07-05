@@ -10,11 +10,29 @@ class StudyPlanGenerator {
     fun generate(
         tasks: List<AcademicTask>,
         events: List<ClassroomEvent>,
+        selectedCourseNames: Set<String>,
         nowMillis: Long = System.currentTimeMillis()
     ): StudyPlan {
         val candidates = mutableListOf<StudyPlanItem>()
+        val normalizedSelectedCourses = selectedCourseNames
+            .map { it.trim().lowercase() }
+            .filter { it.isNotBlank() }
+            .toSet()
 
-        val assignmentTasks = tasks.filter { !it.isCompleted && it.dueDate != null }
+        val filteredTasks = if (normalizedSelectedCourses.isEmpty()) {
+            tasks
+        } else {
+            tasks.filter { normalizedSelectedCourses.contains(it.courseName.trim().lowercase()) }
+        }
+        val filteredEvents = if (normalizedSelectedCourses.isEmpty()) {
+            events
+        } else {
+            events.filter {
+                normalizedSelectedCourses.contains(it.courseName?.trim()?.lowercase().orEmpty())
+            }
+        }
+
+        val assignmentTasks = filteredTasks.filter { !it.isCompleted && it.dueDate != null }
             .sortedBy { it.dueDate }
         assignmentTasks.forEach { task ->
             val scheduledDate = spreadBeforeDeadline(nowMillis, task.dueDate ?: nowMillis)
@@ -34,7 +52,7 @@ class StudyPlanGenerator {
             )
         }
 
-        val examEvents = events.filter {
+        val examEvents = filteredEvents.filter {
             it.eventType == ClassroomEventType.QUIZ || it.eventType == ClassroomEventType.EXAM
         }.sortedBy { it.dueDateMillis ?: it.eventTimeMillis }
         examEvents.forEach { event ->
@@ -51,7 +69,7 @@ class StudyPlanGenerator {
             )
         }
 
-        val readingEvents = events.filter { it.eventType == ClassroomEventType.MATERIAL }
+        val readingEvents = filteredEvents.filter { it.eventType == ClassroomEventType.MATERIAL }
             .filter { textLooksActionable(it.title, it.description.orEmpty(), it.originalText.orEmpty()) }
             .sortedBy { it.dueDateMillis ?: it.eventTimeMillis }
         readingEvents.forEach { event ->

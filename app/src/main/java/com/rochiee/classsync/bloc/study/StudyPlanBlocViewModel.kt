@@ -2,6 +2,7 @@ package com.rochiee.classsync.bloc.study
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rochiee.classsync.domain.usecase.classroom.ObserveClassroomCoursesUseCase
 import com.rochiee.classsync.domain.repository.SettingsRepository
 import com.rochiee.classsync.domain.usecase.study.GenerateStudyPlanUseCase
 import com.rochiee.classsync.study.StudyPlan
@@ -11,11 +12,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class StudyPlanBlocViewModel(
     private val generateStudyPlanUseCase: GenerateStudyPlanUseCase,
+    private val observeClassroomCoursesUseCase: ObserveClassroomCoursesUseCase,
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(StudyPlanState())
@@ -23,11 +27,31 @@ class StudyPlanBlocViewModel(
 
     init {
         loadPersistedPlan()
+        observeCourses()
     }
 
     fun onEvent(event: StudyPlanEvent) {
         when (event) {
             StudyPlanEvent.GeneratePlan -> generatePlan()
+            is StudyPlanEvent.ToggleCourseSelection -> {
+                _state.update { current ->
+                    val nextSelection = current.selectedCourseIds.toMutableSet().apply {
+                        if (!add(event.courseId)) remove(event.courseId)
+                    }
+                    current.copy(selectedCourseIds = nextSelection, errorMessage = null)
+                }
+            }
+            StudyPlanEvent.SelectAllCourses -> {
+                _state.update { current ->
+                    current.copy(
+                        selectedCourseIds = current.availableCourses.map { it.courseId }.toSet(),
+                        errorMessage = null
+                    )
+                }
+            }
+            StudyPlanEvent.ClearCourseSelection -> {
+                _state.update { it.copy(selectedCourseIds = emptySet(), errorMessage = null) }
+            }
             is StudyPlanEvent.ToggleBlockDone -> {
                 _state.update { current ->
                     current.copy(
@@ -58,9 +82,28 @@ class StudyPlanBlocViewModel(
     }
 
     private fun generatePlan() {
+        val currentState = _state.value
+        if (currentState.availableCourses.isEmpty()) {
+            _state.update {
+                it.copy(errorMessage = "Sync Classroom courses first so you can choose what to study.")
+            }
+            return
+        }
+        if (currentState.selectedCourseIds.isEmpty()) {
+            _state.update {
+                it.copy(errorMessage = "Select at least one course before generating a study plan.")
+            }
+            return
+        }
+
         _state.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            runCatching { generateStudyPlanUseCase() }
+            val selectedCourseNames = _state.value.availableCourses
+                .filter { _state.value.selectedCourseIds.contains(it.courseId) }
+                .map { it.name }
+                .toSet()
+
+            runCatching { generateStudyPlanUseCase(selectedCourseNames) }
                 .onSuccess { generatedPlan ->
                     val preservedManualItems = _state.value.plan?.items.orEmpty()
                         .filter { it.isManual }
@@ -74,6 +117,21 @@ class StudyPlanBlocViewModel(
                 }
                 .onFailure { error -> _state.update { it.copy(isLoading = false, errorMessage = error.message) } }
         }
+    }
+
+    private fun observeCourses() {
+        observeClassroomCoursesUseCase()
+            .onEach { courses ->
+                _state.update { current ->
+                    current.copy(
+                        availableCourses = courses,
+                        selectedCourseIds = current.selectedCourseIds.filterTo(linkedSetOf()) { selectedId ->
+                            courses.any { it.courseId == selectedId }
+                        }
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun addManualBlock(

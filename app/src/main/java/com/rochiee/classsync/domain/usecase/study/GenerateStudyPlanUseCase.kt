@@ -10,10 +10,11 @@ class GenerateStudyPlanUseCase(
     private val classroomEventRepository: ClassroomEventRepository,
     private val studyPlanGenerator: StudyPlanGenerator
 ) {
-    suspend operator fun invoke(): StudyPlan {
+    suspend operator fun invoke(selectedCourseNames: Set<String>): StudyPlan {
         return studyPlanGenerator.generate(
             tasks = taskRepository.getTasksSnapshot(),
-            events = classroomEventRepository.getEventsSnapshot()
+            events = classroomEventRepository.getEventsSnapshot(),
+            selectedCourseNames = selectedCourseNames
         )
     }
 }

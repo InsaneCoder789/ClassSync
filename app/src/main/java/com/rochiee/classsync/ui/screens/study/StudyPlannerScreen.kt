@@ -71,6 +71,9 @@ fun StudyPlannerScreen(
     val context = LocalContext.current
     val plan = state.plan
     val items = plan?.items.orEmpty()
+    val availableCourses = state.availableCourses
+    val selectedCourseIds = state.selectedCourseIds
+    val selectedCourseCount = selectedCourseIds.size
     val manualItems = remember(items) { items.filter { it.isManual } }
     val suggestedItems = remember(items) { items.filterNot { it.isManual } }
     val completedCount = remember(items) { items.count { it.isDone } }
@@ -133,7 +136,7 @@ fun StudyPlannerScreen(
         item {
             ScreenSection(
                 title = "Study planner",
-                subtitle = "Blend generated study blocks with your own manual sessions so revision stays flexible."
+                subtitle = "Choose the courses you actually want to focus on, then let ClassSync build a study queue around them."
             ) {
                 TintedPanel {
                     Box(
@@ -156,16 +159,17 @@ fun StudyPlannerScreen(
                         )
                     }
                     Text(
-                        text = "Auto-generated blocks help with urgency, while manual blocks let you protect self-study, lab prep, and revision windows.",
+                        text = "Start with your real course list, pick the subjects you want to work on, then generate a plan that stays aligned with your own intent.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     ResponsiveFlowRow(maxItemsInEachRow = 2) {
                         LiquidGlassTextButton(
-                            text = if (state.isLoading) "Generating..." else "Generate suggested plan",
+                            text = if (state.isLoading) "Generating..." else "Generate study plan",
                             onClick = { onEvent(StudyPlanEvent.GeneratePlan) },
                             modifier = Modifier.fillMaxWidth(),
-                            selected = false
+                            selected = false,
+                            enabled = !state.isLoading
                         )
                         LiquidGlassTextButton(
                             text = if (showComposer) "Hide manual block" else "Add manual block",
@@ -176,6 +180,59 @@ fun StudyPlannerScreen(
                             modifier = Modifier.fillMaxWidth(),
                             selected = showComposer
                         )
+                    }
+                }
+            }
+        }
+
+        item {
+            ScreenSection(
+                title = "Course selection",
+                subtitle = "Every synced class appears here first. Pick only the courses you want this plan to cover."
+            ) {
+                TintedPanel {
+                    Text(
+                        text = if (availableCourses.isEmpty()) {
+                            "No synced Classroom courses are available yet."
+                        } else {
+                            "$selectedCourseCount of ${availableCourses.size} course${if (availableCourses.size == 1) "" else "s"} selected."
+                        },
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = if (availableCourses.isEmpty()) {
+                            "Run a Classroom sync first, then come back here to choose which classes should feed your study plan."
+                        } else {
+                            "Your plan will only use tasks and academic events from the selected courses."
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (availableCourses.isNotEmpty()) {
+                        ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                            LiquidGlassTextButton(
+                                text = "Select all courses",
+                                onClick = { onEvent(StudyPlanEvent.SelectAllCourses) },
+                                modifier = Modifier.fillMaxWidth(),
+                                selected = selectedCourseCount == availableCourses.size
+                            )
+                            LiquidGlassTextButton(
+                                text = "Clear selection",
+                                onClick = { onEvent(StudyPlanEvent.ClearCourseSelection) },
+                                modifier = Modifier.fillMaxWidth(),
+                                selected = selectedCourseCount == 0
+                            )
+                        }
+                        ResponsiveFlowRow(maxItemsInEachRow = 2) {
+                            availableCourses.forEach { course ->
+                                LiquidGlassTextButton(
+                                    text = course.name,
+                                    onClick = { onEvent(StudyPlanEvent.ToggleCourseSelection(course.courseId)) },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    selected = selectedCourseIds.contains(course.courseId)
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -194,7 +251,7 @@ fun StudyPlannerScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "Suggested blocks regenerate from synced work. Manual blocks stay pinned so your own study routine does not disappear on refresh.",
+                        text = "Suggested blocks regenerate only from the courses you selected. Manual blocks stay pinned so your own study routine does not disappear on refresh.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

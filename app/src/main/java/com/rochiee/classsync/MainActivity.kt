@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val EXTRA_START_DESTINATION = "classsync.extra.START_DESTINATION"
         private const val APP_SPLASH_DURATION_MILLIS = 650L
+        private const val OPEN_REFRESH_INTERVAL_MILLIS = 12L * 60L * 60L * 1000L
     }
 
     private val taskViewModel: TaskBlocViewModel by viewModels {
@@ -115,8 +116,22 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                LaunchedEffect(authState.isSignedIn, settingsState.isLoading, showLaunchSplash) {
-                    if (!settingsState.isLoading && !showLaunchSplash && authState.isSignedIn) {
+                LaunchedEffect(
+                    authState.isSignedIn,
+                    settingsState.isLoading,
+                    settingsState.backgroundSyncEnabled,
+                    settingsState.lastSyncTimeMillis,
+                    showLaunchSplash
+                ) {
+                    val shouldAutoRefresh = settingsState.lastSyncTimeMillis == null ||
+                        System.currentTimeMillis() - (settingsState.lastSyncTimeMillis ?: 0L) >= OPEN_REFRESH_INTERVAL_MILLIS
+                    if (
+                        !settingsState.isLoading &&
+                        !showLaunchSplash &&
+                        settingsState.backgroundSyncEnabled &&
+                        authState.isSignedIn &&
+                        shouldAutoRefresh
+                    ) {
                         syncViewModel.onEvent(com.rochiee.classsync.bloc.sync.SyncEvent.RunAutoRefreshOnOpen)
                     }
                 }
