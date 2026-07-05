@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configure Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Prepare public site
         run: |
@@ -56,13 +56,13 @@ jobs:
           perl -0pi -e "s#</body>#  <!-- build-sha: ${build_sha} -->\n</body>#i" public/terms/index.html
 
       - name: Upload privacy policy artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: public
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - name: Check deployed privacy policy availability
         run: |
