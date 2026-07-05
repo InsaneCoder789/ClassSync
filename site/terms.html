@@ -8,7 +8,7 @@
   <meta property="og:title" content="ClassSync terms of service">
   <meta property="og:description" content="Read the current terms that govern access to the Android-first ClassSync application and testing builds.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="../assets/classsync-opening-dark-concept.png">
+  <meta property="og:image" content="../assets/classsync-banner.png">
   <link rel="icon" type="image/png" href="../assets/classsync-logo-generated.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,24 +26,43 @@
       --accent: #8cb4ff;
       --accent-soft: rgba(140, 180, 255, 0.12);
       --radius-shell: 2rem;
-      --radius-panel: 1.45rem;
+      --radius-panel: 1.5rem;
+      --radius-card: 1.2rem;
       --radius-pill: 999px;
       --shadow: 0 28px 100px rgba(4, 8, 16, 0.42);
       --shell-width: calc(100% - 2rem);
       --sans: "Outfit", "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", "SFMono-Regular", monospace;
     }
 
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100dvh;
       font-family: var(--sans);
       color: var(--text);
       background:
         radial-gradient(circle at 14% 2%, rgba(140, 180, 255, 0.24), transparent 19%),
+        radial-gradient(circle at 86% 18%, rgba(140, 180, 255, 0.12), transparent 14%),
         linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      overflow-x: hidden;
     }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.08;
+      background-image: radial-gradient(rgba(255,255,255,0.12) 0.55px, transparent 0.55px);
+      background-size: 12px 12px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.82), transparent 86%);
+    }
+
     a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
     .shell {
       width: var(--shell-width);
       margin: 1rem;
@@ -56,126 +75,287 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(26px);
     }
+
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 1rem;
       flex-wrap: wrap;
-      padding-bottom: 1rem;
+      padding: 0.2rem 0.2rem 1rem;
     }
+
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.9rem;
+      min-width: 0;
     }
+
     .mark {
-      width: 3.4rem;
-      height: 3.4rem;
-      border-radius: 1.1rem;
+      width: 3.6rem;
+      height: 3.6rem;
+      border-radius: 1.2rem;
       border: 1px solid var(--line);
       display: grid;
       place-items: center;
       background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02));
     }
+
     .mark img {
       width: 2.6rem;
       height: 2.6rem;
       object-fit: contain;
       filter: drop-shadow(0 10px 18px rgba(88, 128, 214, 0.18));
     }
-    .brand strong { display: block; font-size: 1.12rem; letter-spacing: -0.03em; }
-    .brand span { display: block; color: var(--muted); font-size: 0.94rem; }
-    .actions { display: flex; gap: 0.65rem; flex-wrap: wrap; }
-    .pill {
+
+    .brand strong {
+      display: block;
+      font-size: 1.15rem;
+      letter-spacing: -0.03em;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill,
+    .primary {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 2.8rem;
-      padding: 0.75rem 1rem;
+      min-height: 2.85rem;
+      padding: 0.78rem 1rem;
       border-radius: var(--radius-pill);
       border: 1px solid var(--line);
       background: rgba(255,255,255,0.03);
       transition: 220ms ease;
     }
-    .pill:hover { transform: translateY(-1px); border-color: var(--line-strong); }
+
+    .primary {
+      background: linear-gradient(135deg, #a7c7ff, #d8ebff);
+      color: #07111d;
+      border-color: rgba(255,255,255,0.36);
+      font-weight: 700;
+    }
+
+    .pill:hover,
+    .primary:hover {
+      transform: translateY(-1px);
+      border-color: var(--line-strong);
+      text-decoration: none;
+    }
+
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
       gap: 1rem;
       margin-bottom: 1rem;
     }
+
+    .hero-banner,
     .hero-panel,
-    .section {
+    .summary-card,
+    .section,
+    .footer {
       border: 1px solid var(--line);
       border-radius: var(--radius-panel);
-      background: rgba(255,255,255,0.03);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015)),
+        rgba(255,255,255,0.018);
     }
-    .hero-panel {
-      padding: clamp(1.35rem, 2.8vw, 2.1rem);
+
+    .hero-banner {
+      padding: 1rem;
       display: grid;
-      gap: 0.95rem;
+      place-items: center;
+      background:
+        radial-gradient(circle at 18% 16%, rgba(140, 180, 255, 0.1), transparent 24%),
+        rgba(255,255,255,0.02);
     }
+
+    .hero-banner img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      border-radius: 1rem;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .hero-panel {
+      padding: clamp(1.45rem, 2.8vw, 2.3rem);
+      display: grid;
+      gap: 1rem;
+    }
+
     .eyebrow {
       display: inline-flex;
       width: fit-content;
-      padding: 0.45rem 0.8rem;
+      padding: 0.5rem 0.85rem;
       border-radius: var(--radius-pill);
       background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-    h1 {
-      margin: 0;
-      font-size: clamp(2.2rem, 6vw, 4.5rem);
-      line-height: 0.98;
-      letter-spacing: -0.05em;
-    }
-    .lede, .section p, .section li {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.72;
-      font-size: 0.98rem;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1rem;
-    }
-    .section {
-      padding: 1.2rem;
-      display: grid;
-      gap: 0.7rem;
-    }
-    .section.full { grid-column: 1 / -1; }
-    .label {
       color: var(--accent);
       font-size: 0.82rem;
       font-weight: 700;
       letter-spacing: 0.05em;
       text-transform: uppercase;
     }
-    h2 {
+
+    h1 {
       margin: 0;
-      font-size: clamp(1.28rem, 2.4vw, 1.75rem);
+      max-width: 12ch;
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
+      line-height: 0.93;
+      letter-spacing: -0.065em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 0;
+      max-width: 66ch;
+      color: var(--muted);
+      line-height: 1.78;
+      font-size: 1.05rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .summary-grid,
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .summary-card {
+      padding: 1.2rem;
+      display: grid;
+      gap: 0.75rem;
+      min-height: 100%;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .summary-card.span-5 { grid-column: span 5; }
+    .summary-card.span-4 { grid-column: span 4; }
+    .summary-card.span-3 { grid-column: span 3; }
+
+    .summary-label,
+    .label {
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .summary-card h2 {
+      margin: 0;
+      font-size: 1.5rem;
       letter-spacing: -0.04em;
     }
-    ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.55rem; }
+
+    .summary-card p,
+    .section p,
+    .section li {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.74;
+      font-size: 1rem;
+    }
+
+    .grid {
+      margin-top: 1rem;
+    }
+
+    .section {
+      padding: 1.25rem;
+      display: grid;
+      gap: 0.85rem;
+      min-height: 100%;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .section.span-7 { grid-column: span 7; }
+    .section.span-6 { grid-column: span 6; }
+    .section.span-5 { grid-column: span 5; }
+    .section.span-4 { grid-column: span 4; }
+
+    .section h2 {
+      margin: 0;
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      letter-spacing: -0.05em;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.1rem;
+      display: grid;
+      gap: 0.6rem;
+    }
+
     .footer {
       margin-top: 1rem;
-      padding-top: 0.4rem;
+      padding: 1.2rem;
       display: flex;
       justify-content: space-between;
       gap: 1rem;
       flex-wrap: wrap;
+      align-items: center;
       color: var(--muted);
-      font-size: 0.92rem;
+      font-size: 0.95rem;
     }
-    @media (max-width: 860px) {
-      .grid { grid-template-columns: 1fr; }
+
+    .footer-links {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 980px) {
+      .summary-grid,
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .summary-card,
+      .section {
+        grid-column: auto !important;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: calc(100% - 1rem);
+        margin: 0.5rem;
+        padding: 0.8rem;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      h1 {
+        max-width: none;
+      }
+
+      .summary-grid,
+      .grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -192,40 +372,67 @@
       <nav class="actions" aria-label="Public links">
         <a class="pill" href="../">Home</a>
         <a class="pill" href="../privacy/">Privacy policy</a>
-        <a class="pill" href="https://play.google.com/store/apps/details?id=com.rochiee.classsync">Download app</a>
+        <a class="pill" href="https://play.google.com/apps/testing/com.rochiee.classsync">Android testing</a>
+        <a class="primary" href="https://play.google.com/store/apps/details?id=com.rochiee.classsync">Download app</a>
       </nav>
     </header>
 
-    <section class="hero">
+    <section class="hero" aria-label="Terms introduction">
+      <article class="hero-banner">
+        <img src="../assets/classsync-banner.png" alt="ClassSync banner">
+      </article>
+
       <article class="hero-panel">
         <span class="eyebrow">Android-first beta terms</span>
         <h1>Use the app carefully while the platform is still evolving.</h1>
         <p class="lede">
           These terms govern access to the current Android release and testing builds of ClassSync. The app is still being refined, cross-platform support may come later, and Google-connected academic features depend on external Google services.
         </p>
+        <div class="hero-actions">
+          <a class="primary" href="https://play.google.com/store/apps/details?id=com.rochiee.classsync">Download app</a>
+          <a class="pill" href="../privacy/">Read privacy policy</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="summary-grid" aria-label="Terms summary">
+      <article class="summary-card span-5">
+        <span class="summary-label">Platform scope</span>
+        <h2>Android application</h2>
+        <p>ClassSync is currently distributed as an Android-first student workspace. Any references to future cross-platform support describe product direction only.</p>
+      </article>
+      <article class="summary-card span-4">
+        <span class="summary-label">Publisher</span>
+        <h2>Donum</h2>
+        <p>The app is being prepared for broader public distribution under the Donum launch identity.</p>
+      </article>
+      <article class="summary-card span-3">
+        <span class="summary-label">Last updated</span>
+        <h2>July 4, 2026</h2>
+        <p>Matches the current Android release and test-track posture.</p>
       </article>
     </section>
 
     <section class="grid" aria-label="Terms sections">
-      <article class="section">
+      <article class="section span-6">
         <span class="label">01</span>
         <h2>Acceptance</h2>
         <p>By installing, accessing, or using ClassSync, you agree to these terms. If you do not agree, do not use the app.</p>
       </article>
 
-      <article class="section">
+      <article class="section span-6">
         <span class="label">02</span>
         <h2>Platform scope</h2>
         <p>ClassSync is currently an Android application. Any references to future cross-platform support describe product direction only and are not a promise of availability or release timing.</p>
       </article>
 
-      <article class="section full">
+      <article class="section span-7">
         <span class="label">03</span>
         <h2>What ClassSync provides</h2>
         <p>ClassSync helps users organize academic workflows by combining Google Classroom read-only sync, optional Gmail-based reminder discovery, manual tasks, local reminders, planners, widgets, study planning, and exam preparation features.</p>
       </article>
 
-      <article class="section">
+      <article class="section span-5">
         <span class="label">04</span>
         <h2>Google-connected features</h2>
         <ul>
@@ -236,7 +443,7 @@
         </ul>
       </article>
 
-      <article class="section">
+      <article class="section span-5">
         <span class="label">05</span>
         <h2>User responsibilities</h2>
         <ul>
@@ -246,31 +453,31 @@
         </ul>
       </article>
 
-      <article class="section">
+      <article class="section span-7">
         <span class="label">06</span>
         <h2>No guarantee of perfect accuracy</h2>
         <p>ClassSync may use local rules and on-device machine learning to classify academic updates. These outputs are assistance features only and may occasionally be incomplete, delayed, or incorrect.</p>
       </article>
 
-      <article class="section">
+      <article class="section span-6">
         <span class="label">07</span>
         <h2>Beta and availability disclaimer</h2>
         <p>Testing builds, preview releases, or newly published versions may contain bugs, sync delays, UI issues, or compatibility problems. Features may change, pause, or be removed while the product is being improved.</p>
       </article>
 
-      <article class="section">
+      <article class="section span-6">
         <span class="label">08</span>
         <h2>Privacy</h2>
         <p>Your use of ClassSync is also governed by the public privacy policy. Read it here: <a href="../privacy/">ClassSync privacy policy</a>.</p>
       </article>
 
-      <article class="section">
+      <article class="section span-6">
         <span class="label">09</span>
         <h2>Limitation of liability</h2>
         <p>To the maximum extent permitted by applicable law, ClassSync is provided on an “as is” and “as available” basis without guarantees that academic sync, reminders, exports, or planning outputs will always be uninterrupted, complete, or error-free.</p>
       </article>
 
-      <article class="section">
+      <article class="section span-6">
         <span class="label">10</span>
         <h2>Contact</h2>
         <p>For support, privacy questions, or terms-related communication, contact <a href="mailto:tech@donum.in">tech@donum.in</a>.</p>
@@ -279,7 +486,11 @@
 
     <footer class="footer">
       <span>Last updated: July 4, 2026</span>
-      <span><a href="../">Home</a> · <a href="../privacy/">Privacy</a> · ClassSync by Donum</span>
+      <div class="footer-links">
+        <a class="pill" href="../">Home</a>
+        <a class="pill" href="../privacy/">Privacy</a>
+        <a class="pill" href="https://github.com/InsaneCoder789/ClassSync">GitHub</a>
+      </div>
     </footer>
   </main>
 </body>
