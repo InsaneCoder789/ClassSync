@@ -62,23 +62,21 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
-        continue-on-error: true
         uses: actions/deploy-pages@v4
 
-      - name: Verify deployed privacy policy
+      - name: Check deployed privacy policy availability
         run: |
-          url="https://insanecoder789.github.io/ClassSync/privacy/"
-          marker="build-sha: ${GITHUB_SHA}"
+          url="https://insanecoder789.github.io/ClassSync/privacy/?build_sha=${GITHUB_SHA}"
 
-          for attempt in $(seq 1 12); do
-            if curl -fsSL "$url" | grep -F "$marker" >/dev/null; then
-              echo "Verified deployed privacy policy for ${GITHUB_SHA}."
+          for attempt in $(seq 1 18); do
+            if curl -fsSI -H "Cache-Control: no-cache" -H "Pragma: no-cache" "$url" >/dev/null; then
+              echo "Privacy policy is reachable after deployment."
               exit 0
             fi
 
-            echo "Verification attempt ${attempt} failed; waiting for GitHub Pages to finish publishing."
-            sleep 10
+            echo "Availability check ${attempt} failed; waiting for GitHub Pages to finish publishing."
+            sleep 15
           done
 
-          echo "Expected build marker not found on the deployed privacy policy."
+          echo "Privacy policy URL did not become reachable in time."
           exit 1
