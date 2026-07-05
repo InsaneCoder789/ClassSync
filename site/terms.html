@@ -29,7 +29,7 @@
       --radius-panel: 1.45rem;
       --radius-pill: 999px;
       --shadow: 0 28px 100px rgba(4, 8, 16, 0.42);
-      --shell-width: min(1240px, calc(100% - 2rem));
+      --shell-width: calc(100% - 2rem);
       --sans: "Outfit", "Segoe UI", sans-serif;
     }
 
@@ -46,7 +46,7 @@
     a { color: inherit; text-decoration: none; }
     .shell {
       width: var(--shell-width);
-      margin: 1rem auto;
+      margin: 1rem;
       padding: 1rem;
       border-radius: var(--radius-shell);
       border: 1px solid var(--line);
@@ -187,6 +187,7 @@
       <nav class="actions" aria-label="Public links">
         <a class="pill" href="../">Home</a>
         <a class="pill" href="../privacy/">Privacy policy</a>
+        <a class="pill" href="https://play.google.com/store/apps/details?id=com.rochiee.classsync">Download app</a>
       </nav>
     </header>
 
@@ -273,7 +274,7 @@
 
     <footer class="footer">
       <span>Last updated: July 4, 2026</span>
-      <span>ClassSync by Donum</span>
+      <span><a href="../">Home</a> · <a href="../privacy/">Privacy</a> · ClassSync by Donum</span>
     </footer>
   </main>
 </body>

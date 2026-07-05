@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ClassSync</title>
-  <meta name="description" content="ClassSync is an Android-first academic workspace that brings Google Classroom, optional Gmail reminders, planning, widgets, and task flows into one local-first app.">
+  <meta name="description" content="ClassSync is an Android-first academic workspace that unifies Google Classroom, optional Gmail reminders, task planning, widgets, and study flows in one local-first app.">
   <meta name="google-site-verification" content="paBhCTAdimEm69FsrmE8g48ljR9KKRYjRsTtSLzKmTo" />
   <meta property="og:title" content="ClassSync">
   <meta property="og:description" content="Android-first academic control deck with Classroom sync, optional Gmail reminders, planner views, widgets, and local-first study workflows.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="./assets/classsync-opening-dark-concept.png">
+  <meta property="og:image" content="./assets/classsync-banner.png">
   <link rel="icon" type="image/png" href="./assets/classsync-logo-generated.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,21 +18,21 @@
     :root {
       color-scheme: dark;
       --bg: #060b12;
-      --bg-2: #0d1521;
-      --panel: rgba(13, 20, 31, 0.82);
-      --panel-soft: rgba(255, 255, 255, 0.04);
+      --bg-2: #0c1522;
+      --panel: rgba(10, 16, 25, 0.84);
+      --panel-soft: rgba(255, 255, 255, 0.03);
       --line: rgba(172, 191, 218, 0.16);
       --line-strong: rgba(172, 191, 218, 0.28);
       --text: #f5f8fd;
-      --muted: #a8b3c3;
+      --muted: #a9b4c4;
       --accent: #8cb4ff;
       --accent-soft: rgba(140, 180, 255, 0.14);
       --good: #9bd0b0;
       --radius-xl: 2rem;
       --radius-lg: 1.5rem;
+      --radius-md: 1.1rem;
       --radius-pill: 999px;
       --shadow: 0 28px 90px rgba(3, 7, 13, 0.42);
-      --shell: min(1280px, calc(100% - 2rem));
       --sans: "Outfit", "Segoe UI", sans-serif;
       --mono: "JetBrains Mono", "SFMono-Regular", monospace;
     }
@@ -45,8 +45,8 @@
       font-family: var(--sans);
       color: var(--text);
       background:
-        radial-gradient(circle at 10% 0%, rgba(140, 180, 255, 0.22), transparent 20%),
-        radial-gradient(circle at 92% 16%, rgba(139, 208, 176, 0.14), transparent 15%),
+        radial-gradient(circle at 8% 0%, rgba(140, 180, 255, 0.22), transparent 18%),
+        radial-gradient(circle at 94% 12%, rgba(155, 208, 176, 0.12), transparent 14%),
         linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
       overflow-x: hidden;
     }
@@ -66,8 +66,8 @@
     img { display: block; max-width: 100%; }
 
     .page-shell {
-      width: var(--shell);
-      margin: 1rem auto;
+      width: calc(100% - 2rem);
+      margin: 1rem;
       padding: 1rem;
       border: 1px solid var(--line);
       border-radius: var(--radius-xl);
@@ -78,12 +78,18 @@
       backdrop-filter: blur(28px);
     }
 
+    .topbar,
+    .section,
+    .footer {
+      width: 100%;
+    }
+
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 1rem;
-      padding: 0.2rem 0.2rem 1rem;
+      padding: 0.15rem 0.15rem 1rem;
       flex-wrap: wrap;
     }
 
@@ -95,24 +101,39 @@
     }
 
     .brand-mark {
-      width: 3.6rem;
-      height: 3.6rem;
-      border-radius: 1.15rem;
+      width: 3.8rem;
+      height: 3.8rem;
+      border-radius: 1.2rem;
       border: 1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
       display: grid;
       place-items: center;
+      flex: 0 0 auto;
     }
 
-    .brand-mark img { width: 2.15rem; height: 2.15rem; object-fit: contain; }
-    .brand-copy strong { display: block; font-size: 1.14rem; letter-spacing: -0.03em; }
-    .brand-copy span { color: var(--muted); font-size: 0.95rem; }
+    .brand-mark img {
+      width: 2.2rem;
+      height: 2.2rem;
+      object-fit: contain;
+    }
+
+    .brand-copy strong {
+      display: block;
+      font-size: 1.18rem;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-copy span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
 
     .top-actions {
       display: flex;
+      gap: 0.65rem;
       flex-wrap: wrap;
       justify-content: flex-end;
-      gap: 0.65rem;
     }
 
     .pill,
@@ -121,21 +142,22 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 2.85rem;
+      min-height: 2.9rem;
       padding: 0.78rem 1rem;
       border-radius: var(--radius-pill);
       border: 1px solid var(--line);
       transition: 220ms ease;
     }
 
-    .pill, .ghost {
+    .pill,
+    .ghost {
       background: rgba(255,255,255,0.03);
     }
 
     .primary {
       color: #07111d;
       background: linear-gradient(135deg, #a7c7ff, #d8ebff);
-      border-color: rgba(255,255,255,0.4);
+      border-color: rgba(255,255,255,0.38);
       font-weight: 700;
     }
 
@@ -148,25 +170,36 @@
 
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
-      gap: 1.25rem;
+      gap: 1rem;
       align-items: stretch;
     }
 
+    .hero-banner-panel,
     .hero-copy,
-    .hero-visual,
-    .panel,
-    .note {
+    .grid-card,
+    .diagram-card,
+    .carousel-card,
+    .footer {
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
       background: rgba(255,255,255,0.03);
     }
 
+    .hero-banner-panel {
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .hero-banner-panel img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      object-position: center;
+    }
+
     .hero-copy {
-      padding: clamp(1.4rem, 2.8vw, 2.2rem);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      padding: clamp(1.45rem, 2.8vw, 2.3rem);
+      display: grid;
       gap: 1rem;
     }
 
@@ -175,217 +208,357 @@
       align-items: center;
       gap: 0.5rem;
       width: fit-content;
-      padding: 0.5rem 0.8rem;
+      padding: 0.52rem 0.82rem;
       border-radius: var(--radius-pill);
       background: var(--accent-soft);
       color: var(--accent);
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 700;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(2.5rem, 7vw, 5.4rem);
-      line-height: 0.95;
-      letter-spacing: -0.055em;
+      max-width: 14ch;
+      font-size: clamp(3rem, 7vw, 6rem);
+      line-height: 0.92;
+      letter-spacing: -0.07em;
     }
 
     .lede {
       margin: 0;
-      max-width: 42rem;
+      max-width: 68ch;
       color: var(--muted);
-      font-size: clamp(1rem, 1.7vw, 1.18rem);
-      line-height: 1.7;
+      font-size: clamp(1rem, 1.6vw, 1.16rem);
+      line-height: 1.74;
     }
 
     .hero-actions {
       display: flex;
+      gap: 0.75rem;
       flex-wrap: wrap;
-      gap: 0.75rem;
     }
 
-    .meta-grid {
+    .hero-metrics {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 0.75rem;
     }
 
-    .meta-card {
+    .metric {
       padding: 1rem;
-      border-radius: 1.25rem;
+      border-radius: var(--radius-md);
       border: 1px solid var(--line);
       background: rgba(255,255,255,0.025);
     }
 
-    .meta-card span {
+    .metric span {
       display: block;
       color: var(--muted);
-      font-size: 0.85rem;
+      font-size: 0.83rem;
       margin-bottom: 0.45rem;
     }
 
-    .meta-card strong {
+    .metric strong {
       display: block;
-      font-size: 1.05rem;
-      line-height: 1.4;
+      font-size: 1.04rem;
+      line-height: 1.42;
     }
 
-    .hero-visual {
-      padding: 1rem;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.018)),
-        rgba(255,255,255,0.03);
+    .section {
+      margin-top: 1rem;
+      display: grid;
+      gap: 1rem;
     }
 
-    .hero-visual-frame {
-      height: 100%;
+    .section-heading {
+      display: grid;
+      gap: 0.45rem;
+      padding: 0 0.15rem;
+    }
+
+    .section-label {
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(1.7rem, 3vw, 2.8rem);
+      letter-spacing: -0.05em;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 78ch;
+      line-height: 1.7;
+    }
+
+    .unique-grid,
+    .diagram-grid,
+    .link-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .grid-card,
+    .diagram-card,
+    .link-card {
+      padding: 1.2rem;
       min-height: 100%;
-      border-radius: 1.2rem;
-      overflow: hidden;
-      position: relative;
-      background: #09111b;
-      border: 1px solid rgba(255,255,255,0.06);
     }
 
-    .hero-visual-frame img {
+    .grid-card {
+      grid-column: span 4;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .grid-card strong,
+    .link-card strong {
+      font-size: 1.1rem;
+      letter-spacing: -0.03em;
+    }
+
+    .grid-card p,
+    .link-card p,
+    .diagram-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .carousel-card {
+      padding: 1.2rem;
+      display: grid;
+      gap: 1rem;
+      overflow: hidden;
+    }
+
+    .carousel-stage {
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      gap: 1.2rem;
+      align-items: stretch;
+    }
+
+    .phone-frame {
+      position: relative;
+      padding: 1rem;
+      border-radius: 2rem;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 30% 10%, rgba(140, 180, 255, 0.12), transparent 30%),
+        rgba(255,255,255,0.02);
+      display: grid;
+      place-items: center;
+    }
+
+    .phone-screen {
+      width: min(100%, 290px);
+      aspect-ratio: 9 / 16;
+      border-radius: 1.8rem;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #05090f;
+      box-shadow: 0 18px 44px rgba(2, 6, 12, 0.45);
+    }
+
+    .phone-screen img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    .hero-overlay {
-      position: absolute;
-      inset: auto 1rem 1rem 1rem;
+    .slide-copy {
       display: grid;
-      gap: 0.6rem;
-      padding: 1rem;
-      border-radius: 1rem;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(7, 12, 19, 0.7);
-      backdrop-filter: blur(18px);
+      gap: 0.9rem;
+      align-content: start;
+      padding: 0.35rem 0;
     }
 
-    .hero-overlay strong {
-      font-size: 1rem;
-      letter-spacing: 0.02em;
-    }
-
-    .hero-overlay span {
-      color: var(--muted);
-      font-size: 0.94rem;
-      line-height: 1.55;
-    }
-
-    .content-grid {
-      display: grid;
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .panel {
-      grid-column: span 6;
-      padding: 1.2rem;
-    }
-
-    .panel.full { grid-column: 1 / -1; }
-
-    .label {
-      display: block;
+    .slide-index {
       color: var(--accent);
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      margin-bottom: 0.55rem;
     }
 
-    .panel h2 {
-      margin: 0 0 0.65rem;
-      font-size: clamp(1.35rem, 2.4vw, 2rem);
-      letter-spacing: -0.04em;
+    .slide-title {
+      margin: 0;
+      font-size: clamp(1.65rem, 3vw, 2.45rem);
+      letter-spacing: -0.05em;
     }
 
-    .panel p,
-    .panel li {
+    .slide-description {
       margin: 0;
       color: var(--muted);
-      line-height: 1.72;
-      font-size: 0.99rem;
+      line-height: 1.75;
+      max-width: 60ch;
     }
 
-    .panel ul {
+    .slide-bullets {
       margin: 0;
-      padding-left: 1.15rem;
+      padding-left: 1.1rem;
       display: grid;
       gap: 0.55rem;
+      color: var(--muted);
     }
 
-    .download-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.85rem;
-      margin-top: 0.9rem;
-    }
-
-    .cta-card {
-      padding: 1rem;
-      border-radius: 1rem;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.02);
-      display: grid;
-      gap: 0.55rem;
-    }
-
-    .cta-card strong { font-size: 1rem; }
-    .cta-card span { color: var(--muted); font-size: 0.94rem; line-height: 1.6; }
-
-    .note {
-      margin-top: 1rem;
-      padding: 1rem 1.1rem;
+    .carousel-controls,
+    .carousel-dots {
       display: flex;
-      gap: 0.8rem;
-      align-items: flex-start;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      align-items: center;
     }
 
-    .note-badge {
-      flex: 0 0 auto;
-      min-width: 2.1rem;
-      height: 2.1rem;
-      border-radius: 50%;
+    .carousel-controls {
+      justify-content: space-between;
+    }
+
+    .carousel-buttons {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .carousel-button,
+    .dot {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      transition: 220ms ease;
+    }
+
+    .carousel-button {
+      min-height: 2.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-pill);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .carousel-button:hover,
+    .dot:hover,
+    .dot.is-active {
+      border-color: var(--line-strong);
+      background: rgba(140, 180, 255, 0.14);
+    }
+
+    .carousel-button:focus-visible,
+    .dot:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .dot {
+      width: 0.9rem;
+      height: 0.9rem;
+      border-radius: 999px;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .diagram-card {
+      grid-column: span 6;
       display: grid;
-      place-items: center;
-      font-weight: 800;
-      color: #07111d;
-      background: linear-gradient(135deg, #b7d4ff, #d8ebff);
+      gap: 0.9rem;
     }
 
-    .note p { margin: 0; color: var(--muted); line-height: 1.7; }
+    .diagram-shell {
+      border: 1px solid var(--line);
+      border-radius: 1.1rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.02);
+      overflow: auto;
+    }
+
+    .diagram-shell .mermaid {
+      min-width: 620px;
+    }
+
+    .link-card {
+      grid-column: span 4;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.03);
+      display: grid;
+      gap: 0.75rem;
+    }
 
     .footer {
       margin-top: 1rem;
-      padding: 1rem 0.2rem 0.2rem;
+      padding: 1.2rem;
       display: flex;
       justify-content: space-between;
       gap: 1rem;
       flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .footer-copy {
       color: var(--muted);
-      font-size: 0.92rem;
+      line-height: 1.7;
     }
 
     .footer-links {
       display: flex;
-      gap: 0.8rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
     }
 
-    @media (max-width: 980px) {
-      .hero { grid-template-columns: 1fr; }
-      .content-grid { grid-template-columns: 1fr; }
-      .panel, .panel.full { grid-column: auto; }
-      .meta-grid, .download-grid { grid-template-columns: 1fr; }
+    @media (max-width: 1120px) {
+      .hero-metrics,
+      .unique-grid,
+      .diagram-grid,
+      .link-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-card,
+      .diagram-card,
+      .link-card {
+        grid-column: auto;
+      }
+
+      .carousel-stage {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page-shell {
+        width: calc(100% - 1rem);
+        margin: 0.5rem;
+        padding: 0.8rem;
+      }
+
+      h1 { max-width: none; }
+
+      .hero-metrics,
+      .unique-grid,
+      .diagram-grid,
+      .link-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .brand,
+      .topbar,
+      .carousel-controls {
+        align-items: flex-start;
+      }
+
+      .diagram-shell .mermaid {
+        min-width: 520px;
+      }
     }
   </style>
 </head>
@@ -405,114 +578,352 @@
         <a class="pill" href="./privacy/">Privacy policy</a>
         <a class="pill" href="./terms/">Terms of service</a>
         <a class="ghost" href="https://play.google.com/apps/testing/com.rochiee.classsync">Android testing</a>
+        <a class="primary" href="https://play.google.com/store/apps/details?id=com.rochiee.classsync">Download app</a>
       </nav>
     </header>
 
-    <section class="hero" aria-label="ClassSync hero">
+    <section class="hero" aria-label="ClassSync introduction">
+      <article class="hero-banner-panel">
+        <img src="./assets/classsync-banner.png" alt="ClassSync banner">
+      </article>
+
       <article class="hero-copy">
-        <div>
-          <span class="eyebrow">Android only for now</span>
-          <h1>Everything academic, finally in sync.</h1>
-          <p class="lede">
-            ClassSync is a local-first Android workspace that pulls Google Classroom activity, optional Gmail reminders, task planning, widgets, reminders, exam prep, and study flows into one focused academic surface.
-          </p>
-        </div>
+        <span class="eyebrow">Introduction to ClassSync</span>
+        <h1>Everything academic, finally in sync.</h1>
+        <p class="lede">
+          ClassSync is an Android-first academic workspace built for students who want Google Classroom, optional Gmail reminders, manual tasks, planner views, study planning, widgets, and exam workflows in one local-first system. The product is designed to reduce scattered academic surfaces and bring deadlines, materials, and action items into a cleaner operating layer.
+        </p>
 
         <div class="hero-actions">
-          <a class="primary" href="https://play.google.com/store/apps/details?id=com.rochiee.classsync">Download on Google Play</a>
+          <a class="primary" href="https://play.google.com/store/apps/details?id=com.rochiee.classsync">Get it on Google Play</a>
           <a class="ghost" href="https://play.google.com/apps/testing/com.rochiee.classsync">Join closed testing</a>
         </div>
 
-        <div class="meta-grid" aria-label="Product summary">
-          <article class="meta-card">
+        <div class="hero-metrics" aria-label="ClassSync summary">
+          <article class="metric">
             <span>Platform</span>
-            <strong>Android-first right now</strong>
+            <strong>Android-first release today</strong>
           </article>
-          <article class="meta-card">
-            <span>Core sources</span>
+          <article class="metric">
+            <span>Sources</span>
             <strong>Classroom + optional Gmail</strong>
           </article>
-          <article class="meta-card">
+          <article class="metric">
+            <span>Storage model</span>
+            <strong>Local-first academic state</strong>
+          </article>
+          <article class="metric">
             <span>Direction</span>
             <strong>Cross-platform later on</strong>
           </article>
         </div>
       </article>
-
-      <aside class="hero-visual">
-        <div class="hero-visual-frame">
-          <img src="./assets/classsync-opening-dark-concept.png" alt="ClassSync concept artwork">
-          <div class="hero-overlay">
-            <strong>Local-first student workflow</strong>
-            <span>Read-only Classroom sync, optional Gmail reminder discovery, planners, widgets, reminders, and study systems designed to stay on the device by default.</span>
-          </div>
-        </div>
-      </aside>
     </section>
 
-    <section class="content-grid" aria-label="ClassSync public information">
-      <article class="panel">
-        <span class="label">What it does</span>
-        <h2>One surface for coursework, reminders, and planning.</h2>
-        <ul>
-          <li>Imports Google Classroom coursework, announcements, and materials into local academic flows.</li>
-          <li>Optionally reads Gmail academic reminders when the user enables Gmail sync.</li>
-          <li>Combines synced work with manual tasks, planners, reminders, and home screen widgets.</li>
-          <li>Uses on-device classification and rules to organize academic updates into usable task signals.</li>
-        </ul>
-      </article>
-
-      <article class="panel">
-        <span class="label">Public links</span>
-        <h2>Use these pages for review and verification.</h2>
-        <div class="download-grid">
-          <div class="cta-card">
-            <strong>Home page</strong>
-            <span>Public application home page for Google OAuth and Play references.</span>
-            <a class="pill" href="./">Open home page</a>
-          </div>
-          <div class="cta-card">
-            <strong>Privacy policy</strong>
-            <span>Explains Google sign-in, Classroom, optional Gmail sync, local storage, exports, and user controls.</span>
-            <a class="pill" href="./privacy/">Open privacy policy</a>
-          </div>
-          <div class="cta-card">
-            <strong>Terms of service</strong>
-            <span>Sets out beta use expectations, acceptable use, disclaimers, and contact terms.</span>
-            <a class="pill" href="./terms/">Open terms</a>
-          </div>
-          <div class="cta-card">
-            <strong>Android testing</strong>
-            <span>Closed testing track for current Android builds while broader rollout is being prepared.</span>
-            <a class="pill" href="https://play.google.com/apps/testing/com.rochiee.classsync">Join testing</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="panel full">
-        <span class="label">Availability</span>
-        <h2>Android-first release, cross-platform roadmap later.</h2>
+    <section class="section" aria-labelledby="unique-heading">
+      <div class="section-heading">
+        <span class="section-label">Why ClassSync is unique</span>
+        <h2 id="unique-heading">Built like an academic operating layer, not just another task list.</h2>
         <p>
-          ClassSync is currently published as an Android application. The current public pages exist to support app distribution, tester onboarding, Play compliance, and Google OAuth verification. Cross-platform expansion may come later, but the current product and testing flow are Android-only.
+          Most education apps stop at one narrow workflow. ClassSync is different because it treats academic updates as a continuous flow: Classroom sync feeds local event intelligence, optional Gmail catches academic reminders, and the result lands across tasks, planners, widgets, study lanes, and exam surfaces without forcing the student to jump between disconnected tools.
         </p>
+      </div>
+
+      <div class="unique-grid">
+        <article class="grid-card">
+          <strong>Local-first by default</strong>
+          <p>Academic state is kept on-device so the app can work like a personal workspace instead of a backend-heavy dashboard.</p>
+        </article>
+        <article class="grid-card">
+          <strong>Classroom plus planner fusion</strong>
+          <p>It does not just display Classroom data. It converts academic activity into planning views, task queues, reminders, and widget-ready summaries.</p>
+        </article>
+        <article class="grid-card">
+          <strong>Optional Gmail reminder discovery</strong>
+          <p>Gmail is treated as an optional academic signal layer for reminder capture rather than the center of the product.</p>
+        </article>
+        <article class="grid-card">
+          <strong>Student workflow design</strong>
+          <p>Home, tasks, planner, study planner, and exam mode are shaped around how students actually pace coursework through a semester.</p>
+        </article>
+        <article class="grid-card">
+          <strong>Widget-aware system</strong>
+          <p>The app surface extends beyond the app itself with a home screen widget that reflects the current academic pressure and focus state.</p>
+        </article>
+        <article class="grid-card">
+          <strong>Hybrid intelligence</strong>
+          <p>Rules and on-device classification work together so trusted academic patterns stay stable while messier updates still become usable signals.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="carousel-heading">
+      <div class="section-heading">
+        <span class="section-label">Product walkthrough</span>
+        <h2 id="carousel-heading">A branded screen carousel that explains what each ClassSync surface does.</h2>
+        <p>
+          These Google Play assets walk through the major product surfaces: the live home dashboard, progress monitoring, task queue, range planner, priority lanes, and home screen widget.
+        </p>
+      </div>
+
+      <article class="carousel-card">
+        <div class="carousel-stage">
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <img id="carousel-image" src="./screenshots/01_home_dashboard.png" alt="ClassSync home dashboard screenshot">
+            </div>
+          </div>
+
+          <div class="slide-copy">
+            <span class="slide-index" id="carousel-index">Screen 1 of 6</span>
+            <h3 class="slide-title" id="carousel-title">Home dashboard</h3>
+            <p class="slide-description" id="carousel-description">
+              The home surface gives the student a high-level academic readout with synced coursework signals, activity pressure, operations shortcuts, and the first layer of daily decision-making.
+            </p>
+            <ul class="slide-bullets" id="carousel-bullets">
+              <li>Unified academic status snapshot</li>
+              <li>Recent sync visibility and operations shortcuts</li>
+              <li>Fast launch point into planner and activity log</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="carousel-controls">
+          <div class="carousel-buttons">
+            <button class="carousel-button" type="button" id="carousel-prev">Previous</button>
+            <button class="carousel-button" type="button" id="carousel-next">Next</button>
+          </div>
+          <div class="carousel-dots" id="carousel-dots" aria-label="Carousel slide controls"></div>
+        </div>
       </article>
     </section>
 
-    <section class="note" aria-label="Beta note">
-      <div class="note-badge">i</div>
-      <p>
-        This site supports the currently distributed Android build of ClassSync. If a Google review form asks for separate links, use this home page for the application home page, <a href="./privacy/">the privacy page</a> for the privacy policy, and <a href="./terms/">the terms page</a> for terms of service.
-      </p>
+    <section class="section" aria-labelledby="diagram-heading">
+      <div class="section-heading">
+        <span class="section-label">System blueprint</span>
+        <h2 id="diagram-heading">Mermaid diagrams that show what the app is doing and what it is not doing.</h2>
+        <p>
+          The flows below are adapted from the product documentation so reviewers, testers, and users can understand the operating model clearly.
+        </p>
+      </div>
+
+      <div class="diagram-grid">
+        <article class="diagram-card">
+          <strong>How ClassSync turns academic inputs into usable student surfaces</strong>
+          <p>Classroom and optional Gmail feed the local event engine, which then powers tasks, planners, widgets, and reminders.</p>
+          <div class="diagram-shell">
+            <div class="mermaid">
+flowchart TD
+    A["Onboarding"] --> B["Google Sign-In"]
+    B --> C["Google Classroom Sync"]
+    B --> D["Optional Gmail Reminder Sync"]
+    C --> E["Hybrid Event Intelligence"]
+    D --> E
+    E --> F["Local Events and Tasks"]
+    F --> G["Home Dashboard"]
+    F --> H["Tasks Queue"]
+    F --> I["Planner Views"]
+    F --> J["Study Planner"]
+    F --> K["Exam Mode"]
+    F --> L["Widget and Reminders"]
+            </div>
+          </div>
+        </article>
+
+        <article class="diagram-card">
+          <strong>What the app handles locally versus what it does not do</strong>
+          <p>This clarifies the trust boundary: ClassSync reads academic inputs, organizes them locally, and does not present itself as a custom cloud backend.</p>
+          <div class="diagram-shell">
+            <div class="mermaid">
+flowchart LR
+    A["Google account sign-in"] --> B["Read-only Google APIs"]
+    B --> C["ClassSync local parser and classifier"]
+    C --> D["On-device Room and DataStore state"]
+    D --> E["Tasks, planner, widget, reminders"]
+    X["No custom academic backend"] -.-> D
+    Y["No email sending or mailbox edits"] -.-> B
+    Z["No server-side reselling of academic data"] -.-> D
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="links-heading">
+      <div class="section-heading">
+        <span class="section-label">Connected public pages</span>
+        <h2 id="links-heading">Home, privacy, and terms are now part of one linked public site.</h2>
+        <p>
+          Use these three links for Google OAuth verification, Play listing references, and public-facing compliance pages.
+        </p>
+      </div>
+
+      <div class="link-grid">
+        <article class="link-card">
+          <strong>Home page</strong>
+          <p>The public front door for ClassSync, with brand context, screenshots, and product flow explanation.</p>
+          <a class="pill" href="./">Open home page</a>
+        </article>
+        <article class="link-card">
+          <strong>Privacy policy</strong>
+          <p>Explains Google sign-in, Classroom access, optional Gmail reminder discovery, local storage, exports, and user controls.</p>
+          <a class="pill" href="./privacy/">Open privacy policy</a>
+        </article>
+        <article class="link-card">
+          <strong>Terms of service</strong>
+          <p>Sets out platform scope, beta expectations, acceptable use, reliability limits, and contact information.</p>
+          <a class="pill" href="./terms/">Open terms of service</a>
+        </article>
+      </div>
     </section>
 
     <footer class="footer">
-      <span>ClassSync by Donum • Privacy support: <a href="mailto:tech@donum.in">tech@donum.in</a></span>
+      <div class="footer-copy">
+        ClassSync is currently an Android-only application. Cross-platform support may come later. Support and privacy contact: <a href="mailto:tech@donum.in">tech@donum.in</a>
+      </div>
       <div class="footer-links">
-        <a href="./privacy/">Privacy</a>
-        <a href="./terms/">Terms</a>
-        <a href="https://github.com/InsaneCoder789/ClassSync">GitHub</a>
+        <a class="pill" href="./">Home</a>
+        <a class="pill" href="./privacy/">Privacy</a>
+        <a class="pill" href="./terms/">Terms</a>
       </div>
     </footer>
   </main>
+
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: "dark",
+      securityLevel: "loose",
+      flowchart: {
+        curve: "basis",
+        padding: 18
+      }
+    });
+
+    const slides = [
+      {
+        image: "./screenshots/01_home_dashboard.png",
+        alt: "ClassSync home dashboard screenshot",
+        title: "Home dashboard",
+        description: "The home surface gives the student a high-level academic readout with synced coursework signals, activity pressure, operations shortcuts, and the first layer of daily decision-making.",
+        bullets: [
+          "Unified academic status snapshot",
+          "Recent sync visibility and operations shortcuts",
+          "Fast launch point into planner and activity log"
+        ]
+      },
+      {
+        image: "./screenshots/02_progress_pulse.png",
+        alt: "ClassSync progress pulse screenshot",
+        title: "Progress pulse",
+        description: "Progress Pulse visualizes completion rhythm, active work, and total workload so the student can understand momentum without digging through multiple lists.",
+        bullets: [
+          "Completion percentage and live counters",
+          "Focus on active versus completed work",
+          "Status feedback designed for quick daily review"
+        ]
+      },
+      {
+        image: "./screenshots/03_tasks_queue.png",
+        alt: "ClassSync tasks queue screenshot",
+        title: "Tasks queue",
+        description: "The task surface is where synced academic items and self-created tasks live together, making coursework and manual planning part of the same queue.",
+        bullets: [
+          "Open and completed task separation",
+          "Manual task entry inside the same workspace",
+          "Single operational lane for academic action items"
+        ]
+      },
+      {
+        image: "./screenshots/04_planner_ranges.png",
+        alt: "ClassSync planner range screenshot",
+        title: "Planner range views",
+        description: "Planner mode lets the user switch between today, week, month, and custom range views to control short-term and medium-term academic load.",
+        bullets: [
+          "Time-range based planning",
+          "Deadline grouping for different horizons",
+          "Cleaner pacing for weekly and monthly study pressure"
+        ]
+      },
+      {
+        image: "./screenshots/05_priority_lanes.png",
+        alt: "ClassSync priority lanes screenshot",
+        title: "Priority lanes",
+        description: "Priority lanes break work into urgency bands so students can identify what needs immediate attention, what is high pressure, and what can be scheduled later.",
+        bullets: [
+          "Today, urgent, high-pressure, and priority buckets",
+          "Clearer triage during busy academic windows",
+          "Designed for semester pressure, not generic to-dos"
+        ]
+      },
+      {
+        image: "./screenshots/06_home_widget.png",
+        alt: "ClassSync home widget screenshot",
+        title: "Home screen widget",
+        description: "The widget extends ClassSync beyond the app by placing current academic focus, overdue counts, and a primary task snapshot directly on the home screen.",
+        bullets: [
+          "At-a-glance academic status outside the app",
+          "Current focus card with due context",
+          "Quick visibility without opening the full interface"
+        ]
+      }
+    ];
+
+    const image = document.getElementById("carousel-image");
+    const indexLabel = document.getElementById("carousel-index");
+    const title = document.getElementById("carousel-title");
+    const description = document.getElementById("carousel-description");
+    const bullets = document.getElementById("carousel-bullets");
+    const dots = document.getElementById("carousel-dots");
+    const prev = document.getElementById("carousel-prev");
+    const next = document.getElementById("carousel-next");
+
+    let currentSlide = 0;
+
+    function renderDots() {
+      dots.innerHTML = "";
+      slides.forEach((slide, idx) => {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = `dot${idx === currentSlide ? " is-active" : ""}`;
+        dot.setAttribute("aria-label", `Go to slide ${idx + 1}`);
+        dot.addEventListener("click", () => {
+          currentSlide = idx;
+          renderSlide();
+        });
+        dots.appendChild(dot);
+      });
+    }
+
+    function renderSlide() {
+      const slide = slides[currentSlide];
+      image.src = slide.image;
+      image.alt = slide.alt;
+      indexLabel.textContent = `Screen ${currentSlide + 1} of ${slides.length}`;
+      title.textContent = slide.title;
+      description.textContent = slide.description;
+      bullets.innerHTML = "";
+      slide.bullets.forEach((point) => {
+        const item = document.createElement("li");
+        item.textContent = point;
+        bullets.appendChild(item);
+      });
+      renderDots();
+    }
+
+    prev.addEventListener("click", () => {
+      currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+      renderSlide();
+    });
+
+    next.addEventListener("click", () => {
+      currentSlide = (currentSlide + 1) % slides.length;
+      renderSlide();
+    });
+
+    renderSlide();
+  </script>
 </body>
 </html>

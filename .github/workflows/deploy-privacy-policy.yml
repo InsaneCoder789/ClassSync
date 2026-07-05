@@ -40,10 +40,13 @@ jobs:
           cp site/terms.html public/terms/index.html
           mkdir -p public/privacy/assets
           mkdir -p public/assets
+          mkdir -p public/screenshots
           cp app/src/main/res/drawable-nodpi/classsync_logo_generated.png public/privacy/assets/classsync-logo-generated.png
           cp app/src/main/res/drawable-nodpi/classsync_logo_generated.png public/assets/classsync-logo-generated.png
           cp design/opening/classsync-opening-dark-concept.png public/privacy/assets/classsync-opening-dark-concept.png
           cp design/opening/classsync-opening-dark-concept.png public/assets/classsync-opening-dark-concept.png
+          cp docs/assets/classsync-banner.png public/assets/classsync-banner.png
+          cp playstore_assets/screenshots/*.png public/screenshots/
           build_sha="${GITHUB_SHA}"
           perl -0pi -e "s#</body>#  <!-- build-sha: ${build_sha} -->\n</body>#i" public/privacy/index.html
           cp site/index.html public/index.html

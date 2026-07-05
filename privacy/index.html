@@ -31,7 +31,7 @@
       --shadow: rgba(4, 8, 16, 0.42);
       --sans: "Outfit", "Segoe UI", sans-serif;
       --mono: "JetBrains Mono", "SFMono-Regular", monospace;
-      --shell-width: min(1380px, calc(100% - 2rem));
+      --shell-width: calc(100% - 2rem);
       --radius-shell: 2rem;
       --radius-panel: 1.5rem;
       --radius-pill: 999px;
@@ -115,7 +115,7 @@
 
     .page-shell {
       width: var(--shell-width);
-      margin: 1rem auto;
+      margin: 1rem;
       padding: 1rem;
       border-radius: var(--radius-shell);
       border: 1px solid var(--line);
@@ -812,9 +812,10 @@
       </div>
 
       <nav class="top-actions" aria-label="Privacy page actions">
+        <a class="ghost-link" href="../">Home</a>
+        <a class="ghost-link" href="../terms/">Terms</a>
         <a class="ghost-link" href="#policy-content">Policy sections</a>
         <a class="ghost-link" href="mailto:tech@donum.in">Contact privacy support</a>
-        <a class="ghost-link" href="https://github.com/InsaneCoder789/ClassSync">Source repository</a>
       </nav>
     </header>
 
@@ -877,7 +878,7 @@
         <article class="summary-card">
           <span class="summary-label">Privacy contact</span>
           <h2>tech@donum.in</h2>
-          <p class="summary-copy">Privacy questions, deletion guidance, and support requests route through a monitored mailbox.</p>
+          <p class="summary-copy">Privacy questions, deletion guidance, grievance handling, and support requests route through a monitored mailbox.</p>
         </article>
         <article class="summary-card">
           <span class="summary-label">Last updated</span>
@@ -969,6 +970,7 @@
             <li>Google Classroom API is used for read-only academic sync</li>
             <li>Gmail API is used for optional read-only academic reminder discovery</li>
             <li>Task exports are written to the user's device only when the user explicitly triggers them</li>
+            <li>Exported files may remain on the device until the user deletes them</li>
           </ul>
         </article>
 
@@ -1024,7 +1026,10 @@
 
         <article class="policy-card span-6" id="section-10">
           <span class="section-index">10</span>
-          <h2>Children and policy updates</h2>
+          <h2>Privacy requests, children, and updates</h2>
+          <p>
+            For privacy questions, deletion guidance, or to raise a privacy grievance related to the published app, contact <a href="mailto:tech@donum.in">tech@donum.in</a>.
+          </p>
           <p>
             ClassSync is intended as a general student productivity app and is not designed as a child-directed service under Google Play Families policies unless explicitly declared otherwise in the Play Console.
           </p>
@@ -1041,6 +1046,8 @@
           <p>For privacy questions, deletion guidance, or support, contact <a href="mailto:tech@donum.in">tech@donum.in</a>.</p>
         </div>
         <div class="footer-actions">
+          <a class="pill-link" href="../">Home</a>
+          <a class="pill-link" href="../terms/">Terms</a>
           <a class="pill-link" href="#privacy-title">Back to top</a>
           <a class="ghost-link" href="https://github.com/InsaneCoder789/ClassSync">Project source</a>
         </div>
