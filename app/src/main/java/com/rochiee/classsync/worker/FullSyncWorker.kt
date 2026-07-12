@@ -21,12 +21,13 @@ class FullSyncWorker(
         val syncGmailTasksUseCase = app.container.syncGmailTasksUseCase
         val syncClassroomCourseworkUseCase = app.container.syncClassroomCourseworkUseCase
 
+        googleAuthManager.checkAuthState()
         if (!googleAuthManager.isSignedIn()) {
             syncLogRepository.addLog(
                 SyncLog(
                     source = "FULL_SYNC_WORKER",
                     status = "SKIPPED",
-                    message = "Skipped full sync because the user is not signed in.",
+                    message = "Skipped full sync because no Google account is remembered in ClassSync.",
                     timestamp = System.currentTimeMillis()
                 )
             )

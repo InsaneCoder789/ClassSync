@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition {
-            settingsViewModel.state.value.isLoading
+            settingsViewModel.state.value.isLoading || authViewModel.state.value.isLoading
         }
         enableEdgeToEdge()
         authViewModel.onEvent(AuthEvent.CheckAuthState)

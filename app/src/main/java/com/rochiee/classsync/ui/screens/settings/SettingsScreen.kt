@@ -182,6 +182,13 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                authState.accessWarning?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
                 syncState.errorMessage?.let {
                     Text(
                         text = it,
@@ -214,6 +221,13 @@ fun SettingsScreen(
                     if (!authState.isSignedIn) {
                         LiquidGlassTextButton(
                             text = "Connect Google",
+                            onClick = onNavigateToAuth,
+                            modifier = Modifier.widthIn(min = 148.dp),
+                            showArrow = true
+                        )
+                    } else if (!authState.isGoogleAccessHealthy) {
+                        LiquidGlassTextButton(
+                            text = "Refresh Google connection",
                             onClick = onNavigateToAuth,
                             modifier = Modifier.widthIn(min = 148.dp),
                             showArrow = true

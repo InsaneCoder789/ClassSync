@@ -30,7 +30,7 @@ class GoogleAuthManager(private val context: Context) {
 
     fun beginSignInIntent(activityContext: Context): Intent? {
         if (!isOAuthConfigured()) {
-            _authState.value = AuthState.Error(
+            publishSignInFailure(
                 "Google OAuth is not configured yet. Complete the Google setup guide for this build before signing in."
             )
             return null
@@ -46,7 +46,7 @@ class GoogleAuthManager(private val context: Context) {
                 .getResult(ApiException::class.java)
             persistAccount(account)
         } catch (error: ApiException) {
-            _authState.value = when (error.statusCode) {
+            publishSignInFailure((when (error.statusCode) {
                 CommonStatusCodes.CANCELED -> AuthState.Error(
                     "Google sign-in was canceled before an account was selected."
                 )
@@ -76,9 +76,9 @@ class GoogleAuthManager(private val context: Context) {
                         }
                     }
                 )
-            }
+            }).message)
         } catch (error: Exception) {
-            _authState.value = AuthState.Error(error.message ?: "Google sign-in failed.")
+            publishSignInFailure(error.message ?: "Google sign-in failed.")
         }
     }
 
@@ -99,32 +99,30 @@ class GoogleAuthManager(private val context: Context) {
 
     suspend fun checkAuthState() {
         if (_authState.value != AuthState.Idle) return
+        val session = secureAuthStore.restoreSession()
         if (!isOAuthConfigured()) {
-            _authState.value = AuthState.Unauthenticated
+            _authState.value = session?.asReconnectRequired(
+                "Google sync needs OAuth configuration before access can be refreshed for this account."
+            ) ?: AuthState.Unauthenticated
             return
         }
 
         val account = GoogleSignIn.getLastSignedInAccount(context)
-        val session = secureAuthStore.restoreSession()
-        _authState.value = when {
+        when {
             account?.email?.isNotBlank() == true && hasRequiredPermissions(account) -> {
                 persistAccount(account)
-                _authState.value
-            }
-            account?.email?.isNotBlank() == true -> {
-                secureAuthStore.clearSession()
-                AuthState.Error(
-                    "Google sign-in is missing the Gmail or Classroom permissions ClassSync needs. Sign out, sign in again, and accept every requested Google permission."
-                )
             }
             session != null -> {
                 recoverPersistedSession(session)
-                AuthState.Authenticated(
-                    email = session.email,
-                    displayName = session.displayName
+            }
+            account?.email?.isNotBlank() == true -> {
+                _authState.value = AuthState.Error(
+                    "Google sign-in is missing the Gmail or Classroom permissions ClassSync needs. Sign in again and accept every requested Google permission."
                 )
             }
-            else -> AuthState.Unauthenticated
+            else -> {
+                _authState.value = AuthState.Unauthenticated
+            }
         }
     }
 
@@ -135,6 +133,9 @@ class GoogleAuthManager(private val context: Context) {
     }
 
     fun isSignedIn(): Boolean = authState.value is AuthState.Authenticated
+
+    fun isGoogleAccessHealthy(): Boolean =
+        (authState.value as? AuthState.Authenticated)?.accessStatus == GoogleAccessStatus.Healthy
 
     fun selectedAccountEmail(): String? {
         return (authState.value as? AuthState.Authenticated)?.email
@@ -153,16 +154,13 @@ class GoogleAuthManager(private val context: Context) {
             if (account.email?.isNotBlank() == true && hasRequiredPermissions(account)) {
                 persistAccount(account)
             } else {
-                // Keep the remembered identity until the user explicitly signs out.
-                _authState.value = AuthState.Authenticated(
-                    email = session.email,
-                    displayName = session.displayName
+                _authState.value = session.asReconnectRequired(
+                    "Your saved Google account is still connected, but Google permissions need refreshing before sync can continue."
                 )
             }
         }.onFailure {
-            _authState.value = AuthState.Authenticated(
-                email = session.email,
-                displayName = session.displayName
+            _authState.value = session.asReconnectRequired(
+                "Your saved Google account is still connected, but Google sign-in needs refreshing before sync can continue."
             )
         }
     }
@@ -182,7 +180,7 @@ class GoogleAuthManager(private val context: Context) {
     private fun persistAccount(account: GoogleSignInAccount) {
         val email = account.email?.trim().orEmpty()
         if (email.isBlank()) {
-            _authState.value = AuthState.Error("Google sign-in succeeded but no account email was returned.")
+            publishSignInFailure("Google sign-in succeeded but no account email was returned.")
             return
         }
 
@@ -196,4 +194,17 @@ class GoogleAuthManager(private val context: Context) {
             idToken = account.idToken
         )
     }
+
+    private fun publishSignInFailure(message: String) {
+        val session = secureAuthStore.restoreSession()
+        _authState.value = session?.asReconnectRequired(message) ?: AuthState.Error(message)
+    }
+
+    private fun SecureAuthStore.PersistedAuthSession.asReconnectRequired(message: String) =
+        AuthState.Authenticated(
+            email = email,
+            displayName = displayName,
+            accessStatus = GoogleAccessStatus.NeedsReauth,
+            accessMessage = message
+        )
 }

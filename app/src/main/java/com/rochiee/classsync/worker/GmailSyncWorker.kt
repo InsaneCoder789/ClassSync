@@ -18,12 +18,13 @@ class GmailSyncWorker(
         val syncLogRepository = app.container.syncLogRepository
         val syncGmailTasksUseCase = app.container.syncGmailTasksUseCase
 
+        googleAuthManager.checkAuthState()
         if (!googleAuthManager.isSignedIn()) {
             syncLogRepository.addLog(
                 SyncLog(
                     source = "GMAIL_WORKER",
                     status = "SKIPPED",
-                    message = "Skipped Gmail sync because the user is not signed in.",
+                    message = "Skipped Gmail sync because no Google account is remembered in ClassSync.",
                     timestamp = System.currentTimeMillis()
                 )
             )

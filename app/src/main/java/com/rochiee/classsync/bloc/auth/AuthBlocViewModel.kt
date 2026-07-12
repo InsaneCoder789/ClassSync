@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rochiee.classsync.auth.AuthState
 import com.rochiee.classsync.auth.GoogleAuthManager
+import com.rochiee.classsync.auth.GoogleAccessStatus
 import com.rochiee.classsync.domain.usecase.auth.ClearLocalAcademicDataUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,29 +33,40 @@ class AuthBlocViewModel(
                         is AuthState.Authenticated -> it.copy(
                             isOAuthConfigured = googleAuthManager.isOAuthConfigured(),
                             isSignedIn = true,
+                            isGoogleAccessHealthy = authState.accessStatus == GoogleAccessStatus.Healthy,
                             isLoading = false,
                             userEmail = authState.email,
                             displayName = authState.displayName,
-                            errorMessage = null
+                            errorMessage = null,
+                            accessWarning = authState.accessMessage
                         )
                         is AuthState.Error -> it.copy(
                             isOAuthConfigured = googleAuthManager.isOAuthConfigured(),
                             isSignedIn = false,
+                            isGoogleAccessHealthy = false,
                             isLoading = false,
                             errorMessage = authState.message
                         )
                         AuthState.Loading -> it.copy(
                             isOAuthConfigured = googleAuthManager.isOAuthConfigured(),
                             isLoading = true,
+                            errorMessage = null,
+                            accessWarning = null
+                        )
+                        AuthState.Idle -> it.copy(
+                            isOAuthConfigured = googleAuthManager.isOAuthConfigured(),
+                            isLoading = true,
                             errorMessage = null
                         )
-                        AuthState.Unauthenticated, AuthState.Idle -> it.copy(
+                        AuthState.Unauthenticated -> it.copy(
                             isOAuthConfigured = googleAuthManager.isOAuthConfigured(),
                             isSignedIn = false,
+                            isGoogleAccessHealthy = false,
                             isLoading = false,
                             userEmail = null,
                             displayName = null,
-                            errorMessage = null
+                            errorMessage = null,
+                            accessWarning = null
                         )
                     }
                 }
@@ -82,7 +94,7 @@ class AuthBlocViewModel(
                 }
             }
             AuthEvent.ClearAuthError -> {
-                _state.update { it.copy(errorMessage = null) }
+                _state.update { it.copy(errorMessage = null, accessWarning = null) }
             }
         }
     }

@@ -74,8 +74,24 @@ fun AuthScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "Your Google account is connected. Classroom sync is ready, and Gmail sync stays opt-in through settings.",
+                        text = if (authState.isGoogleAccessHealthy) {
+                            "Your Google account is connected. Classroom sync is ready, and Gmail sync stays opt-in through settings."
+                        } else {
+                            "Your account is still remembered on this device. ClassSync will keep trying sync with this account, and you can refresh Google sign-in if Google asks for it."
+                        },
                         style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                if (!authState.isGoogleAccessHealthy) {
+                    LiquidGlassTextButton(
+                        text = "Refresh Google connection",
+                        onClick = {
+                            onAuthEvent(AuthEvent.ClearAuthError)
+                            onBeginGoogleSignIn(context)?.let(signInLauncher::launch)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = authState.isOAuthConfigured,
+                        showArrow = true
                     )
                 }
                 LiquidGlassTextButton(
@@ -110,6 +126,9 @@ fun AuthScreen(
                 )
             }
             authState.errorMessage?.let {
+                Text(text = it, color = MaterialTheme.colorScheme.error)
+            }
+            authState.accessWarning?.let {
                 Text(text = it, color = MaterialTheme.colorScheme.error)
             }
             syncState.errorMessage?.let {

@@ -18,12 +18,13 @@ class ClassroomSyncWorker(
         val syncLogRepository = app.container.syncLogRepository
         val syncClassroomCourseworkUseCase = app.container.syncClassroomCourseworkUseCase
 
+        googleAuthManager.checkAuthState()
         if (!googleAuthManager.isSignedIn()) {
             syncLogRepository.addLog(
                 SyncLog(
                     source = "CLASSROOM_WORKER",
                     status = "SKIPPED",
-                    message = "Skipped Classroom sync because the user is not signed in.",
+                    message = "Skipped Classroom sync because no Google account is remembered in ClassSync.",
                     timestamp = System.currentTimeMillis()
                 )
             )
