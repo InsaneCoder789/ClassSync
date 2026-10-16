@@ -234,8 +234,34 @@ Detailed setup guide:
 
 ## Build And Verify
 
+The [Android Application workflow](.github/workflows/android.yml) builds the debug
+app, executes JVM tests, runs Android lint and compiles instrumentation APKs on
+push/pull request. It publishes reports even after a failure. The existing website
+workflow is separate and does not verify the Android app.
+
+To actually run device tests, dispatch Android Application with `run_device_tests`
+enabled. Its separate emulator job executes `connectedDebugAndroidTest`; a skipped
+device job or compiled test APK is **not** evidence that instrumentation passed.
+This newly added workflow needs its first published run before remote acceptance
+can be claimed. Google OAuth and real Classroom/Gmail account flows are separate
+manual/device gates, not established by a synthetic fixture.
+
+Local check on 16 October 2026 passed debug APK assembly, Android lint, all 20 JVM
+tests (zero failures/skips) and instrumentation APK compilation. The check used
+the local Android SDK and JDK 22 after resolving host SDK/JDK configuration;
+the workflow intentionally uses JDK 17. No connected-device test was executed,
+and no remote GitHub Actions pass is claimed before publication.
+
+The existing [Gmail/Classroom synchronization fixtures](app/src/test/java/com/rochiee/classsync/domain/usecase/gmail/GmailClassroomSyncFixtureTest.kt)
+exercise deduplication/synchronization scenarios. Other JVM tests cover classification,
+link safety, CSV export and UI-state serialization; inspect the actual test reports
+instead of treating a website deployment as application validation.
+
 ```bash
 ./gradlew assembleDebug
 ./gradlew :app:compileDebugKotlin
 ./gradlew :app:testDebugUnitTest
+./gradlew :app:lintDebug :app:assembleDebugAndroidTest
+# Only with a configured, running device/emulator:
+./gradlew :app:connectedDebugAndroidTest
 ```
