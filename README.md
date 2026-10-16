@@ -242,8 +242,9 @@ workflow is separate and does not verify the Android app.
 To actually run device tests, dispatch Android Application with `run_device_tests`
 enabled. Its separate emulator job executes `connectedDebugAndroidTest`; a skipped
 device job or compiled test APK is **not** evidence that instrumentation passed.
-This newly added workflow needs its first published run before remote acceptance
-can be claimed. Google OAuth and real Classroom/Gmail account flows are separate
+The first published run exposed a retired SDK `tools` package in the setup action's
+defaults. Both jobs now request `platform-tools` explicitly; a successful rerun is
+still required before remote acceptance is claimed. Google OAuth and real Classroom/Gmail account flows are separate
 manual/device gates, not established by a synthetic fixture.
 
 Local check on 16 October 2026 passed debug APK assembly, Android lint, all 20 JVM
